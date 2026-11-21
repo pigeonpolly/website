@@ -43,6 +43,12 @@
 .tdm-reset{border:1px solid rgba(246,236,217,.4);border-radius:999px;padding:9px 18px;background:none;color:#f6ecd9;font:400 12px/1.2 Karla,sans-serif;cursor:pointer}
 .tdm-reset:hover{background:rgba(246,236,217,.12)}
 .tdm-reset:disabled{opacity:.55;cursor:default}
+/* скачать карту / поделиться: тихая строка под кнопками, видна только когда карта уже выпала */
+.tdm-share{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+.tdm-share[hidden],.tdm-share-b[hidden]{display:none}
+.tdm-dl,.tdm-share-b{border:1px solid rgba(246,236,217,.28);border-radius:999px;padding:8px 14px;background:none;color:#cdc3df;font:400 12px/1.2 Karla,sans-serif;cursor:pointer}
+.tdm-dl:hover,.tdm-share-b:hover{background:rgba(246,236,217,.1);color:#f6ecd9}
+.tdm-dl:disabled,.tdm-share-b:disabled{opacity:.5;cursor:default}
 @media (max-width:1199px){
   .td-b{width:58px;height:64px}
   .td-st{width:30px;height:51px}

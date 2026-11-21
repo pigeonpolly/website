@@ -20,6 +20,10 @@
     poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
     err: ['Something went wrong, try again', 'Не получилось, попробуй ещё раз', 'Neizdevās, mēģini vēlreiz'],
     hole: ['Polly says', 'Полли говорит', 'Pollijs saka'],
+    save: ['Download the card', 'Скачать карту', 'Lejupielādēt karti'],
+    share: ['Share', 'Поделиться', 'Dalīties'],
+    invite: ['Draw your card', 'Вытяни свою карту', 'Izvelc savu karti'],
+    failPic: ['Could not make the picture — try again', 'Не получилось собрать картинку — попробуй ещё раз', 'Neizdevās izveidot attēlu — mēģini vēlreiz'],
     aria: ['Bird tarot — one card an hour', 'Птичье таро — карта раз в час', 'Putnu tarots — viena karte stundā'],
     close: ['Close', 'Закрыть', 'Aizvērt']
   };
@@ -50,8 +54,9 @@
   deck.hidden = false;
   btn.setAttribute('aria-label', t('aria'));
 
-  let modal = null, holeShown = false, timer = 0, tick = 0;
+  let modal = null, holeShown = false, timer = 0, tick = 0, busy = false;
   const q = s => modal.querySelector(s);
+  const canSystemShare = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   function sync() {
     const ready = leftMs() <= 0;
@@ -78,11 +83,18 @@
       '<div class="tdm-card"><div class="tdm-back"></div><div class="tdm-face"><img alt=""></div></div>' +
       '<p class="tdm-t"></p><p class="tdm-s"></p>' +
       '<div class="tdm-btns"><button type="button" class="tdm-go"></button><button type="button" class="tdm-reset" hidden></button></div>' +
+      '<div class="tdm-share" hidden><button type="button" class="tdm-dl"></button><button type="button" class="tdm-share-b" hidden></button></div>' +
       '</div>';
     document.body.appendChild(modal);
     modal.addEventListener('click', e => { if (e.target.closest('[data-td-close]')) close(); });
     q('.tdm-go').addEventListener('click', poke);
     q('.tdm-reset').addEventListener('click', resetLimit);
+    q('.tdm-dl').textContent = '⬇ ' + t('save');
+    const sb = q('.tdm-share-b');
+    sb.textContent = '📤 ' + t('share');
+    sb.hidden = !canSystemShare();
+    q('.tdm-dl').addEventListener('click', downloadCard);
+    sb.addEventListener('click', shareCard);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) close(); });
   }
 
@@ -98,6 +110,7 @@
       q('.tdm-t').textContent = t('hole');
       q('.tdm-s').textContent = txt('next', minutes(left));
       res.hidden = false; res.textContent = resetLabel();
+      syncShare();
       return;
     }
     holeShown = false;
@@ -122,6 +135,7 @@
       q('.tdm-s').textContent = txt('next', minutes(left));
       res.hidden = false; res.textContent = resetLabel();
     }
+    syncShare();
   }
 
   function open() {
@@ -166,6 +180,7 @@
     q('.tdm-s').textContent = txt('next', minutes(leftMs()));
     q('.tdm-reset').hidden = false;
     q('.tdm-reset').textContent = resetLabel();
+    syncShare();
     schedule();
   }
 
@@ -191,6 +206,7 @@
     q('.tdm-s').textContent = txt('next', minutes(leftMs()));
     q('.tdm-reset').hidden = false;
     q('.tdm-reset').textContent = resetLabel();
+    syncShare();
   }
 
   // сброс лимита за пуговки: платит сервер (POST /api/tarot/reset), сразу открываем новую карту
@@ -215,6 +231,97 @@
     } catch (e) { q('.tdm-s').textContent = t('err'); }
     b.disabled = false;
     if (!ok) b.textContent = resetLabel();
+  }
+
+  // ---------- поделиться выпавшей картой: скачать картинку 1080×1920 (карта 5× + адрес сайта) ----------
+  const rnd = i => { const x = Math.sin(i * 127.1) * 43758.5453; return x - Math.floor(x); };
+  function faceSrc() { const img = q('.tdm-face img'); return (img && img.getAttribute('src')) || ''; }
+  function syncShare() { const row = q('.tdm-share'); if (row) row.hidden = !faceSrc(); }
+  function shareName() {
+    const key = faceSrc().indexOf('/hole-') >= 0 ? 'hole' : (KEYS[st.i] || 'card');
+    return 'pigeonpolly-tarot-' + key + '-' + LANGS[L] + '.png';
+  }
+  const loadImg = src => new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im); im.onerror = rej; im.src = src;
+    if (im.decode) im.decode().then(() => res(im)).catch(() => {});
+  });
+  async function cardBlob() {
+    const src = faceSrc();
+    if (!src) return null;
+    const im = await loadImg(src);
+    try { await Promise.race([document.fonts && document.fonts.ready, new Promise(r => setTimeout(r, 1200))]); } catch (e) {}
+    const W = 1080, H = 1920, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    if (!g) return null;
+    g.imageSmoothingEnabled = false;
+    const bg = g.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#120A2A'); bg.addColorStop(.55, '#2B1A51'); bg.addColorStop(1, '#45287A');
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 220; i++) { // звёзды — как на карточке птички
+      const s = rnd(i + 7) < .85 ? 4 : 8, x = Math.round(rnd(i) * W / 4) * 4, y = Math.round(rnd(i + 99) * H / 4) * 4;
+      g.fillStyle = rnd(i + 3) < .25 ? '#F5D547' : rnd(i + 5) < .5 ? '#F3EFFA' : '#B9A8E8';
+      g.globalAlpha = .35 + rnd(i + 11) * .65; g.fillRect(x, y, s, s);
+    }
+    g.globalAlpha = 1;
+    const cx = W / 2, cy = 845;
+    const glow = g.createRadialGradient(cx, cy, 150, cx, cy, 700);
+    glow.addColorStop(0, 'rgba(155,93,229,.4)'); glow.addColorStop(1, 'rgba(155,93,229,0)');
+    g.fillStyle = glow; g.beginPath(); g.arc(cx, cy, 700, 0, 7); g.fill();
+    const cw = 800, ch = 1350, x0 = (W - cw) / 2, y0 = 170; // 160×270 → 800×1350, ровно 5×
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 48; g.shadowOffsetY = 26;
+    g.drawImage(im, x0, y0, cw, ch);
+    g.restore();
+    g.strokeStyle = 'rgba(246,236,217,.22)'; g.lineWidth = 2; g.strokeRect(x0 - 1, y0 - 1, cw + 2, ch + 2);
+    g.textAlign = 'center';
+    g.fillStyle = '#E9C14A'; g.font = '700 30px Karla, Arial, sans-serif';
+    if (g.letterSpacing !== undefined) g.letterSpacing = '9px';
+    g.fillText('PIGEON POLLY', cx, 116);
+    if (g.letterSpacing !== undefined) g.letterSpacing = '0px';
+    g.fillStyle = '#E9C14A'; g.fillRect(cx - 70, 1588, 140, 3);
+    g.fillStyle = '#F6ECD9'; g.font = '700 34px Karla, Arial, sans-serif';
+    g.fillText(t('invite'), cx, 1652);
+    g.fillStyle = '#F5D547'; g.font = '700 46px Karla, Arial, sans-serif';
+    g.fillText('pigeonpolly.com', cx, 1732);
+    return new Promise(r => c.toBlob(r, 'image/png'));
+  }
+  const saveBlob = b => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b); a.download = shareName();
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  };
+  function shareBusy(on) {
+    const dl = q('.tdm-dl'), sb = q('.tdm-share-b');
+    if (dl) dl.disabled = on;
+    if (sb) sb.disabled = on;
+  }
+  async function downloadCard() {
+    if (busy) return;
+    busy = true; shareBusy(true);
+    try { const b = await cardBlob(); if (!b) throw new Error('no blob'); saveBlob(b); }
+    catch (e) { if (window.PPToast) window.PPToast(t('failPic')); }
+    busy = false; shareBusy(false);
+  }
+  async function shareCard() {
+    if (busy) return;
+    busy = true; shareBusy(true);
+    let b = null;
+    try {
+      b = await cardBlob();
+      if (!b) throw new Error('no blob');
+      let f = null;
+      try { f = new File([b], shareName(), { type: 'image/png' }); } catch (e) {}
+      if (f && navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: 'Pigeon Polly', text: t('invite') + ' · pigeonpolly.com' });
+      else saveBlob(b);
+    } catch (e) {
+      if (e && e.name === 'AbortError') { /* закрыли системное окно */ }
+      else if (b) saveBlob(b);
+      else if (window.PPToast) window.PPToast(t('failPic'));
+    }
+    busy = false; shareBusy(false);
   }
 
   btn.addEventListener('click', open);
