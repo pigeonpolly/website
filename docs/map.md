@@ -131,7 +131,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/sketch-wall.js` (121K) — стена работ, вход, загрузка, бейджи, профиль /bird/, сумка: PPProfile, SPECIAL, LEVELS, COL, loadWall
 - `site/assets/sketchbook.js` (13K) — Скетчбук /sketchbook/ (docs/site.md): вкладки-тетрадки, просмотр картин, число картин на о: select, tabs, fromHash, panel, recount
 - `site/assets/tarot-admin.js` (11K) — Кабинет → «🃏 Таро» (только админ; admin.js открывает PPTarotAdmin.mount(main)): PPTarotAdmin, FREE_MAX, KEY, CSS, paras
-- `site/assets/tarot.js` (12K) — Птичье таро — колода в шапке: одна карта в час, счёт по браузеру (pp_tarot).: KEYS, CFG, LANGS, leftMs, txt
+- `site/assets/tarot.js` (18K) — Птичье таро — колода в шапке: одна карта в час, счёт по браузеру (pp_tarot).: KEYS, CFG, LANGS, leftMs, txt
 - `site/assets/titos-bugs.js` (21K) — «Жуки» на /titos/ (этап 9 Б, docs/titos.md): в кабинет Титоса заползли жуки и жучки-прослу: DEMO, GOAL, SAY, drawCard, cupsOf
 - `site/assets/titos-sort.js` (35K) — «Разбери дела» на /titos/ (этап 9 А, docs/titos.md): у Титоса упали коробки — документы из: PPTitos, SAY, DEMO, BLOT, setPot
 - `site/assets/titos-ui.js` (13K) — «Детектив Титос» /titos/ (docs/titos.md): кофейник (полный / половина / пустой — Титос спи: PPTitos, REWARDS, COL, CSS, pot

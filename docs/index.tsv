@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 417, страниц 55, маршрутов 216, таблиц 76, ключей meta 68, имён 5673, разделов доков 245
+# файлов 417, страниц 55, маршрутов 216, таблиц 76, ключей meta 68, имён 5684, разделов доков 245
 file	build.py	build.py	0	890 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -59,7 +59,7 @@ file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
 file	docs/basics.md	docs/basics.md	0	47 строк, 9 КБ
 file	docs/bird.md	docs/bird.md	0	112 строк, 59 КБ
 file	docs/blog.md	docs/blog.md	0	121 строк, 38 КБ
-file	docs/cards.md	docs/cards.md	0	108 строк, 23 КБ
+file	docs/cards.md	docs/cards.md	0	109 строк, 24 КБ
 file	docs/challenge.md	docs/challenge.md	0	152 строк, 63 КБ
 file	docs/coloring.md	docs/coloring.md	0	7 строк, 2 КБ
 file	docs/db.md	docs/db.md	0	157 строк, 16 КБ
@@ -70,7 +70,7 @@ file	docs/growth.md	docs/growth.md	0	89 строк, 14 КБ
 file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
 file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
-file	docs/map.md	docs/map.md	0	367 строк, 73 КБ
+file	docs/map.md	docs/map.md	0	369 строк, 74 КБ
 file	docs/palettes.md	docs/palettes.md	0	59 строк, 28 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
 file	docs/plan-status.md	docs/plan-status.md	0	190 строк, 48 КБ
@@ -170,8 +170,8 @@ file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
 file	site/assets/style.css	site/assets/style.css	0	5729 строк, 514 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
-file	site/assets/tarot.css	site/assets/tarot.css	0	64 строк, 5 КБ
-file	site/assets/tarot.js	site/assets/tarot.js	0	235 строк, 12 КБ
+file	site/assets/tarot.css	site/assets/tarot.css	0	70 строк, 6 КБ
+file	site/assets/tarot.js	site/assets/tarot.js	0	342 строк, 18 КБ
 file	site/assets/titos-bugs.js	site/assets/titos-bugs.js	0	229 строк, 21 КБ
 file	site/assets/titos-sort.js	site/assets/titos-sort.js	0	337 строк, 35 КБ
 file	site/assets/titos-ui.js	site/assets/titos-ui.js	0	133 строк, 13 КБ
@@ -3860,32 +3860,43 @@ sym	PPTarotAdmin	site/assets/tarot-admin.js	126	win
 sym	KEYS	site/assets/tarot.js	6	const
 sym	lang	site/assets/tarot.js	7	const
 sym	LANGS	site/assets/tarot.js	9	const
-sym	txt	site/assets/tarot.js	27	const
-sym	CFG	site/assets/tarot.js	29	const
-sym	hourMs	site/assets/tarot.js	30	const
-sym	minutes	site/assets/tarot.js	31	const
-sym	cardUrl	site/assets/tarot.js	32	const
-sym	holeUrl	site/assets/tarot.js	33	const
-sym	st	site/assets/tarot.js	35	const
-sym	hasCard	site/assets/tarot.js	42	const
-sym	leftMs	site/assets/tarot.js	43	const
-sym	save	site/assets/tarot.js	44	const
-sym	deck	site/assets/tarot.js	46	const
-sym	btn	site/assets/tarot.js	47	const
-sym	badge	site/assets/tarot.js	48	const
-sym	modal	site/assets/tarot.js	53	const
-sym	sync	site/assets/tarot.js	56	fn
-sym	schedule	site/assets/tarot.js	62	fn
-sym	build	site/assets/tarot.js	69	fn
-sym	resetLabel	site/assets/tarot.js	89	fn
-sym	refresh	site/assets/tarot.js	92	fn
-sym	open	site/assets/tarot.js	127	fn
-sym	close	site/assets/tarot.js	144	fn
-sym	newCard	site/assets/tarot.js	152	fn
-sym	poke	site/assets/tarot.js	172	fn
-sym	showHole	site/assets/tarot.js	183	fn
-sym	resetLimit	site/assets/tarot.js	197	fn
-sym	applyCfg	site/assets/tarot.js	223	const
+sym	txt	site/assets/tarot.js	31	const
+sym	CFG	site/assets/tarot.js	33	const
+sym	hourMs	site/assets/tarot.js	34	const
+sym	minutes	site/assets/tarot.js	35	const
+sym	cardUrl	site/assets/tarot.js	36	const
+sym	holeUrl	site/assets/tarot.js	37	const
+sym	st	site/assets/tarot.js	39	const
+sym	hasCard	site/assets/tarot.js	46	const
+sym	leftMs	site/assets/tarot.js	47	const
+sym	save	site/assets/tarot.js	48	const
+sym	deck	site/assets/tarot.js	50	const
+sym	btn	site/assets/tarot.js	51	const
+sym	badge	site/assets/tarot.js	52	const
+sym	modal	site/assets/tarot.js	57	const
+sym	canSystemShare	site/assets/tarot.js	59	const
+sym	sync	site/assets/tarot.js	61	fn
+sym	schedule	site/assets/tarot.js	67	fn
+sym	build	site/assets/tarot.js	74	fn
+sym	resetLabel	site/assets/tarot.js	101	fn
+sym	refresh	site/assets/tarot.js	104	fn
+sym	open	site/assets/tarot.js	141	fn
+sym	close	site/assets/tarot.js	158	fn
+sym	newCard	site/assets/tarot.js	166	fn
+sym	poke	site/assets/tarot.js	187	fn
+sym	showHole	site/assets/tarot.js	198	fn
+sym	resetLimit	site/assets/tarot.js	213	fn
+sym	rnd	site/assets/tarot.js	237	const
+sym	faceSrc	site/assets/tarot.js	238	fn
+sym	syncShare	site/assets/tarot.js	239	fn
+sym	shareName	site/assets/tarot.js	240	fn
+sym	loadImg	site/assets/tarot.js	244	const
+sym	cardBlob	site/assets/tarot.js	249	fn
+sym	saveBlob	site/assets/tarot.js	290	const
+sym	shareBusy	site/assets/tarot.js	296	fn
+sym	downloadCard	site/assets/tarot.js	301	fn
+sym	shareCard	site/assets/tarot.js	308	fn
+sym	applyCfg	site/assets/tarot.js	330	const
 sym	kit	site/assets/titos-bugs.js	5	const
 sym	GOAL	site/assets/titos-bugs.js	9	const
 sym	SAY	site/assets/titos-bugs.js	32	const
@@ -6657,10 +6668,10 @@ doc	Сервер	docs/map.md	5	h2
 doc	Браузер (site/assets)	docs/map.md	55	h2
 doc	Сборка	docs/map.md	151	h2
 doc	Инструменты (tools)	docs/map.md	155	h2
-doc	Маршруты worker/index.js (179)	docs/map.md	275	h2
-doc	Маршруты worker/blog.js (37)	docs/map.md	281	h2
-doc	RULE_DEFAULTS (worker/index.js) по группам	docs/map.md	287	h2
-doc	Общее	docs/map.md	311	h2
+doc	Маршруты worker/index.js (179)	docs/map.md	277	h2
+doc	Маршруты worker/blog.js (37)	docs/map.md	283	h2
+doc	RULE_DEFAULTS (worker/index.js) по группам	docs/map.md	289	h2
+doc	Общее	docs/map.md	313	h2
 doc	Палитры	docs/palettes.md	1	h1
 doc	Кратко	docs/palettes.md	3	h2
 doc	Оглавление	docs/palettes.md	10	h2
