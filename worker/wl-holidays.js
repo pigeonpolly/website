@@ -70,7 +70,7 @@ export async function wlHolidayCron(env, h, force) {
   let key = null, list = [];
   for (let n = 0; n < MAIL_DAYS && !key; n++) { const d = shift(day, -n), l = all.filter(x => x.md === d.slice(5)); if (l.length && await h.getMeta('wl_gift:' + d)) { key = d; list = l; } }
   if (!key) return;
-  const sent = Number(await h.getMeta('wl_mail_n:' + day)) || 0, adv = (Number(await h.getMeta('advent_mail_n:' + day)) || 0) + (Number(await h.getMeta('mail_n:' + day)) || 0); // + письма из кабинета (worker/mail.js)
+  const sent = Number(await h.getMeta('wl_mail_n:' + day)) || 0, adv = (Number(await h.getMeta('advent_mail_n:' + day)) || 0) + (Number(await h.getMeta('mail_n:' + day)) || 0) + (Number(await h.getMeta('pc_mail_n:' + day)) || 0); // + письма из кабинета (worker/mail.js) и открытки (worker/postcards.js)
   const lim = Math.max(0, Math.min(HOUR_MAX, DAY_MAX - sent - adv));
   if (!lim) return;
   const rows = (await env.DB.prepare("SELECT id, email, nick, lang FROM users WHERE email IS NOT NULL AND email != '' AND banned = 0 AND nick IS NOT NULL AND nick != '' AND COALESCE(wl_mail_off, 0) = 0 AND mail_games = 1 AND COALESCE(mail_day, '') != ? AND COALESCE(wl_sent, '') < ? ORDER BY id LIMIT ?").bind(h.rigaDay(), key, lim).all()).results;

@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (76)
+## Таблицы (78)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -156,3 +156,5 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
 - `room_visits` (worker/visits.js, 21.11.2026): owner_id, user_id (PK вместе), home, at (мс последней отметки), act, act_n — кто сейчас в гостях в комнате и его последнее действие; старше 1 ч удаляются, при удалении аккаунта — тоже.
+- `postcards` (worker/postcards.js, 21.11.2026): id PK auto, token (уник., p+24 hex — ссылка из письма), design, greet (своя надпись), msg, from_uid nn, from_name ('' — аноним), to_name, to_email nn (нижний регистр), to_uid (забрал по ссылке), lang, mail (sent/queue/off/fail/block), seen =0, created_at nn. Индексы по from_uid, to_email, to_uid.
+- `postcard_block` (worker/postcards.js): hash PK (sha256 почты — отказ от открыток), at. Meta `pc_mail_n:<день>` — писем с открытками за сутки (входит в общий лимит usedToday).

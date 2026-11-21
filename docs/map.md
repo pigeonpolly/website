@@ -366,6 +366,8 @@ _Сюда следующие этапы дописывают общие свед
 
 - Этап 89: кухня — worker/kitchen.js (`RECIPES`, `dishOf(env, uid)` — действующее блюдо, `dishBonus` — прибавка к награде игры; в `award` для SEED_GAMES), site/assets/cookbook.js `PPCookbook`. Новое блюдо = строка в RECIPES + `DISH` в cookbook.js.
 
+- 💌 Открытки: worker/postcards.js (`postcardsApi`, `postcardNews`, `postcardCron`), список site/assets/postcard-designs.js, сцены postcard-scenes.js, страница postcards.js `PPPostcard.card(el, d, {greet, msg, from, still})`; Полли любого размера и в любой шапке — `PollyPet.paint(canvas, o)` (polly.js); картинка в письме — 4-й аргумент `mailHtml` (docs/postcards.md).
+
 - worker/pause.js — ⏸ пауза сайта: `pauseOn(env)`, `pauseGate` (страницы), `POST /api/admin/pause`.
 
 - Файлы только для вошедших: положить в `site/members/…` — worker `membersFile` (worker/index.js) пускает вошедших, гостя уводит на /learn/?c=<имя>#signin (docs/coloring.md).

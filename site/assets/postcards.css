@@ -1,0 +1,106 @@
+/* 💌 /postcards/ — открытки (site/assets/postcards.js, docs/postcards.md) */
+.pc-top{padding:64px 0 10px}
+.pc-top .w{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.pc-top h1{font-size:clamp(42px,6vw,80px);margin:16px 0 18px}
+.pc-lead{font-size:18px;line-height:1.6;color:var(--mut);max-width:30em}
+.pc-top .btn{margin-top:22px}
+
+/* Полли в шапке Санты с мешком подарков и счётчик */
+.pc-polly{position:relative;justify-self:center;display:flex;align-items:flex-end;gap:0;padding-top:86px;min-height:280px}
+.pc-pp{width:150px;height:185px;image-rendering:pixelated;animation:pc-bob 1.04s ease-in-out infinite}
+.pc-sack{width:144px;height:126px;image-rendering:pixelated;margin-left:-14px;transform-origin:50% 100%;animation:pc-wig 3.2s ease-in-out infinite}
+.pc-bubble{position:absolute;top:0;left:50%;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;background:#fff;border:2px solid var(--ink,#2A211C);border-radius:14px;padding:10px 18px;font:700 26px/1.1 Caveat,cursive;color:#9E1B22;box-shadow:4px 4px 0 rgba(42,33,28,.15)}
+.pc-bubble::after{content:"";position:absolute;left:38%;bottom:-12px;width:18px;height:18px;background:#fff;border-right:2px solid var(--ink,#2A211C);border-bottom:2px solid var(--ink,#2A211C);transform:rotate(45deg)}
+.pc-pop{position:absolute;right:44px;bottom:80px;width:0;height:0}
+.pc-pop i{position:absolute;left:0;top:0;width:16px;height:14px;background:var(--c);box-shadow:inset 6px 0 0 -0px transparent;border:2px solid #2A211C;animation:pc-pop 1.5s cubic-bezier(.2,.7,.4,1) forwards}
+.pc-pop i::before{content:"";position:absolute;left:5px;top:-2px;width:3px;height:14px;background:#F6C445}
+@keyframes pc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pc-wig{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-4deg)}90%{transform:rotate(4deg)}95%{transform:rotate(-2deg)}}
+@keyframes pc-pop{0%{transform:translate(0,0) rotate(0);opacity:1}60%{transform:translate(var(--dx),-90px) rotate(180deg);opacity:1}100%{transform:translate(calc(var(--dx)*1.6),-40px) rotate(320deg);opacity:0}}
+
+/* открытка */
+.pc-card{display:block;background:#FFFDF8;border:1px solid #E7DFD4;border-radius:6px;padding:10px 10px 0;box-shadow:0 14px 30px rgba(31,35,38,.12);text-align:left;color:var(--ink,#2A211C);font:inherit}
+.pc-pic{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:3/2;background:#eee}
+.pc-cv{display:block;width:100%;height:100%}
+.pc-strip{padding:10px 6px 12px;text-align:center}
+.pc-g{display:block;font:700 clamp(22px,2.6vw,30px)/1.1 Caveat,cursive;color:var(--ink)}
+.pc-msg{margin:10px 4px 0;font:400 16px/1.5 Lora,Georgia,serif;white-space:pre-wrap;word-break:break-word;color:#3B322C;text-align:left}
+.pc-msg:empty{display:none}
+.pc-sig{margin:6px 4px 0;font:700 22px/1.1 Caveat,cursive;color:var(--ink);text-align:right}
+.pc-sig:empty{display:none}
+
+.pc-h{font-size:clamp(28px,3.2vw,40px);margin:0 0 14px}
+#pc-main{padding:30px 0 60px;scroll-margin-top:80px}
+.pc-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.pc-chips button{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:8px 16px;font:700 14px Karla,sans-serif;color:var(--ink);cursor:pointer}
+.pc-chips button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px}
+.pc-tile{cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+.pc-tile:nth-child(3n+1){transform:rotate(-1deg)}.pc-tile:nth-child(3n+2){transform:rotate(.8deg)}
+.pc-tile:hover,.pc-tile:focus-visible{transform:translateY(-4px) rotate(0);box-shadow:0 20px 40px rgba(31,35,38,.2)}
+.pc-tile .pc-g{font-size:24px}
+
+.pc-back{border:0;background:none;color:var(--acc);font:700 15px Karla,sans-serif;cursor:pointer;padding:0;margin-bottom:18px}
+.pc-comp{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:start}
+.pc-prev{position:sticky;top:90px}
+.pc-form{display:grid;gap:14px}
+.pc-form label{display:grid;gap:6px;font:700 13px Karla,sans-serif;letter-spacing:.04em;color:var(--mut)}
+.pc-form input:not([type=checkbox]),.pc-form textarea{font:400 16px/1.4 Karla,sans-serif;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.pc-form textarea{resize:vertical;min-height:110px}
+.pc-form input:disabled{opacity:.5}
+.pc-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc-cnt{justify-self:end;font-weight:400;letter-spacing:0}
+.pc-form .pc-chk{display:flex;align-items:center;gap:8px;font-size:14px;letter-spacing:0;color:var(--ink);font-weight:500}
+.pc-err{color:#B3261E;font-weight:700;min-height:1em;margin:0}
+.pc-login{margin:0;color:var(--mut)}
+.pc-send{justify-self:start}
+
+.pc-done{max-width:560px;margin:0 auto;text-align:center}
+.pc-link{display:grid;gap:6px;text-align:left;font:700 13px Karla,sans-serif;color:var(--mut);margin:18px 0}
+.pc-link span{display:flex;gap:8px}.pc-link input{flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;font:14px Karla,sans-serif}
+.pc-left{color:var(--mut);font-size:14px}
+.pc-fly{height:90px;position:relative}
+.pc-env{position:absolute;left:50%;top:30px;width:70px;height:46px;margin-left:-35px;background:#F3E3D5;border:2px solid #9E1B22;border-radius:4px;animation:pc-flyaway 1.6s ease-in forwards}
+.pc-env::after{content:"";position:absolute;left:8px;right:8px;top:-1px;height:24px;border-left:2px solid #9E1B22;border-bottom:2px solid #9E1B22;transform:skewY(0) rotate(-45deg) scale(.7);transform-origin:0 0;display:none}
+@keyframes pc-flyaway{0%{transform:translate(0,0) rotate(0)}30%{transform:translate(-10px,6px) rotate(-6deg)}100%{transform:translate(260px,-120px) rotate(18deg) scale(.4);opacity:0}}
+
+/* «Мои открытки» */
+.pc-inb{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.pc-it{display:grid;gap:8px;text-decoration:none;color:var(--mut);font-size:13px}
+.pc-it .pc-msg{display:none}.pc-it .pc-g{font-size:22px}
+.pc-new{background:#9E1B22;color:#fff;border-radius:999px;padding:1px 7px;font-size:11px}
+.pc-none{color:var(--mut)}
+#pc-main h3{margin:26px 0 12px;font:700 15px Karla,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+
+/* открытка из письма: конверт */
+.pc-view{display:grid;justify-items:center;gap:14px;padding-top:10px}
+.pc-envl{position:relative;width:min(520px,92vw);aspect-ratio:3/2;margin-top:min(300px,60vw);border:0;padding:0;background:none;cursor:pointer;perspective:1200px}
+.pc-body{position:absolute;inset:0;background:#E9D9C6;border-radius:8px;box-shadow:0 18px 40px rgba(31,35,38,.25);z-index:3;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12%;clip-path:polygon(0 0,50% 52%,100% 0,100% 100%,0 100%);background-image:linear-gradient(160deg,#EFE2D2,#DCC8B1)}
+.pc-to{font:700 clamp(24px,4vw,34px) Caveat,cursive;color:#5B3A2E}
+.pc-flap{position:absolute;left:0;right:0;top:0;height:56%;background:#D9C3A9;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0;z-index:4;transition:transform .7s ease,z-index 0s .35s}
+.pc-seal{position:absolute;left:50%;top:44%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:#9E1B22;color:#F6E3C6;font:700 24px/52px Fraunces,Georgia,serif;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:opacity .3s}
+.pc-in{position:absolute;left:5%;right:5%;top:4%;z-index:2;opacity:0;transition:transform 1s cubic-bezier(.3,.8,.3,1) .5s,opacity .3s .4s}
+.pc-envl.open .pc-in{opacity:1}
+.pc-envl:not(.open):hover .pc-flap{transform:rotateX(18deg)}
+.pc-envl.open .pc-flap{transform:rotateX(180deg);z-index:1}
+.pc-envl.open .pc-seal{opacity:0}
+.pc-envl.open .pc-in{transform:translateY(-62%) scale(1.04);z-index:6;transition:transform 1s cubic-bezier(.3,.8,.3,1) .5s,z-index 0s 1s}
+.pc-tap{font:700 22px Caveat,cursive;color:var(--acc);animation:pc-bob 1.2s ease-in-out infinite}
+.pc-after{display:grid;justify-items:center;gap:10px;margin-top:20px}
+.pc-kept{color:var(--mut);margin:0}
+.pc-viewing .pc-top{display:none}
+
+/* кадры для письма (tools/postcard_gifs.py) */
+.pc-shot header,.pc-shot footer,.pc-shot .ft2,.pc-shot .pc-top,.pc-shot #pc-main,.pc-shot .polly-pet,.pc-shot .crumbs{display:none!important}
+#pc-shot{display:none}
+.pc-shot #pc-shot{display:block;position:fixed;left:0;top:0;width:560px;padding:0;border:0;border-radius:0;box-shadow:none;z-index:99999}
+.pc-shot #pc-shot .pc-pic{border-radius:0}.pc-shot #pc-shot .pc-strip{display:none}
+
+@media (max-width:860px){
+  .pc-top{padding-top:34px}.pc-top .w{grid-template-columns:1fr;gap:10px}
+  .pc-comp{grid-template-columns:1fr}.pc-prev{position:static}
+  .pc-row{grid-template-columns:1fr}
+  .pc-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+  .pc-tile .pc-g{font-size:19px}.pc-card{padding:6px 6px 0}
+  .pc-pp{width:120px;height:148px}.pc-sack{width:112px;height:98px}.pc-polly{min-height:220px;padding-top:70px}.pc-bubble{font-size:22px}
+}
