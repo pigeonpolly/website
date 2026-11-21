@@ -125,7 +125,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/how.css?v=68e18a41">
+<link rel="stylesheet" href="/assets/how.css?v=5392d215">
 <section data-ppb="how.1" class="hw-hero"><div class="w">
   <div class="hw-hero-tx">
     <span class="k">гид на первые пять минут</span>
@@ -134,7 +134,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <p class="hw-free"><span>Бесплатно</span> · смотреть можно без входа · пуговки зарабатывают, их не покупают</p>
     <div class="hw-ctas">
       <a class="btn pri" href="/ru/flock/" data-how-join>Вылупите свою птичку</a>
-      <a class="btn" href="#minute">Показать за минуту ↓</a>
+      <a class="btn" href="#doors">Выбрать дверь ↓</a>
     </div>
   </div>
   <figure class="hw-post">
@@ -144,11 +144,42 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </figure>
 </div></section>
 
-<section data-ppb="how.2" class="hw-route"><div class="w">
+<section data-ppb="how.2" class="hw-doors" id="doors"><div class="w">
+  <p class="hw-doors-k"><span class="k">две двери · выберите свою</span></p>
+  <div class="hw-doors-g">
+    <article class="hw-door hw-door-draw">
+      <span class="hw-door-ico" aria-hidden="true">✏️</span>
+      <h2>Рисование и скетчинг</h2>
+      <p class="hw-door-lead">Тема дня, цвета настоящих картин, бесплатные видеоуроки и заметки из мастерской. Рисуйте вместе без входа — хватит карандаша и бумаги.</p>
+      <div class="hw-secs">
+        <a href="/ru/challenge/"><b>Челлендж дня</b><i>тема на каждый день, таймер и серия</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/palettes/"><b>Палитры</b><i>цвета с HEX-кодами из каждой картины</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/learn/"><b>Уроки</b><i>бесплатные видеоуроки — рисуйте вместе</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/blog/"><b>Журнал</b><i>заметки, новости и процесс из мастерской</i><em aria-hidden="true">→</em></a>
+      </div>
+      <a class="btn pri" href="/ru/challenge/">Нарисовать тему дня</a>
+    </article>
+    <article class="hw-door hw-door-play">
+      <span class="hw-door-ico" aria-hidden="true">🎮</span>
+      <h2>Игры и мир Полли</h2>
+      <p class="hw-door-lead">Воббленд, мир Полли и кухня птички — плюс маленькие игры, которые платят пуговками. Бесплатно, в браузере, ничего не нужно устанавливать.</p>
+      <div class="hw-secs">
+        <a href="/ru/wobbleland/"><b>Воббленд</b><i>одиннадцать пиксельных городков, праздники и блюда</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/games/"><b>Мир Полли</b><i>офис, поезд, смена с Полли и детектив Титос</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/bird/#room"><b>Кухня птички</b><i>готовьте из урожая и собирайте книгу рецептов</i><em aria-hidden="true">→</em></a>
+        <a href="/ru/games/"><b>Другие игры</b><i>«Пуговичный дождь», зелья, блинчики и ещё</i><em aria-hidden="true">→</em></a>
+      </div>
+      <a class="btn pri" href="/ru/games/">Открыть все игры</a>
+    </article>
+  </div>
+  <p class="hw-bridge">А вот как устроена Лаборатория — птички, пуговки и рынок.</p>
+</div></section>
+
+<section data-ppb="how.3" class="hw-route"><div class="w">
   <p class="hw-flow" aria-label="Путь по сайту"><span>осмотреться</span><i aria-hidden="true">→</i><span>вылупить птичку</span><i aria-hidden="true">→</i><span>заработать пуговки</span><i aria-hidden="true">→</i><span>заглянуть на птичий рынок</span><i aria-hidden="true">→</i><span>вернуться завтра</span></p>
 </div></section>
 
-<section data-ppb="how.3" class="hw-minute" id="minute"><div class="w">
+<section data-ppb="how.4" class="hw-minute" id="minute"><div class="w">
   <div class="hw-h"><span class="k">три слова, без которых никак</span><h2>За одну минуту</h2></div>
   <div class="hw-keys">
     <article class="hw-key">
@@ -169,7 +200,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.4" class="hw-steps"><div class="w">
+<section data-ppb="how.5" class="hw-steps"><div class="w">
   <div class="hw-h"><span class="k">весь путь целиком</span><h2>Как всё идёт, шаг за шагом</h2></div>
   <ol class="hw-way">
     <li>
@@ -215,7 +246,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </ol>
 </div></section>
 
-<section data-ppb="how.5" class="hw-words"><div class="w">
+<section data-ppb="how.6" class="hw-words"><div class="w">
   <div class="hw-h"><span class="k">маленький словарик</span><h2>Что значат слова</h2></div>
   <dl class="hw-dl">
     <div><dt>Птичка</dt><dd>Ваш пиксельный голубь. Полли — нарисованный герой картин и книг; ваша птичка — маленькая пиксельная родственница из того же мира.</dd></div>
@@ -231,7 +262,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </dl>
 </div></section>
 
-<section data-ppb="how.6" class="hw-more"><div class="w">
+<section data-ppb="how.7" class="hw-more"><div class="w">
   <div class="hw-h"><span class="k">за углом</span><h2>А если захочется большего</h2></div>
   <div class="hw-more-g">
     <a href="/ru/games/">🎮 Игры<small>девять маленьких игр, все бесплатные</small></a>
@@ -243,7 +274,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.7" class="hw-qa"><div class="w">
+<section data-ppb="how.8" class="hw-qa"><div class="w">
   <div class="hw-h"><span class="k">честные ответы</span><h2>Если интересно…</h2></div>
   <div class="hw-faq">
     <details><summary>Нужно ли входить на сайт?</summary><p>Нет. Уроки, журнал, книги, палитры, заставки и стена челленджа открыты всем. Птичке нужен вход: Google или почта с паролем. И то и другое бесплатно.</p></details>
@@ -255,7 +286,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.8" class="hw-end"><div class="w">
+<section data-ppb="how.9" class="hw-end"><div class="w">
   <span class="hand">вот и всё ✿</span>
   <h2>Заходите, дверь открыта</h2>
   <p>Начните с рисунка или с птички. И то и другое бесплатно, и торопиться некуда.</p>
@@ -289,7 +320,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="147">v147 · 21.11 14:23</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="148">v148 · 21.11 14:32</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

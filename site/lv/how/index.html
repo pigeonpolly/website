@@ -125,7 +125,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/how.css?v=68e18a41">
+<link rel="stylesheet" href="/assets/how.css?v=5392d215">
 <section data-ppb="how.1" class="hw-hero"><div class="w">
   <div class="hw-hero-tx">
     <span class="k">ceļvedis pirmajām piecām minūtēm</span>
@@ -134,7 +134,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <p class="hw-free"><span>Bez maksas</span> · var skatīties bez ienākšanas · pogas nopelna, tās nepērk</p>
     <div class="hw-ctas">
       <a class="btn pri" href="/lv/flock/" data-how-join>Izperē savu putniņu</a>
-      <a class="btn" href="#minute">Parādīt minūtē ↓</a>
+      <a class="btn" href="#doors">Izvēlēties durvis ↓</a>
     </div>
   </div>
   <figure class="hw-post">
@@ -144,11 +144,42 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </figure>
 </div></section>
 
-<section data-ppb="how.2" class="hw-route"><div class="w">
+<section data-ppb="how.2" class="hw-doors" id="doors"><div class="w">
+  <p class="hw-doors-k"><span class="k">divas durvis · izvēlies savējās</span></p>
+  <div class="hw-doors-g">
+    <article class="hw-door hw-door-draw">
+      <span class="hw-door-ico" aria-hidden="true">✏️</span>
+      <h2>Zīmēt un skicēt</h2>
+      <p class="hw-door-lead">Dienas tēma, īstu gleznu krāsas, bezmaksas video nodarbības un piezīmes no darbnīcas. Zīmē līdzi bez ienākšanas — pietiek ar zīmuli un papīru.</p>
+      <div class="hw-secs">
+        <a href="/lv/challenge/"><b>Dienas izaicinājums</b><i>tēma katrai dienai, taimeris un sērija</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/palettes/"><b>Paletes</b><i>krāsas ar HEX kodiem no katras gleznas</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/learn/"><b>Nodarbības</b><i>bezmaksas video nodarbības — zīmē līdzi</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/blog/"><b>Žurnāls</b><i>piezīmes, jaunumi un process no darbnīcas</i><em aria-hidden="true">→</em></a>
+      </div>
+      <a class="btn pri" href="/lv/challenge/">Uzzīmēt dienas tēmu</a>
+    </article>
+    <article class="hw-door hw-door-play">
+      <span class="hw-door-ico" aria-hidden="true">🎮</span>
+      <h2>Spēlēt un pētīt</h2>
+      <p class="hw-door-lead">Voblenda, Pollija pasaule un putniņa virtuve — plus mazas spēles, kas maksā pogās. Bez maksas, pārlūkā, nekas nav jāinstalē.</p>
+      <div class="hw-secs">
+        <a href="/lv/wobbleland/"><b>Voblenda</b><i>vienpadsmit pikseļu pilsētiņas, svētki un ēdieni</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/games/"><b>Pollija pasaule</b><i>birojs, vilciens, maiņa ar Polliju un detektīvs Titoss</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/bird/#room"><b>Putniņa virtuve</b><i>gatavo no ražas un krāj recepšu grāmatu</i><em aria-hidden="true">→</em></a>
+        <a href="/lv/games/"><b>Citas spēles</b><i>«Pogu lietus», dziras, pankūkas un vēl</i><em aria-hidden="true">→</em></a>
+      </div>
+      <a class="btn pri" href="/lv/games/">Atvērt visas spēles</a>
+    </article>
+  </div>
+  <p class="hw-bridge">Un lūk, kā darbojas Laboratorija — putniņi, pogas un tirgus.</p>
+</div></section>
+
+<section data-ppb="how.3" class="hw-route"><div class="w">
   <p class="hw-flow" aria-label="Ceļš pa vietni"><span>apskaties</span><i aria-hidden="true">→</i><span>izperi putniņu</span><i aria-hidden="true">→</i><span>nopelni pogas</span><i aria-hidden="true">→</i><span>ieej Putnu tirgū</span><i aria-hidden="true">→</i><span>atgriezies rīt</span></p>
 </div></section>
 
-<section data-ppb="how.3" class="hw-minute" id="minute"><div class="w">
+<section data-ppb="how.4" class="hw-minute" id="minute"><div class="w">
   <div class="hw-h"><span class="k">trīs vārdi, kas jāzina</span><h2>Vienā minūtē</h2></div>
   <div class="hw-keys">
     <article class="hw-key">
@@ -169,7 +200,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.4" class="hw-steps"><div class="w">
+<section data-ppb="how.5" class="hw-steps"><div class="w">
   <div class="hw-h"><span class="k">viss ceļš kopumā</span><h2>Kā tas notiek, soli pa solim</h2></div>
   <ol class="hw-way">
     <li>
@@ -215,7 +246,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </ol>
 </div></section>
 
-<section data-ppb="how.5" class="hw-words"><div class="w">
+<section data-ppb="how.6" class="hw-words"><div class="w">
   <div class="hw-h"><span class="k">maza vārdnīca</span><h2>Ko nozīmē vārdi</h2></div>
   <dl class="hw-dl">
     <div><dt>Putniņš</dt><dd>Tavs pikseļu balodis. Pollijs ir gleznu un grāmatu varonis; tavs putniņš ir mazs pikseļu radinieks no tās pašas pasaules.</dd></div>
@@ -231,7 +262,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </dl>
 </div></section>
 
-<section data-ppb="how.6" class="hw-more"><div class="w">
+<section data-ppb="how.7" class="hw-more"><div class="w">
   <div class="hw-h"><span class="k">aiz stūra</span><h2>Un, ja gribas vairāk</h2></div>
   <div class="hw-more-g">
     <a href="/lv/games/">🎮 Spēles<small>deviņas mazas spēles, visas bez maksas</small></a>
@@ -243,7 +274,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.7" class="hw-qa"><div class="w">
+<section data-ppb="how.8" class="hw-qa"><div class="w">
   <div class="hw-h"><span class="k">godīgas atbildes</span><h2>Ja rodas jautājumi…</h2></div>
   <div class="hw-faq">
     <details><summary>Vai man jāienāk vietnē?</summary><p>Nē. Nodarbības, žurnāls, grāmatas, paletes, foni un izaicinājuma siena ir atvērtas visiem. Putniņam vajag ienākšanu: Google vai e-pasts ar paroli. Abi ir bez maksas.</p></details>
@@ -255,7 +286,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="how.8" class="hw-end"><div class="w">
+<section data-ppb="how.9" class="hw-end"><div class="w">
   <span class="hand">tas arī viss ✿</span>
   <h2>Nāc iekšā, durvis ir vaļā</h2>
   <p>Sāc ar zīmējumu vai ar putniņu. Abi ir bez maksas, un neviens no tiem nesteidzas.</p>
@@ -289,7 +320,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="147">v147 · 21.11 14:23</span><span><a href="/lv/privacy/">Privātums</a></span></div>
+  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="148">v148 · 21.11 14:32</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>
 </body>
 </html>

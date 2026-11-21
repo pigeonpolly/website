@@ -14,6 +14,36 @@
 .hw-post figcaption{font:700 22px Caveat,cursive;color:var(--acc);text-align:right;padding:8px 2px 12px;transform:rotate(1deg)}
 .hw-tape{position:absolute;left:50%;top:-15px;width:118px;height:30px;transform:translateX(-50%) rotate(-3deg);background:rgba(233,222,205,.9);box-shadow:0 1px 3px rgba(0,0,0,.09)}
 
+/* две двери: рисование или игры — главный выбор на странице */
+.hw-doors{padding:46px 0 6px}
+.hw-doors-k{margin-bottom:20px}
+.hw-doors-g{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.hw-door{display:flex;flex-direction:column;border-radius:10px;padding:30px 28px 26px;min-width:0}
+.hw-door-draw{background:var(--sheet);border:1px solid var(--line);box-shadow:0 14px 30px rgba(31,35,38,.07)}
+.hw-door-play{background:var(--gr);color:#F2EDE6}
+.hw-door-ico{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;font-size:24px;background:color-mix(in srgb,var(--acc) 12%,#fff);margin-bottom:14px}
+.hw-door-play .hw-door-ico{background:rgba(242,237,230,.12)}
+.hw-door h2{font-size:clamp(29px,3.1vw,40px);margin-bottom:10px}
+.hw-door-play h2{color:#FBF7F1}
+.hw-door-lead{font-size:15.5px;line-height:1.6;color:var(--mut);margin-bottom:8px}
+.hw-door-play .hw-door-lead{color:#D8D2CA}
+.hw-secs{display:grid;margin:14px 0 20px;border-top:1px solid var(--line)}
+.hw-door-play .hw-secs{border-color:rgba(242,237,230,.2)}
+.hw-secs a{display:grid;grid-template-columns:minmax(0,1fr) 20px;gap:2px 12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.hw-door-play .hw-secs a{border-color:rgba(242,237,230,.2)}
+.hw-secs b{font:400 20px/1.2 Fraunces,Lora,serif}
+.hw-secs i{grid-column:1;font-style:normal;font-size:13px;line-height:1.4;color:var(--mut)}
+.hw-door-play .hw-secs i{color:#B9B2AA}
+.hw-secs em{grid-column:2;grid-row:1/3;font-style:normal;color:var(--acc);font-size:16px;transition:transform .15s}
+.hw-door-play .hw-secs em{color:var(--acc2)}
+.hw-secs a:hover b{color:var(--acc)}
+.hw-door-play .hw-secs a:hover b{color:var(--acc2)}
+.hw-secs a:hover em{transform:translateX(3px)}
+.hw-door-cta{margin-top:auto}
+.hw-door-play .btn.pri{background:#FBF7F1;border-color:#FBF7F1;color:var(--gr);box-shadow:none}
+.hw-door-play .btn.pri:hover{background:#fff;color:var(--gr)}
+.hw-bridge{margin:26px auto 0;max-width:660px;text-align:center;font-size:14px;line-height:1.5;color:var(--mut);padding-top:18px;border-top:1px dashed var(--line)}
+
 .hw-route{padding:24px 0 0}
 .hw-flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 12px;font:700 11.5px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 .hw-flow span{padding:7px 14px;border:1px dashed var(--line);border-radius:999px;background:var(--sheet)}
@@ -76,6 +106,8 @@
   .hw-hero{padding:60px 0 22px}
   .hw-hero .w{grid-template-columns:1fr;gap:44px}
   .hw-post{justify-self:start;max-width:420px;transform:rotate(-1deg)}
+  .hw-doors{padding:36px 0 4px}
+  .hw-doors-g{grid-template-columns:1fr}
   .hw-keys{grid-template-columns:1fr 1fr}
   .hw-dl{grid-template-columns:1fr}
   .hw-more-g{grid-template-columns:1fr 1fr}
@@ -84,6 +116,11 @@
   .hw-hero h1{font-size:clamp(40px,11vw,56px)}
   .hw-lead{font-size:17px}
   .hw-free{font-size:12px;line-height:1.55}
+  .hw-doors{padding:28px 0 2px}
+  .hw-door{padding:24px 20px 22px}
+  .hw-door h2{font-size:30px}
+  .hw-door-lead{font-size:15px}
+  .hw-secs b{font-size:19px}
   .hw-minute,.hw-steps,.hw-more,.hw-qa{padding:56px 0}
   .hw-words{padding:58px 0}
   .hw-minute{margin-top:26px}
