@@ -785,7 +785,7 @@
     const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
     if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
     // комната птички (room.js); пока его нет на странице — блок скрыт
-    if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, doors: pr.doors, mine, me, onRoom: room => { me.room = room; if (curBag && curBag.box && curBag.box.isConnected) curBag.draw(); } });
+    if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, doors: pr.doors, mine, me, guest: !mine && me && me.nick ? { id: me.id, nick: me.nick, avatar: me.avatar } : null, onRoom: room => { me.room = room; if (curBag && curBag.box && curBag.box.isConnected) curBag.draw(); } });
       const fe = page.querySelector('#bp-feathers'); // пёрышки комнаты (feathers.js, этап 13 В)
       if (window.PPFeathers) { fe.hidden = false; window.PPFeathers.mount(fe, { nick: pr.nick, room: rb, signedIn: !!(me && me.nick), onShare: share }); if (mine && location.hash === '#feathers') { history.replaceState(null, '', location.pathname + location.search); setTimeout(() => fe.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); } }
       const h = mine && (location.hash.match(/^#use=(.+)$/) || [])[1]; // пришли из сумки на другой странице: поставить вещь
