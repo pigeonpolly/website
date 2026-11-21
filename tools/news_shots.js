@@ -1,5 +1,5 @@
 // Снимки для новостей блога (скилл .claude/skills/site-news): только картинка сцены (canvas), без подписей и кнопок — статьи переводятся.
-// Запуск: python3 -m http.server 8790 --directory site &  затем  node tools/news_shots.js <room|winter|garden|wl|shift|hol|all> [мс ходьбы]
+// Запуск: python3 -m http.server 8790 --directory site &  затем  node tools/news_shots.js <room|winter|advent|garden|wl|shift|hol|all> [мс ходьбы]
 // /api подменяется прямо здесь (данные-примеры), снимки — в _shots/news/. Новая сцена — новый блок по образцу.
 const { chromium } = require('playwright');
 const B = 'http://localhost:8790', O = require('path').join(__dirname, '..', '_shots', 'news') + '/';
@@ -14,6 +14,21 @@ async function page(b, w, h, api = {}) {
 (async () => {
   require('fs').mkdirSync(O, { recursive: true });
   const b = await chromium.launch(); const which = process.argv[2] || 'all';
+  if (which === 'all' || which === 'advent') { // 21.11.2026: вещи только из адвента — две комнаты
+    const p = await page(b, 1100, 820);
+    await p.goto(B + '/ru/garden/', { waitUntil: 'load' }); await p.waitForTimeout(800);
+    await p.addStyleTag({ content: '.room-door-btn{opacity:0!important}' });
+    for (const [file, room] of [['advent-cozy', { wall: 'plain_burgundy', floor: 'walnut', view: 'snow', items: [['furn', 'advtree2', 4], ['furn', 'advcandles', 70], ['furn', 'advpenguin', 40], ['furn', 'advlantern', 92], ['furn', 'advsnowpolly', 140], ['furn', 'advpresents', 160], ['furn', 'advcarousel', 108], ['deco', 'advbulbs', 40, 6], ['deco', 'advstartop', 70, 30], ['deco', 'advmittens', 96, 62], ['deco', 'advangelbird', 176, 30]] }],
+      ['advent-night', { wall: 'snowforest', view: 'snowforest', items: [['furn', 'advclocktower', 6], ['furn', 'advigloo', 26], ['furn', 'advyeti', 46], ['furn', 'advfirework', 64], ['furn', 'advowl', 84], ['furn', 'advsamovar', 104], ['furn', 'advsleigh', 120], ['furn', 'advdeer', 140], ['furn', 'advbear', 160], ['deco', 'advaurora', 40, 6], ['deco', 'advsparkler', 10, 46], ['deco', 'advcomet', 70, 34], ['deco', 'advsnowcloud', 160, 12]] }]]) {
+      await p.evaluate(room => {
+        const m = document.querySelector('main'); m.innerHTML = '<div id="rr" style="max-width:900px;margin:30px auto"></div>';
+        room.items = room.items.map(([k, v, x, y]) => Object.assign({ k, v, x }, y != null ? { y } : {}));
+        PPRoom.mount(document.getElementById('rr'), { id: 5, nick: 'polly', avatar: {}, room, mine: false });
+      }, room);
+      await p.mouse.move(0, 0); await p.waitForTimeout(2500); await (await p.$('.room-cv')).screenshot({ path: O + 'c-' + file + '.png' });
+    }
+    await p.close();
+  }
   if (which === 'all' || which === 'winter') { // 21.11.2026: зимний пир и гость в чужой комнате (ярлык «@ник» гаснет через 5 с — снимать позже)
     const p = await page(b, 1100, 820);
     await p.goto(B + '/ru/garden/', { waitUntil: 'load' }); await p.waitForTimeout(800);

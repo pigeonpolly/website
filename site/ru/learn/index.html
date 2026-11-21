@@ -36,7 +36,7 @@
 <!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/birds.js?v=c4476bda" defer></script>
-<script src="/assets/room.js?v=e93be72e" defer></script>
+<script src="/assets/room.js?v=0184c417" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
 <script src="/assets/day-card.js?v=00ac769a" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
@@ -147,7 +147,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="161">v161 · 21.11 17:17</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="162">v162 · 21.11 17:23</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

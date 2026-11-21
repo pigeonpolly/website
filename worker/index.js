@@ -448,7 +448,7 @@ function adventNow(req, env) {
   // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC. year — год адвента (в январе — прошлый декабрь).
   // Пропущенные окошки можно открыть до 23 января включительно (claimTo — до какого дня декабря можно забрать)
   const catchUp = m === 1 || m === 2; // янвaрь и февраль: пропущенные окна можно забрать до 1 марта
-  return { year: m === 1 ? y - 1 : y, day: m === 12 ? d : 0, month: m, dom: d, date: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
+  return { year: m <= 2 ? y - 1 : y, day: m === 12 ? d : 0, // в январе и феврале — прошлый декабрь (21.11.2026: в феврале был новый год — открытые окна открывались второй раз) month: m, dom: d, date: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
     startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? (tm ? rigaMs(y, m, d, tm[0], tm[1], tm[2] || 0) : Date.UTC(y, m - 1, d, 10)) : Date.now(),
     nextAt: rigaMs(y, m, d + 1) }; // следующая полночь по Риге — тогда откроется следующее окошко
 }
