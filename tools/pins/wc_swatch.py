@@ -77,11 +77,11 @@ cols = [c['hex'] for c in data['colors']]
 n = len(cols)
 cw = W - 2 * M
 step = cw / n
-sw = int(step + 18)
+sw = int(step - 20)  # промежуток между мазками ~25 px
 for i, c in enumerate(cols):
-    x = int(M + i * step - 6 + rng.integers(-4, 5))
+    x = int(M + i * step + 10 + rng.integers(-3, 4))
     y = 70 + int(rng.integers(-8, 9))
-    paint(paper, c, x, y, sw - 14, 250 + int(rng.integers(-14, 15)))
+    paint(paper, c, x, y, sw, 250 + int(rng.integers(-14, 15)))
 
 out = Image.fromarray(np.clip(paper * 255, 0, 255).astype(np.uint8))
 
