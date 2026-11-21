@@ -7,6 +7,7 @@
 .hw-lead{font-size:19px;line-height:1.6;color:var(--mut);max-width:31em}
 .hw-free{margin-top:18px;font-size:13.5px;line-height:1.7;color:var(--mut);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .hw-free span{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--acc);color:#fff;font:700 10.5px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.hw-signin{margin-top:14px;font-size:13px;line-height:1.55;color:var(--mut)}
 .hw-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
 
 .hw-post{position:relative;margin:0;background:#fff;padding:14px 14px 0;border:1px solid #E7DFD4;box-shadow:0 20px 44px rgba(31,35,38,.18);transform:rotate(-1.4deg);max-width:470px;justify-self:center}
