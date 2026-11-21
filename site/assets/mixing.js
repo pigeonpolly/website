@@ -184,6 +184,8 @@
     another: { en: '🎲 Other colours', ru: '🎲 Другие цвета', lv: '🎲 Citas krāsas' },
     mine: { en: 'My paints', ru: 'Мои краски', lv: 'Manas krāsas' },
     mineTip: { en: 'Tick the paints you have. The pigment code is printed on the tube or pan (like PB29): paints with the same code mix alike in any brand.', ru: 'Отметьте краски, которые у вас есть. Код пигмента написан на тюбике или кювете (например, PB29): краски с одним кодом смешиваются похоже у любого бренда.', lv: 'Atzīmē krāsas, kas tev ir. Pigmenta kods ir uz tūbiņas vai kivetes (piemēram, PB29): krāsas ar vienu kodu jaucas līdzīgi jebkuram zīmolam.' },
+    all: { en: '☑ Select all', ru: '☑ Отметить все', lv: '☑ Atzīmēt visas' },
+    clear: { en: '☐ Clear all', ru: '☐ Убрать все', lv: '☐ Noņemt visas' },
     reset: { en: '↺ Basic set', ru: '↺ Базовый набор', lv: '↺ Pamata komplekts' },
     m3: { en: '3. How to mix it', ru: '3. Как смешать', lv: '3. Kā sajaukt' },
     wait: { en: 'Mixing paints…', ru: 'Смешиваю краски…', lv: 'Jaucu krāsas…' },
@@ -207,6 +209,7 @@
     waterLittle: { en: 'Almost no water: just wet the brush', ru: 'Воды почти не нужно: только смочить кисть', lv: 'Ūdens gandrīz nevajag: tikai samitrināt otu' },
     steps: { en: 'How to mix', ru: 'Как смешивать', lv: 'Kā jaukt' },
     stOpaque: { en: 'Put the white on the palette first and add the colour to it bit by bit: a dark colour is much stronger than white.', ru: 'Сначала положите на палитру белила и добавляйте к ним цвет понемногу: тёмный цвет намного сильнее белил.', lv: 'Vispirms uzliec uz paletes balto un pa druskai pievieno krāsu: tumša krāsa ir daudz stiprāka par balto.' },
+    stWhiteFirst: { en: 'Start with the white, then add the colours to it bit by bit.', ru: 'Начните с белил, потом понемногу добавляйте к ним цвета.', lv: 'Sāc ar balto, tad pa druskai pievieno tai krāsas.' },
     stMain: { en: 'Start with', ru: 'Начните с', lv: 'Sāc ar' },
     stAdd: { en: 'then add', ru: 'потом добавьте', lv: 'tad pievieno' },
     stWater: { en: 'Wet the paint with water in a palette well, then add the other colours one by one and stir. Test on a scrap of the same paper: watercolour dries lighter.', ru: 'Размочите краску водой в лунке палитры, добавьте остальные цвета по одному и размешайте. Проверьте на обрезке той же бумаги: акварель высыхает светлее.', lv: 'Samitrini krāsu ar ūdeni paletes iedobē, pievieno pārējās krāsas pa vienai un samaisi. Pārbaudi uz tā paša papīra strēmeles: akvarelis nožūst gaišāks.' },
@@ -246,18 +249,18 @@
   const qs = new URLSearchParams(location.search);
   let medium = MEDIA[qs.get('m')] ? qs.get('m') : (MEDIA[ls.get('pp-mix-m')] ? ls.get('pp-mix-m') : 'watercolor');
   let target = /^#?[0-9a-f]{6}$/i.test(qs.get('c') || '') ? '#' + qs.get('c').replace('#', '').toUpperCase() : '#7A9E7E';
-  const myPaints = m => { const s = ls.get('pp-mix-p-' + m); const v = s ? s.split(',').filter(id => MEDIA[m].all.includes(id)) : null; return v && v.length ? v : MEDIA[m].on.slice(); };
+  const myPaints = m => { const s = ls.get('pp-mix-p-' + m); if (s === '-') return []; const v = s ? s.split(',').filter(id => MEDIA[m].all.includes(id)) : null; return v && v.length ? v : MEDIA[m].on.slice(); };
 
   app.innerHTML = `
-    <div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
-      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><div class="mx-pg"></div><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></details></div>
+    <div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
+      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
     <div class="mx-step"><h2>${t('m2')}</h2>
       <div class="mx-pickrow"><label class="mx-color"><input type="color" value="${target}" aria-label="${t('pick')}"><span class="mx-tsw"></span></label>
         <input class="mx-hex" type="text" maxlength="7" spellcheck="false" aria-label="HEX" value="${target}">
         <label class="mx-btn mx-ph">${t('photo')}<input type="file" accept="image/*" hidden></label></div>
       <div class="mx-photo" hidden><p class="mx-hint">${t('photoTip')}</p><canvas></canvas></div>
       <div class="mx-pal"><p class="mx-hint">${t('fromPal')}</p><div class="mx-chips"></div><button type="button" class="mx-lnk mx-more">${t('another')}</button></div></div>
-    <div class="mx-step"><h2>${t('m3')}</h2><p class="mx-unit"></p><div class="mx-out"></div>
+    </div><div class="mx-step mx-right"><h2>${t('m3')}</h2><p class="mx-unit"></p><div class="mx-out"></div>
       <p class="mx-note">⚠️ ${t('note')}</p></div>`;
   const $ = s => app.querySelector(s);
 
@@ -267,7 +270,8 @@
     $('.mx-pg').innerHTML = MEDIA[medium].all.map(id => `<label class="mx-p"><input type="checkbox" value="${id}"${on.includes(id) ? ' checked' : ''}><i style="background:linear-gradient(90deg,${P[id].m} 50%,${P[id].t} 50%)"></i><span>${esc(nm(id))}<small>${P[id].ci}</small></span></label>`).join('') +
       (MEDIA[medium].water ? '' : `<label class="mx-p"><input type="checkbox" checked disabled><i style="background:${WHITE_HEX}"></i><span>${t('white')}<small>PW6</small></span></label>`);
     $('.mx-cnt').textContent = '(' + on.length + ')';
-    $('.mx-unit').innerHTML = `<b>${t('unitT')}:</b> ${MEDIA[medium].water ? t('unitBrush') : t('unitPea')}`;
+    const w = MEDIA[medium].water;
+    $('.mx-unit').innerHTML = `<b>${t('unitT')}:</b> ${w ? t('unitBrush') : t('unitPea')}<br>💡 ${w ? t('stWater') : t('stOpaque') + ' ' + (medium === 'gouache' ? t('stGouache') : t('stAcrylic'))}`;
   }
   const amt = (n, water) => {
     if (n === 0.25) return water ? t('tip') : t('dot');
@@ -335,13 +339,16 @@
     for (const it of order) { acc2.push([it[0], it[1]]); steps.push(water ? mixHex(acc2, 0, r.d, true) : mixHex(acc2, r.white * (acc2.length === order.length ? 1 : 0), 1, false)); }
     if (!water && r.white) { steps.pop(); steps.push(mixHex(acc2, 0, 1, false)); steps.push(r.hex); }
     const strong = r.items.filter(it => it[0].strong).map(it => `<li>${esc(nm(it[0].id))} ${t('strong')}</li>`).join('');
-    const howto = water ? `<li>${t('stWater')}</li>` : `<li>${r.white ? t('stOpaque') : t('stMain') + ' ' + esc(nm(r.items[0][0].id)) + (r.items.length > 1 ? ', ' + t('stAdd') + ' ' + r.items.slice(1).map(it => esc(nm(it[0].id))).join(', ') : '') + '.'}</li><li>${medium === 'gouache' ? t('stGouache') : t('stAcrylic')}</li>`;
+    // общие советы материала — один раз над рецептами (.mx-unit), в карточке — только порядок и сильные краски
+    const seq = r.items.map(it => it[0]); const first = water ? seq[0] : (r.white ? null : seq.slice().sort((a, b) => labOfR(b.K.map((k, i) => KMf(k / b.S)))[0] - labOfR(a.K.map((k, i) => KMf(k / a.S)))[0])[0]);
+    const howto = `<li>${first ? t('stMain') + ' ' + esc(nm(first.id)) + (seq.length > 1 ? ', ' + t('stAdd') + ' ' + seq.filter(p => p !== first).map(p => esc(nm(p.id))).join(', ') : '') + '.' : t('stWhiteFirst')}</li>`;
     return `<article class="mx-r"><header><b>${t('rec')} ${i + 1}</b>${i === 0 && r.items.length === 1 ? '' : ''}<span class="mx-acc">${esc(acc)}</span></header>
-      <div class="mx-cmp"><figure>${sw(target, 'mx-big')}<figcaption>${t('want')}<br><code>${target}</code></figcaption></figure><figure>${sw(r.hex, 'mx-big')}<figcaption>${t('got')}<br><code>${r.hex}</code></figcaption></figure></div>
+      <div class="mx-dots">${rows.map(x => `<span class="mx-dot" style="background:${x.hex}" title="${esc(x.name)}"></span>`).join('<b>+</b>')}${water ? '<b>+</b><span class="mx-dot mx-sww" title="' + t('water') + '"></span>' : ''}</div>
       <ul class="mx-ing">${rows.map(x => `<li>${sw(x.hex)}<span><b>${amt(x.n, water)}</b> — ${esc(x.name)} <small>${x.ci} · ${Math.round(x.pct * 100)}%</small></span></li>`).join('')}${waterRow}</ul>
       <div class="mx-bar">${bar}</div>
       ${steps.length > 1 ? `<p class="mx-sub">${t('path')}</p><div class="mx-path">${steps.map(h => sw(h)).join('<span>→</span>')}</div>` : ''}
-      <p class="mx-sub">${t('steps')}</p><ul class="mx-how">${howto}${strong}</ul></article>`;
+      <p class="mx-sub">${t('steps')}</p><ul class="mx-how">${howto}${strong}</ul>
+      <div class="mx-cmp"><div class="mx-strip"><i style="background:${target}"></i><i style="background:${r.hex}"></i></div><div class="mx-cl"><span>${t('want')} <code>${target}</code></span><span>${t('got')} <code>${r.hex}</code></span></div></div></article>`;
   }
 
   let job = 0;
@@ -385,11 +392,13 @@
     if (m) { medium = m.dataset.m; ls.set('pp-mix-m', medium); renderMedia(); run(); return; }
     const c = e.target.closest('[data-c]');
     if (c) { setTarget(c.dataset.c); $('.mx-out').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (e.target.closest('.mx-all')) { ls.set('pp-mix-p-' + medium, MEDIA[medium].all.join(',')); renderMedia(); run(); return; }
+    if (e.target.closest('.mx-nonebtn')) { ls.set('pp-mix-p-' + medium, '-'); renderMedia(); run(); return; }
     if (e.target.closest('.mx-reset')) { ls.set('pp-mix-p-' + medium, ''); renderMedia(); run(); return; }
     if (e.target.closest('.mx-more')) palChips();
   });
   app.addEventListener('change', e => {
-    if (e.target.matches('.mx-pg input')) { const v = [...app.querySelectorAll('.mx-pg input:checked:not(:disabled)')].map(x => x.value); ls.set('pp-mix-p-' + medium, v.join(',')); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
+    if (e.target.matches('.mx-pg input')) { const v = [...app.querySelectorAll('.mx-pg input:checked:not(:disabled)')].map(x => x.value); ls.set('pp-mix-p-' + medium, v.join(',') || '-'); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
     if (e.target.matches('input[type=color]')) setTarget(e.target.value, 'pick');
     if (e.target.matches('.mx-ph input')) photo(e.target.files[0]);
   });
