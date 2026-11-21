@@ -1,0 +1,44 @@
+// Открытки /postcards/ (docs/postcards.md): общий список для браузера (postcards.js) и сервера (worker/postcards.js).
+// Новая открытка = строка здесь: id, cat (winter, bday, love, friends), art — картинка с сайта (или null — рисует postcards.js сам: scene),
+// fx — анимация поверх (snow, twinkle, hearts, sun, leaves, bubbles, confetti, balloons, sparkle, fireworks), ink — цвет надписи,
+// g — пожелание на открытке [en, ru, lv] (RU — без рода). Картинка для письма — site/images/postcards/<id>.gif (tools/postcard_gifs.py).
+(function (root) {
+  const DESIGNS = [
+    { id: 'ny-tree', cat: 'winter', art: '/images/bird/2026-pigeon-polly-sam-milka-cat-and-horse-of-the-year-celebrates-new-year.jpg', fx: 'twinkle', ink: '#9E1B22',
+      g: ['Happy New Year!', 'С Новым годом!', 'Laimīgu Jauno gadu!'] },
+    { id: 'polly-sack', cat: 'winter', art: null, scene: 'polly', fx: 'snow', ink: '#1F3A5F',
+      g: ['Ho-ho-coo! A gift from Polly', 'Хо-хо-курлык! Подарок от Полли', 'Ho-ho-kū! Dāvana no Pollija'] },
+    { id: 'chew-xmas', cat: 'winter', art: '/images/snail/2024-mr-chew-celebrates-new-year.jpg', fx: 'snow', ink: '#9E1B22',
+      g: ['Merry Christmas! Jo-ho-ho', 'С Рождеством! Хо-хо-хо', 'Priecīgus Ziemassvētkus!'] },
+    { id: 'cozy-santa', cat: 'winter', art: '/images/bird/2022-pigeon-polly-celebrates-new-year-first-time-in-the-bed.jpg', fx: 'snow', ink: '#6B2A5E',
+      g: ['Warm and cozy holidays', 'Тёплых и уютных праздников', 'Siltus un mājīgus svētkus'] },
+    { id: 'fireworks', cat: 'winter', art: null, scene: 'night', fx: 'fireworks', ink: '#22405F',
+      g: ['Hello, 2027!', 'Привет, 2027!', 'Sveiks, 2027!'] },
+    { id: 'ny-kitchen', cat: 'winter', art: '/images/bird/2025-pigeon-polly-celebrates-new-year.jpg', fx: 'sparkle', ink: '#4B2E83',
+      g: ['May the new year be delicious', 'Пусть новый год будет вкусным', 'Lai jaunais gads ir garšīgs'] },
+    { id: 'bday-candy', cat: 'bday', art: '/images/snail/2024-mr-chew-rainbow-candy-edition.jpg', fx: 'confetti', ink: '#C2367A',
+      g: ['Happy Birthday!', 'С днём рождения!', 'Daudz laimes dzimšanas dienā!'] },
+    { id: 'bday-cake', cat: 'bday', art: null, scene: 'cake', fx: 'confetti', ink: '#B0412E',
+      g: ['Make a wish!', 'Загадай желание!', 'Iedomājies vēlēšanos!'] },
+    { id: 'love-chew', cat: 'love', art: '/images/snail/2024-mr-chew-celebrates-valentines-day.jpg', fx: 'hearts', ink: '#C0392B',
+      g: ['You are so loved', 'Тебя очень любят', 'Tevi ļoti mīl'] },
+    { id: 'thanks', cat: 'friends', art: '/images/snail/2023-mr-chew-delivery.jpg', fx: 'balloons', ink: '#5B3A8E',
+      g: ['Thank you!', 'Спасибо!', 'Paldies!'] },
+    { id: 'sunshine', cat: 'friends', art: '/images/bird/2022-pigeon-polly-summer-lover.jpg', fx: 'sun', ink: '#C26A0A',
+      g: ['Sending you some sunshine', 'Немного солнца для тебя', 'Sūtu tev saules gaismu'] },
+    { id: 'coffee', cat: 'friends', art: '/images/bird/2025-pigeon-polly-romantizing-coffee-and-trains-in-autumn-vibes.jpg', fx: 'leaves', ink: '#7A4A28',
+      g: ['A cup of coziness for you', 'Чашка уюта для тебя', 'Tase mājīguma tev'] },
+    { id: 'bath', cat: 'friends', art: '/images/bird/2024-pigeon-polly-bath-relax.jpg', fx: 'bubbles', ink: '#1F6F8B',
+      g: ['Time to rest and bubble', 'Время отдохнуть', 'Laiks atpūsties'] },
+    { id: 'busy', cat: 'friends', art: '/images/bird/2026-pigeon-polly-keeps-busy-living.jpg', fx: 'sparkle', ink: '#3E5C2E',
+      g: ['Just because: you are doing great', 'Просто так: всё получается', 'Tāpat vien: tev viss izdodas'] },
+  ];
+  const CATS = [
+    ['all', ['All', 'Все', 'Visas']],
+    ['winter', ['Winter holidays', 'Зимние праздники', 'Ziemas svētki']],
+    ['bday', ['Birthday', 'День рождения', 'Dzimšanas diena']],
+    ['love', ['Love', 'Любовь', 'Mīlestība']],
+    ['friends', ['Thanks & just because', 'Спасибо и просто так', 'Paldies un tāpat vien']],
+  ];
+  root.PPPostcardDesigns = { DESIGNS, CATS, byId: id => DESIGNS.find(d => d.id === id) || null };
+})(typeof window !== 'undefined' ? window : globalThis);
