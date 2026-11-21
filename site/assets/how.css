@@ -52,7 +52,6 @@
 .hw-door-cta{margin-top:auto}
 .hw-door-play .btn.pri{background:#FBF7F1;border-color:#FBF7F1;color:var(--gr);box-shadow:none}
 .hw-door-play .btn.pri:hover{background:#fff;color:var(--gr)}
-.hw-bridge{margin:26px auto 0;max-width:660px;text-align:center;font-size:14px;line-height:1.5;color:var(--mut);padding-top:18px;border-top:1px dashed var(--line)}
 
 .hw-minute{background:var(--sheet);padding:76px 0 84px;margin-top:36px}
 .hw-h{max-width:760px;margin-bottom:34px}
@@ -90,12 +89,6 @@
 .hw-dl dd{font-size:15.5px;line-height:1.6;color:#D8D2CA}
 .hw-dl a{color:#FBF7F1;text-decoration:underline;text-decoration-color:var(--acc2);text-underline-offset:3px}
 
-.hw-more{background:var(--sheet);padding:78px 0 84px}
-.hw-more-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.hw-more-g a{display:flex;flex-direction:column;gap:4px;padding:20px 22px;border:1px solid var(--line);border-radius:6px;background:#fff;font:400 23px/1.15 Fraunces,Lora,serif;transition:transform .15s,border-color .15s}
-.hw-more-g a:hover{transform:translateY(-2px);border-color:var(--acc)}
-.hw-more-g small{font:400 14px/1.4 Karla,'Nunito Sans',sans-serif;color:var(--mut)}
-
 .hw-qa{padding:78px 0 84px}
 .hw-faq{border-top:1px solid var(--line)}
 .hw-faq details{border-bottom:1px solid var(--line)}
@@ -124,7 +117,6 @@
   .hw-doors-g{grid-template-columns:1fr}
   .hw-keys{grid-template-columns:1fr 1fr}
   .hw-dl{grid-template-columns:1fr}
-  .hw-more-g{grid-template-columns:1fr 1fr}
   .hw-stops{display:flex;flex-direction:column;height:auto;gap:0;padding-left:46px}
   .hw-stops:before{left:18px;right:auto;top:6px;bottom:10px;border-top:0;border-left:2px dashed var(--line)}
   .hw-stop{height:auto;min-height:0;padding:0 0 26px}
@@ -141,7 +133,7 @@
   .hw-door h2{font-size:30px}
   .hw-door-lead{font-size:15px}
   .hw-secs b{font-size:19px}
-  .hw-minute,.hw-steps,.hw-more,.hw-qa{padding:56px 0}
+  .hw-minute,.hw-steps,.hw-qa{padding:56px 0}
   .hw-words{padding:58px 0}
   .hw-minute{margin-top:26px}
   .hw-keys{grid-template-columns:1fr}
@@ -152,7 +144,6 @@
   .hw-stop{padding-bottom:22px}
   .hw-stop-card h3{font-size:21px}
   .hw-stop-card p{font-size:13.5px}
-  .hw-more-g{grid-template-columns:1fr}
   .hw-faq summary{font-size:21px;gap:10px}
   .hw-faq p{padding-left:28px}
   .hw-end{padding:60px 0 68px}
