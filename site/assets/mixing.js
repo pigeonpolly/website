@@ -215,6 +215,11 @@
     stWater: { en: 'Wet the paint with water in a palette well, then add the other colours one by one and stir. Test on a scrap of the same paper: watercolour dries lighter.', ru: 'Размочите краску водой в лунке палитры, добавьте остальные цвета по одному и размешайте. Проверьте на обрезке той же бумаги: акварель высыхает светлее.', lv: 'Samitrini krāsu ar ūdeni paletes iedobē, pievieno pārējās krāsas pa vienai un samaisi. Pārbaudi uz tā paša papīra strēmeles: akvarelis nožūst gaišāks.' },
     stGouache: { en: 'Gouache shifts a little as it dries: light colours often dry lighter, dark ones a bit lighter and duller too. Make a test swatch and let it dry.', ru: 'Гуашь при высыхании немного меняется: светлые цвета обычно светлеют, тёмные тоже становятся чуть светлее и глуше. Сделайте выкраску и дайте ей высохнуть.', lv: 'Guaša, nožūstot, nedaudz mainās: gaišas krāsas parasti kļūst gaišākas, tumšās arī mazliet gaišākas un blāvākas. Uztaisi izkrāsojumu un ļauj tam nožūt.' },
     stAcrylic: { en: 'Acrylic dries a little darker than it looks wet: mix a touch lighter than you need.', ru: 'Акрил высыхает чуть темнее, чем выглядит мокрым: смешайте чуть светлее, чем нужно.', lv: 'Akrils nožūst mazliet tumšāks, nekā izskatās slapjš: sajauc nedaudz gaišāku, nekā vajag.' },
+    strongS: { en: 'very strong, add by tiny bits', ru: 'очень сильная, добавляйте по капельке', lv: 'ļoti spēcīga, pievieno pa pilieniņam' },
+    wheel: { en: 'Colour wheel', ru: 'Цветовой круг', lv: 'Krāsu aplis' },
+    wYou: { en: 'your colour (closer to the centre = more muted)', ru: 'ваш цвет (ближе к центру — глуше)', lv: 'tava krāsa (tuvāk centram — blāvāka)' },
+    wOpp: { en: 'its opposite', ru: 'противоположный', lv: 'pretējā' },
+    rules: { en: 'Mixing rules', ru: 'Правила смешивания', lv: 'Jaukšanas noteikumi' },
     strong: { en: 'is very strong: add it in tiny amounts.', ru: 'очень сильная краска: добавляйте совсем понемногу.', lv: 'ir ļoti spēcīga krāsa: pievieno pavisam pa druskai.' },
     path: { en: 'Step by step', ru: 'Шаг за шагом', lv: 'Soli pa solim' },
     about: { en: 'About this colour', ru: 'Про этот цвет', lv: 'Par šo krāsu' },
@@ -332,25 +337,54 @@
       const paint = r.items.reduce((a, it) => a + it[1], 0), wb = Math.max(0, Math.round(paint * (1 / Math.max(r.d, 0.03) - 1) * 2) / 2);
       waterRow = `<li class="mx-w"><span class="mx-sw mx-sww"></span><span><b>${wb >= 0.5 ? t('waterAbout') + ' ' + amt(wb, true) + ' ' + t('waterOf') : t('waterLittle')}</b><small>${esc(cons)}</small></span></li>`;
     }
-    const bar = rows.map(x => `<i style="flex:${x.pct};background:${x.hex}" title="${Math.round(x.pct * 100)}%"></i>`).join('');
     // шаг за шагом: краски добавляются по очереди
     const steps = []; const acc2 = [];
-    const order = water ? r.items.slice() : r.items.slice();
-    for (const it of order) { acc2.push([it[0], it[1]]); steps.push(water ? mixHex(acc2, 0, r.d, true) : mixHex(acc2, r.white * (acc2.length === order.length ? 1 : 0), 1, false)); }
-    if (!water && r.white) { steps.pop(); steps.push(mixHex(acc2, 0, 1, false)); steps.push(r.hex); }
-    const strong = r.items.filter(it => it[0].strong).map(it => `<li>${esc(nm(it[0].id))} ${t('strong')}</li>`).join('');
-    // общие советы материала — один раз над рецептами (.mx-unit), в карточке — только порядок и сильные краски
-    const seq = r.items.map(it => it[0]); const first = water ? seq[0] : (r.white ? null : seq.slice().sort((a, b) => labOfR(b.K.map((k, i) => KMf(k / b.S)))[0] - labOfR(a.K.map((k, i) => KMf(k / a.S)))[0])[0]);
-    const howto = `<li>${first ? t('stMain') + ' ' + esc(nm(first.id)) + (seq.length > 1 ? ', ' + t('stAdd') + ' ' + seq.filter(p => p !== first).map(p => esc(nm(p.id))).join(', ') : '') + '.' : t('stWhiteFirst')}</li>`;
-    return `<article class="mx-r"><header><b>${t('rec')} ${i + 1}</b>${i === 0 && r.items.length === 1 ? '' : ''}<span class="mx-acc">${esc(acc)}</span></header>
+    if (!water && r.white) steps.push(WHITE_HEX); // гуашь и акрил с белилами: начинаем с белил и добавляем цвета
+    for (const it of r.items) { acc2.push([it[0], it[1]]); steps.push(water ? mixHex(acc2, 0, r.d, true) : mixHex(acc2, r.white, 1, false)); }
+    // общие советы материала — один раз над рецептами (.mx-unit), в карточке — только порядок
+    const seq = r.items.map(it => it[0]); const first = water ? seq[0] : (r.white ? null : seq.slice().sort((a, b) => labOfR(b.K.map(k => KMf(k / b.S)))[0] - labOfR(a.K.map(k => KMf(k / a.S)))[0])[0]);
+    const howto = first ? t('stMain') + ' ' + esc(nm(first.id)) + (seq.length > 1 ? ', ' + t('stAdd') + ' ' + seq.filter(p => p !== first).map(p => esc(nm(p.id))).join(', ') : '') + '.' : t('stWhiteFirst');
+    const strongIds = new Set(r.items.filter(it => it[0].strong).map(it => it[0].id));
+    return `<article class="mx-r"><header><b>${t('rec')} ${i + 1}</b><span class="mx-acc">${esc(acc)}</span></header>
       <div class="mx-dots">${rows.map(x => `<span class="mx-dot" style="background:${x.hex}" title="${esc(x.name)}"></span>`).join('<b>+</b>')}${water ? '<b>+</b><span class="mx-dot mx-sww" title="' + t('water') + '"></span>' : ''}</div>
-      <ul class="mx-ing">${rows.map(x => `<li>${sw(x.hex)}<span><b>${amt(x.n, water)}</b> — ${esc(x.name)} <small>${x.ci} · ${Math.round(x.pct * 100)}%</small></span></li>`).join('')}${waterRow}</ul>
-      <div class="mx-bar">${bar}</div>
-      ${steps.length > 1 ? `<p class="mx-sub">${t('path')}</p><div class="mx-path">${steps.map(h => sw(h)).join('<span>→</span>')}</div>` : ''}
-      <p class="mx-sub">${t('steps')}</p><ul class="mx-how">${howto}${strong}</ul>
+      <ul class="mx-ing">${rows.map(x => `<li><b>${amt(x.n, water)}</b> ${esc(x.name)} <small>${x.ci} · ${Math.round(x.pct * 100)}%</small>${[...strongIds].some(id => nm(id) === x.name) ? `<em>⚡ ${t('strongS')}</em>` : ''}</li>`).join('')}${waterRow}</ul>
+      <p class="mx-how">${steps.length > 1 ? `<span class="mx-path">${steps.map(h => sw(h)).join('<span>→</span>')}</span>` : ''}${howto}</p>
       <div class="mx-cmp"><div class="mx-strip"><i style="background:${target}"></i><i style="background:${r.hex}"></i></div><div class="mx-cl"><span>${t('want')} <code>${target}</code></span><span>${t('got')} <code>${r.hex}</code></span></div></div></article>`;
   }
 
+  // цветовой круг художника (жёлтый — красный — синий): 12 секторов, точка — нужный цвет (ближе к центру — глуше), ◦ — противоположный
+  const WHEEL = ['#F7D417', '#F6A91B', '#F07F1F', '#E5502A', '#D3263A', '#B0246C', '#6E3A8E', '#44449A', '#2856A8', '#16848A', '#3A9A4A', '#9CC23A'];
+  const WN = [['yellow', 'жёлтый', 'dzeltens'], ['yellow-orange', 'жёлто-оранжевый', 'dzelteni oranžs'], ['orange', 'оранжевый', 'oranžs'], ['red-orange', 'красно-оранжевый', 'sarkani oranžs'], ['red', 'красный', 'sarkans'], ['red-violet', 'красно-фиолетовый', 'sarkani violets'], ['violet', 'фиолетовый', 'violets'], ['blue-violet', 'сине-фиолетовый', 'zili violets'], ['blue', 'синий', 'zils'], ['blue-green', 'сине-зелёный', 'zili zaļš'], ['green', 'зелёный', 'zaļš'], ['yellow-green', 'жёлто-зелёный', 'dzelteni zaļš']];
+  const WH = WHEEL.map(h => lch(labOfHex(h))[2]);
+  // оттенок OKLCh → положение на круге художника (0…12), по ближайшим секторам
+  const wheelPos = h => {
+    for (let k = 0; k < 12; k++) {
+      const a = WH[k], b = WH[(k + 1) % 12]; let span = (a - b + 360) % 360, dd = (a - h + 360) % 360; // по кругу оттенки убывают Y→R→V→B→G
+      if (dd <= span) return k + (span ? dd / span : 0);
+    }
+    return 0;
+  };
+  function wheelSVG(tl) {
+    const [, C, h] = lch(tl), pos = wheelPos(h), R = 70, cx = 80, cy = 80;
+    const pt = (p, r) => { const a = (p / 12) * 2 * Math.PI - Math.PI / 2; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    let seg = '';
+    for (let k = 0; k < 12; k++) {
+      const [x1, y1] = pt(k - 0.5, R), [x2, y2] = pt(k + 0.5, R), [x3, y3] = pt(k + 0.5, 34), [x4, y4] = pt(k - 0.5, 34);
+      seg += `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)}A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}L${x3.toFixed(1)} ${y3.toFixed(1)}A34 34 0 0 0 ${x4.toFixed(1)} ${y4.toFixed(1)}Z" fill="${WHEEL[k]}"><title>${WN[k][gi]}</title></path>`;
+    }
+    const rr = C < 0.03 ? 0 : 34 + Math.min(1, C / 0.2) * 36, [mx, my] = rr ? pt(pos, rr) : [cx, cy], [ox, oy] = pt(pos + 6, 52);
+    return `<svg class="mx-wheel" viewBox="0 0 160 160" role="img" aria-label="${t('wheel')}">${seg}<circle cx="80" cy="80" r="33" fill="#FFFDF8"/><circle cx="80" cy="80" r="14" fill="#8E8A86"/>` +
+      `<circle cx="${ox.toFixed(1)}" cy="${oy.toFixed(1)}" r="8" fill="none" stroke="#fff" stroke-width="3"/><circle cx="${ox.toFixed(1)}" cy="${oy.toFixed(1)}" r="8" fill="none" stroke="#2A2230" stroke-width="1.5" stroke-dasharray="3 2"/>` +
+      `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="11" fill="${target}" stroke="#fff" stroke-width="3"/><circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="12.5" fill="none" stroke="#2A2230" stroke-width="1.5"/></svg>`;
+  }
+  const RULES = [
+    { en: 'Mix two paints that sit next to each other on the wheel to get a clean, bright colour. Violet = ultramarine + a pink-leaning red (quinacridone rose), not orange-leaning red.', ru: 'Для чистого яркого цвета смешивайте две краски, которые на круге рядом. Фиолетовый = ультрамарин + красный с уклоном в розовый (хинакридон), а не в оранжевый.', lv: 'Tīrai spilgtai krāsai jauc divas krāsas, kas aplī ir blakus. Violetā = ultramarīns + sarkanā ar rozā nokrāsu (hinakridons), nevis ar oranžu.' },
+    { en: 'Opposite colours on the wheel calm each other down: this is how you get greys, browns and soft muted colours.', ru: 'Противоположные на круге цвета гасят друг друга: так получаются серые, коричневые и мягкие приглушённые цвета.', lv: 'Pretējās krāsas aplī nodzēš viena otru: tā sanāk pelēkās, brūnās un maigas remdenas krāsas.' },
+    { en: 'The fewer paints, the cleaner the colour: 2–3 paints at most.', ru: 'Чем меньше красок, тем чище цвет: не больше 2–3.', lv: 'Jo mazāk krāsu, jo tīrāka krāsa: ne vairāk kā 2–3.' },
+    { en: 'Add dark to light, a little at a time — never the other way round.', ru: 'Добавляйте тёмное в светлое понемногу — не наоборот.', lv: 'Pievieno tumšo gaišajam pa druskai — ne otrādi.' },
+    { en: 'Lighter: water in watercolour, white in gouache and acrylic (white also makes the colour cooler and chalkier).', ru: 'Светлее: в акварели — водой, в гуаши и акриле — белилами (белила ещё делают цвет холоднее и «мелованнее»).', lv: 'Gaišāk: akvarelī — ar ūdeni, guašā un akrilā — ar balto (baltā krāsu arī padara vēsāku un krītaināku).' },
+    { en: 'Darker: not with black, but with a dark neighbour or the opposite colour (ultramarine, burnt umber).', ru: 'Темнее: не чёрной, а тёмной соседней или противоположной краской (ультрамарин, умбра).', lv: 'Tumšāk: nevis ar melno, bet ar tumšu blakus vai pretējo krāsu (ultramarīns, umbra).' },
+  ];
   let job = 0;
   function run() {
     const my = job = job + 1;
@@ -373,9 +407,11 @@
       }
       const tu = tune(best, water, ids);
       const tRow = (k, x) => x ? `<li>${sw(tu.base)}<span>→</span>${sw(x.hex)}<span><b>${t(k)}:</b> ${esc(x.txt)}</span></li>` : '';
-      $('.mx-out').innerHTML = gam + res.recipes.map((r, i) => recipeHTML(r, i, water)).join('') +
-        `<article class="mx-r mx-th"><header><b>${t('about')}</b></header><p class="mx-desc">${sw(target)} <b>${esc(d.words)}</b></p><p>${esc(d.theory)}</p>
-        <p class="mx-sub">${t('tune')}</p><ul class="mx-tune">${tRow('lighter', tu.lighter)}${tRow('darker', tu.darker)}${tRow('muted', tu.muted)}</ul></article>`;
+      $('.mx-out').innerHTML = `<article class="mx-r mx-th"><div class="mx-thw">${wheelSVG(res.tLab)}<p class="mx-wl"><span><i class="mx-k1"></i>${t('wYou')}</span><span><i class="mx-k2"></i>${t('wOpp')}</span></p></div><div class="mx-tht">
+        <header><b>${t('about')}</b></header><p class="mx-desc">${sw(target)} <b>${esc(d.words)}</b></p><p>${esc(d.theory)}</p>
+        <p class="mx-sub">${t('tune')}</p><ul class="mx-tune">${tRow('lighter', tu.lighter)}${tRow('darker', tu.darker)}${tRow('muted', tu.muted)}</ul>
+        <details class="mx-rules"${matchMedia('(min-width: 1100px)').matches ? ' open' : ''}><summary>📐 ${t('rules')}</summary><ol>${RULES.map(x => `<li>${esc(x[L])}</li>`).join('')}</ol></details></div></article>` +
+        gam + res.recipes.map((r, i) => recipeHTML(r, i, water)).join('');
     }, 30);
   }
   function setTarget(h, from) {
