@@ -188,6 +188,27 @@
       for (let i = 0; i < 3; i++) { const q = (t + i / 3) % 1, x = Math.round(q * (W + 20)) - 10, y = 18 + i * 12 + Math.round(S(t, 3, i * .3) * 4), up = S(t, 8, i * .2) > 0;
         R(x - 1, y, 3, 2, '#0B0614'); if (up) { LINE(x - 5, y - 2, x - 1, y, '#0B0614'); LINE(x + 5, y - 2, x + 1, y, '#0B0614'); } else { LINE(x - 5, y + 2, x - 1, y, '#0B0614'); LINE(x + 5, y + 2, x + 1, y, '#0B0614'); } }
     },
+    // ⏳ открытки на сегодня кончились: Полли мешает чернила в котелке, рядом в горшке растёт бумага (листки-листья качаются и подрастают)
+    ink(c, t) { g = c;
+      R(0, 0, W, H, '#F3EADF'); for (let x = 0; x < W; x += 12) for (let y = 6; y < 92; y += 12) P(x + (y / 12 % 2) * 6, y, '#E6D8C6');
+      R(0, 92, W, 28, '#C9A27E'); for (let y = 96; y < H; y += 6) R(0, y, W, 1, '#B48D6A'); R(0, 92, W, 2, '#A47C5A');
+      // полка с баночками чернил
+      R(8, 30, 52, 3, '#8A5A3B'); [['#22405F', 12], ['#9E1B22', 24], ['#4B2E83', 36], ['#2F6B3A', 48]].forEach(([col, x], i) => { R(x, 20, 8, 10, col); R(x + 1, 18, 6, 2, '#2A211C'); P(x + 2, 22, '#FFFFFF66'); });
+      // котелок с чернилами на огне
+      const kx = 54, ky = 90; for (let i = 0; i < 3; i++) TRI(kx - 6 + i * 6, ky + 2 - 6 - Math.round(S(t, 4, i * .3) * 2), 7, 5, ['#E8862E', '#F6C445', '#E5484D'][i]);
+      E(kx, ky - 8, 18, 10, '#2A2A33'); R(kx - 19, ky - 18, 38, 4, '#3A3A46'); E(kx, ky - 17, 16, 2, '#4B2E83');
+      for (let i = 0; i < 5; i++) { const q = (t * 2 + i / 5) % 1; D(kx - 10 + i * 5 + Math.round(S(t, 2, i * .2) * 2), ky - 19 - q * 18, 1 + (q < .5 ? 1 : 0), q < .7 ? '#6B4FA3' : '#9C86C9'); }
+      // ложка, которой мешает Полли
+      const sw = Math.round(S(t, 2) * 4); LINE(kx + 2 + sw, ky - 18, kx + 14 + sw, ky - 36, '#8A5A3B'); R(kx + sw, ky - 18, 4, 2, '#8A5A3B');
+      polly(kx + 12, 55, { hat: 'beret', legs: S(t, 2) > 0 ? 'legA' : 'legB', closed: S(t, 1, .2) > .96 });
+      // горшок с бумажным деревцем
+      const px = 140, py = 92; R(px - 12, py - 14, 24, 14, '#C8642A'); R(px - 14, py - 16, 28, 4, '#D9752F'); R(px - 10, py - 12, 2, 10, '#E08A4A');
+      const grow = 34 + Math.round(S(t, 1) * 3); LINE(px, py - 16, px, py - 16 - grow, '#4E7A2E'); LINE(px, py - 30, px - 10, py - 40, '#4E7A2E'); LINE(px, py - 34, px + 11, py - 44, '#4E7A2E');
+      [[px - 14, py - 46, -1], [px + 10, py - 50, 1], [px - 6, py - 16 - grow - 8, 0], [px + 2, py - 28, 1]].forEach(([x, y, d], i) => { const k = Math.round(S(t, 1, i * .25) * 1.5);
+        R(x + k, y, 9, 11, '#FFFFFF'); R(x + k, y, 9, 1, '#E6E1D8'); R(x + 8 + k, y, 1, 11, '#E6E1D8'); for (let l = 3; l < 10; l += 2) R(x + 2 + k, y + l, 5, 1, '#C9D6F2'); });
+      // лейка капает
+      const dq = (t * 3) % 1; P(px + 18, py - 40 + dq * 20, '#7FB8E3'); R(px + 16, py - 52, 10, 7, '#7FB8E3'); LINE(px + 16, py - 50, px + 12, py - 46, '#7FB8E3');
+    },
   };
   window.PPPostcardScenes = { W, H, draw: (name, c, t) => { if (SC[name]) { c.imageSmoothingEnabled = false; SC[name](c, t); } } };
 })();
