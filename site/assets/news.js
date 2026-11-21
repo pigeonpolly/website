@@ -37,6 +37,13 @@
       act: ['Open the gift', 'Открыть подарок', 'Atvērt dāvanu'],
       go: () => pre + '/bird/#gift',
     },
+    postcard: { // 💌 открытка от кого-то (worker/postcards.js postcardNews); гаснет, когда открыта или открыты «Мои открытки»
+      icon: '💌',
+      title: x => x.n > 1 ? [`Postcards for you! (${x.n})`, `Тебе открытки! (${x.n})`, `Tev kartītes! (${x.n})`][L] : ['A postcard for you!', 'Тебе открытка!', 'Tev kartīte!'][L],
+      text: x => x.from ? [`From ${x.from}`, `От: ${x.from}`, `No: ${x.from}`][L] : ['From a secret friend', 'От тайного друга', 'No slepena drauga'][L],
+      act: ['Open the postcard', 'Открыть открытку', 'Atvērt kartīti'],
+      go: x => pre + (x.n > 1 || !x.t ? '/postcards/#inbox' : '/postcards/?c=' + x.t),
+    },
     salary: {
       icon: '💌',
       title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],

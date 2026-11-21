@@ -29,6 +29,7 @@
 | Freebies /freebies/: календари, заставки для скачивания | docs/freebies.md |
 | Раскраски (Уроки → Раскраски, PDF для своих) | docs/coloring.md |
 | Коллекционные карточки | docs/cards.md |
+| Открытки /postcards/ («Отправить подарок»): новая открытка — строка в postcard-designs.js и GIF `tools/postcard_gifs.py` | docs/postcards.md |
 | Кабинет, статистика | docs/admin.md |
 | Полли-питомец | docs/polly-pet.md |
 | «Нарисуй мне» | docs/requests.md |

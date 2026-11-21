@@ -79,7 +79,8 @@
 .pc-to{font:700 clamp(24px,4vw,34px) Caveat,cursive;color:#5B3A2E}
 .pc-flap{position:absolute;left:0;right:0;top:0;height:56%;background:#D9C3A9;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0;z-index:4;transition:transform .7s ease,z-index 0s .35s}
 .pc-seal{position:absolute;left:50%;top:44%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:#9E1B22;color:#F6E3C6;font:700 24px/52px Fraunces,Georgia,serif;z-index:5;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:opacity .3s}
-.pc-in{position:absolute;left:5%;right:5%;top:4%;z-index:2;transition:transform 1s cubic-bezier(.3,.8,.3,1) .5s}
+.pc-in{position:absolute;left:5%;right:5%;top:4%;z-index:2;opacity:0;transition:transform 1s cubic-bezier(.3,.8,.3,1) .5s,opacity .3s .4s}
+.pc-envl.open .pc-in{opacity:1}
 .pc-envl:not(.open):hover .pc-flap{transform:rotateX(18deg)}
 .pc-envl.open .pc-flap{transform:rotateX(180deg);z-index:1}
 .pc-envl.open .pc-seal{opacity:0}

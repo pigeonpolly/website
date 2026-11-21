@@ -1,0 +1,20 @@
+# Открытки /postcards/ («Отправить подарок»)
+
+## Кратко
+- Вошедшая птичка с ником выбирает живую открытку, может поменять надпись, пишет послание, имя и почту получателя (или «анонимно — от тайного друга») и отправляет. Получателю — письмо с анимированной картинкой и кнопкой «Открыть открытку».
+- Вход — кнопка «🎁 Send a gift» на главной (src/pages/preview.html, `.gift-go`, белый текст на тёмно-красном) и сама страница `src/pages/postcards.html` (шаблон V2, build.py `PAGES`, `V2`).
+- Шапка страницы: пиксельная Полли в шапке Санты с шарфом и мешком подарков (`PollyPet.paint` в polly.js), из мешка выпрыгивают подарочки; облачко — счётчик отправленных (`/api/postcards/stats`).
+
+## Открытки
+- Список — site/assets/postcard-designs.js `PPPostcardDesigns.DESIGNS` (общий для браузера и worker): id, cat (winter, bday, love, seasons, friends), art (картинка с сайта) или scene, fx, ink, g — надпись [en, ru, lv]. Сейчас 20: 10 с артами Алины, 10 рисованных.
+- Рисованные сцены — site/assets/postcard-scenes.js `PPPostcardScenes` (180×120, растягиваются без сглаживания): xmas, night (Новый год), polly (с мешком), cake (ДР), love, flowers (8 Марта), easter, ligo, halloween. Полли в них — `PollyPet.paint(canvas, {sp, hat, acc, legs, closed})` (hat: beret, party, santa, wreath, witch).
+- Анимация поверх — postcards.js `FX` (snow, twinkle, sparkle, hearts, bubbles, confetti, leaves, balloons, sun, fireworks): всё — функция фазы t ∈ [0,1), петля 4 с без шва.
+- Новая открытка: строка в DESIGNS (+ сцена, если рисованная) → `python3 build.py` → `python3 tools/postcard_gifs.py <id>` (GIF для письма: 16 кадров по 250 мс, 560 px, site/images/postcards/<id>.gif).
+
+## Как работает
+- worker/postcards.js `postcardsApi`: POST /api/postcards/send, GET /api/postcards/card?t=, GET /api/postcards/inbox, POST /api/postcards/seen, GET /api/postcards/stats, GET/POST /api/postcards/block (отказ получателя, подпись HMAC секретом `mail_secret`).
+- Таблицы `postcards`, `postcard_block` (docs/db.md). Аноним: `from_name` пустое, `from_uid` в базе остаётся.
+- Видит на сайте: открывший ссылку из письма вошедший (кроме отправителя) — открытка становится его (`to_uid`); иначе — птичка с той же подтверждённой почтой (`email_ok`). Новость в «конвертике» — вид `postcard` (NEWS_KINDS, news.js), гаснет после просмотра.
+- Письмо — `mailHtml(subject, text, date, {img, href, caption, ink, btn})` (worker/mail-html.js): картинка-GIF, надпись рукописным, кнопка «Открыть открытку», в подвале «Не присылать мне открытки». Правило «одно письмо в день» к открыткам не относится (их шлёт человек).
+- Защита: только вошедшим с ником; `pcDay` в сутки с птички (5) и 2 на один адрес; ссылки из текста и надписи вырезаются; писем в сутки `pcMailDay` (40) и общий лимит с остальными письмами (`usedToday`, meta `pc_mail_n:<день>`, ≤95 из 100 Resend); не влезло — очередь, `postcardCron` раз в час (14 дней). Числа — «📜 Правила» → «💌 Открытки».
+- Проверено 21.11.2026: 25 проверок API на node:sqlite (лимиты, аноним, вырезание ссылок, входящие, отказ, очередь); страница, конверт, «Мои открытки» — Playwright 390 и 1440 с подставным /api. На живом сайте после деплоя не проверено.
