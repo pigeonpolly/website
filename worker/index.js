@@ -1177,7 +1177,9 @@ async function dayCard(env, req, u, L, withLog) {
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 // ---------- копия картинок: MEDIA (pigeonpolly-media) → MEDIA_BACKUP (pigeonpolly-backup), только новые, по 50 за запуск; из копии ничего не удаляется ----------
 const BACKUP_PREFIXES = ['blog/', 'art/', 'cards/', 'howto/'];
-async function r2Keys(bucket, prefix) { const keys = []; let cursor; do { const r = await bucket.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); return keys; }
+// r2Try — повтор при разовых сбоях R2 (например «internal error 10001»): 3 попытки, пауза 1 и 3 с
+async function r2Try(fn, tries = 3) { for (let i = 0; ; i++) { try { return await fn(); } catch (e) { if (i >= tries - 1) throw e; await new Promise(r => setTimeout(r, i ? 3000 : 1000)); } } }
+async function r2Keys(bucket, prefix) { const keys = []; let cursor; do { const r = await r2Try(() => bucket.list({ prefix, cursor })); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); return keys; }
 async function mediaBackup(env, max = 50) {
   if (!env.MEDIA || !env.MEDIA_BACKUP) return { copied: 0, left: 0 };
   let copied = 0, left = 0;
@@ -1185,9 +1187,8 @@ async function mediaBackup(env, max = 50) {
     const have = new Set(await r2Keys(env.MEDIA_BACKUP, prefix));
     for (const k of (await r2Keys(env.MEDIA, prefix)).filter(k => !have.has(k))) {
       if (copied >= max) { left++; continue; }
-      const obj = await env.MEDIA.get(k);
-      if (!obj) continue;
-      await env.MEDIA_BACKUP.put(k, obj.body, { httpMetadata: obj.httpMetadata });
+      const ok = await r2Try(async () => { const obj = await env.MEDIA.get(k); if (!obj) return false; await env.MEDIA_BACKUP.put(k, obj.body, { httpMetadata: obj.httpMetadata }); return true; });
+      if (!ok) continue;
       copied++;
     }
   }
