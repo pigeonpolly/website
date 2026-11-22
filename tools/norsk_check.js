@@ -42,6 +42,14 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
     const txt = part ? part.txt.join(' ').toLowerCase() : '';
     for (const w of Object.keys(n.gl || {})) if (!new RegExp(`(?<![\\wæøå])${w.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\wæøå])`).test(txt)) bad.push(`${u.id}: подсказки «${w}» нет в тексте части книги`);
   }
+  const stories = await pg.evaluate(() => window.NO_STORIES || {}); // 📚 Fortelling (content/norsk/stories.js)
+  for (const [id, F] of Object.entries(stories)) {
+    if (!units.some(u => u.id === id)) bad.push(`рассказ ${id}: нет такого урока`);
+    for (const k of ['title', 'txt', 'sm', 'q']) if (!F[k]) bad.push(`рассказ ${id}: нет ${k}`);
+    for (const g of F.q || []) fmtCheck(`${id}-f`, g);
+    const t = (F.txt || []).join(' ').toLowerCase();
+    for (const w of Object.keys(F.gl || {})) if (!t.includes(w.toLowerCase())) bad.push(`рассказ ${id}: подсказки «${w}» нет в тексте`);
+  }
   const topics = await pg.evaluate(() => window.NO_TOPICS || {});
   for (const u of units) { const T = topics[u.id]; if (!T) { bad.push(u.id + ': нет тематического словаря (topics.js)'); continue; } if (T.w.length < 12) bad.push(u.id + ': в теме мало слов'); for (const w of T.w) if (w.length !== 3 || w.some(x => /\|| # /.test(x))) bad.push(u.id + ': тема, плохое слово ' + w[0]); }
   const noTr = await pg.evaluate(() => { const out = []; for (const u of UNITS) { const ss = [...(u.ex || []).filter(e => e.t === 'order').flatMap(e => e.q.map(q => q.split('|')[0])), ...(u.words || []).map(w => w[2]), ...(((window.NO_TOPICS || {})[u.id] || {}).w || []).map(w => w[2])].filter(Boolean); for (const x of ss) if (!window.NO_DEBUG.ruOf(x)) out.push(u.id + ': ' + x); } return out; });

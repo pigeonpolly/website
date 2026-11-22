@@ -396,7 +396,7 @@
     const nu = UNITS[reach()]; if (reach() > was && nu) toast('🔓', nu.lvl + ' · ' + nu.t, `Урок пройден на ${PASS} % — открыт следующий`, 'Открыто: ');
   }
   // ---------- ошибки: где ошибаюсь — там новые задания ----------
-  const refUnit = ref => byId(ref.replace(/-(e\d+|x\d+|m|t|r|b|s|v)#\d+$/, '')); // x — «🎯 Бонус» (вне процента урока и замков)
+  const refUnit = ref => byId(ref.replace(/-(e\d+|x\d+|m|t|r|b|f|s|v)#\d+$/, '')); // x — «🎯 Бонус» (вне процента урока и замков)
   function mark(it, ok) {
     const u = refUnit(it.ref), bump = k => { const a = S.m[k] || [0, 0]; S.m[k] = [a[0] + (ok ? 0 : 1), a[1] + 1]; };
     if (u) bump(u.id); bump('t:' + it.t);
@@ -406,6 +406,7 @@
   function groupsOf(u, tag) { // задания блока в том же порядке, что на странице (без авто-заданий «Своими словами»)
     if (/^e\d+$/.test(tag)) { const e = (u.ex || [])[+tag.slice(1)]; return e ? [e] : []; }
     if (/^x\d+$/.test(tag)) { const e = (u.bonus || [])[+tag.slice(1)]; return e ? [e] : []; }
+    if (tag === 'f') return ((window.NO_STORIES || {})[u.id] || {}).q || [];
     if (tag === 'r') return (u.read || {}).q || [];
     if (tag === 's') return [{ t: 'choice', q: (u.series || []).map(s => s.qz).filter(Boolean) }];
     if (tag === 'm') return [{ t: 'mk', q: (NOTES[u.id] || {}).mk || [] }];
@@ -449,7 +450,7 @@
   }
   function weakUnits() { return UNITS.filter(u => (S.m[u.id] || [0, 0])[1] >= 5).map(u => [u, S.m[u.id][0] / S.m[u.id][1]]).filter(x => x[1] >= .15).sort((a, b) => b[1] - a[1]); }
   function fixItems(units, n) { // задания с ошибками (сначала самые частые) + новые задания по тем же урокам, если ошибок мало
-    const refs = Object.entries(S.x).filter(([r]) => { const u = refUnit(r); return u && !/-[rb]#/.test(r) && (!units || units.includes(u)); }) /* вопросы к текстам и главам книги — только рядом с текстом */.sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    const refs = Object.entries(S.x).filter(([r]) => { const u = refUnit(r); return u && !/-[rbf]#/.test(r) && (!units || units.includes(u)); }) /* вопросы к текстам и главам книги — только рядом с текстом */.sort((a, b) => b[1] - a[1]).map(x => x[0]);
     const out = []; for (const r of refs) { if (out.length >= n) break; const it = itemByRef(r); if (it) out.push(variant(it)); }
     const pool = shuffle((units || weakUnits().map(x => x[0])).flatMap(u => blocksOf(u).filter(b => !/-[wrb]$/.test(b)).flatMap(b => itemsOf(b).map((_, i) => b + '#' + i)))).filter(r => !refs.includes(r));
     for (const r of pool) { if (out.length >= n) break; const it = itemByRef(r); if (it && it.t !== 'mk') out.push(variant(it)); }
@@ -776,6 +777,7 @@
         <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь»; выделите несколько слов — переведётся фраза. Подчёркнутые — с готовой подсказкой.</p></article>${late(u.id + '-r', 'Задания к тексту', () => blockHTML(u.id + '-r', 'Задания к тексту', r.q, { track: true }))}</section>`;
     }
     if (bk) h += bookHTML(u, bk, N);
+    h += storyHTML(u);
     if (u.series) {
       h += `<section class="sec" id="series"><h3><span class="ic">🗣</span>Как говорят норвежцы: выражения и сериалы</h3><p class="note-s">Пословицы, идиомы, «типично норвежское» — и норвежские комедии. Фразы из сериалов — в духе героев, не дословные цитаты: найдите серию по ссылке и послушайте, как это звучит у них.</p><div class="series">${u.series.map(quoteHTML).join('')}</div>
         ${late(u.id + '-s', 'Проверь себя: поймёшь норвежца?', () => blockHTML(u.id + '-s', 'Проверь себя: поймёшь норвежца?', [{ t: 'choice', q: u.series.map(s => s.qz).filter(Boolean) }], { track: true }))}</section>`;
@@ -812,14 +814,26 @@
       ${L ? `<div class="box lift"><h4>☕ Kaffepause: кофе с коллегами</h4><p>${fmt(L.tip)}</p>${phr(L.ph)}</div>` : ''}
       ${late(u.id + '-t', 'Смолток: ваша очередь', build)}</section>`;
   }
+  // 📖 чтение по шагам (как в «Short Stories in …» О. Ричардса): целиком → пересказ → ещё раз → слова → вопросы
+  const READSTEPS = '<details class="steps"><summary>📖 Как читать: 6 шагов</summary><ol><li>Прочитайте целиком, не останавливаясь на незнакомых словах. Цель — дойти до конца и уловить сюжет.</li><li>Откройте пересказ (<i>Sammendrag</i>) — понятно ли главное?</li><li>Прочитайте ещё раз, уже внимательнее.</li><li>Снова пересказ и слова; непонятное слово найдите в тексте — в контексте оно запомнится.</li><li>Ответьте на вопросы. Ошибки — не страшно: вопросы тоже учат.</li><li>Всё ещё туманно — перечитайте со словами. Понятно — идите дальше, даже если поняли не каждое слово.</li></ol></details>';
+  const smHTML = (sm, smru) => sm ? `<details class="sm"><summary>📝 Sammendrag — пересказ <span class="note-s">(откройте после первого чтения)</span></summary><p>${sayBtn(sm)} ${esc(sm)}</p>${smru ? `<p class="note-s">${esc(smru)}</p>` : ''}</details>` : '';
+  const olHTML = gl => { const w = Object.entries(gl || {}); return w.length ? `<details class="ordliste"><summary>📒 Ordliste — слова (${w.length})</summary><ul>${w.map(([a, b]) => `<li><b class="en">${esc(a)}</b> — ${esc(b)}</li>`).join('')}</ul></details>` : ''; };
+  function storyHTML(u) {
+    const F = (window.NO_STORIES || {})[u.id]; if (!F) return '';
+    return `<section class="sec" id="story"><h3><span class="ic">📚</span>Fortelling: короткий рассказ</h3><p class="note-s">Отдельная история к уроку, по желанию: на процент урока и замки не влияет.</p>${READSTEPS}
+      <article class="reading"><h4>${esc(F.title)} ${sayBtn(F.title + '. ' + F.txt.join(' '))}</h4><div class="txt">${F.txt.map(p => `<p>${glossText(p, F.gl)}</p>`).join('')}</div>
+      <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь». Подчёркнутые — с готовой подсказкой.</p></article>
+      ${smHTML(F.sm, F.smru)}${olHTML(F.gl)}${F.q && F.q.length ? blockHTML(u.id + '-f', 'Forståelsesspørsmål — вопросы', F.q, { track: true }) : ''}</section>`;
+  }
   function bookHTML(u, bk, N) {
     const k = BOOK.parts.indexOf(bk);
     return `<section class="sec" id="book"><span id="book-${u.id}"></span><h3><span class="ic">⛵</span>Книга: «${esc(BOOK.title)}»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
       <p class="note-s">Часть ${k + 1} из ${BOOK.parts.length} · повесть, написанная для этого учебника: язык растёт вместе с уровнями. ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
-      ${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
+      ${READSTEPS}${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
       <article class="reading book">${bk.h.map(x => `<h4>${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map((p, j) => { const ps = PICS[k] || []; return ps.filter(x => x.at === j && !x.after).map(x => picHTML(x)).join('') + `<p>${glossText(p, N.gl)}</p>` + ps.filter(x => x.at === j && x.after).map(x => picHTML(x)).join(''); }).join('')}</div>
       <p>${sayBtn(bk.txt.join(' ').replace(/<br>/g, ' ').replace(/&amp;/g, '&').slice(0, 3000))} <span class="note-s">послушать отрывок (начало)</span></p>
       <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь»; выделите несколько слов — переведётся фраза. Подчёркнутые — с готовой подсказкой.</p></article>
+      ${smHTML(N.sm, N.smru)}${olHTML(N.gl)}
       ${N.etb ? `<div class="box etym"><h4>🔎 Слово из книги</h4><p>${fmt(N.etb)}</p></div>` : ''}
       ${bookGroups(u).length ? late(u.id + '-b', 'Задания к книге', () => blockHTML(u.id + '-b', 'Задания к книге', bookGroups(u), { track: true })) : ''}</section>`;
   }

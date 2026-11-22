@@ -168,6 +168,12 @@ td i, td em { color: var(--en); }
 .box.why { background: var(--paper-2); }
 .box.why h4 { color: var(--accent); }
 .box.why p { margin: 4px 0; font-size: 16.5px; }
+details.steps, details.sm, details.ordliste { border: 1px solid var(--rule); border-radius: 10px; padding: 8px 14px; margin: 12px 0; background: var(--card); }
+details.steps summary, details.sm summary, details.ordliste summary { cursor: pointer; font: 600 15px var(--f-ui); }
+details.steps ol { margin: 8px 0 4px; padding-left: 22px; font-size: 16px; }
+details.sm { background: var(--ok-soft); border-color: transparent; }
+details.sm p { margin: 8px 0 4px; }
+details.ordliste ul { columns: 2 220px; margin: 8px 0 4px; padding-left: 18px; font-size: 15.5px; }
 
 .words { display: grid; gap: 8px; margin: 10px 0; padding: 0; list-style: none; }
 .words li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 6px 0; }
