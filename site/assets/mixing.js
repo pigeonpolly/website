@@ -211,6 +211,11 @@
     baseSet: { en: 'Basic pigments (any brand)', ru: 'Базовые пигменты (любой бренд)', lv: 'Pamata pigmenti (jebkurš zīmols)' },
     brandSrc: { en: 'Where the pigments come from: {src}. Tick the tubes you have. ≈ means the pigment colour is approximate.', ru: 'Откуда составы: {src}. Отметьте тюбики, которые у вас есть. ≈ — цвет пигмента приблизительный.', lv: 'No kurienes sastāvi: {src}. Atzīmē tūbiņas, kas tev ir. ≈ — pigmenta krāsa ir aptuvena.' },
     brandsNote: { en: 'This site is not affiliated with paint makers. Brand and paint names belong to their owners; pigment lists are taken from the makers’ own websites and colour charts.', ru: 'Сайт не связан с производителями красок. Названия брендов и красок принадлежат их владельцам; составы взяты с сайтов и выкрасок самих производителей.', lv: 'Vietne nav saistīta ar krāsu ražotājiem. Zīmolu un krāsu nosaukumi pieder to īpašniekiem; sastāvi ņemti no pašu ražotāju vietnēm un krāsu kartēm.' },
+    myPal: { en: 'My palette (any brands)', ru: 'Моя палитра (любые бренды)', lv: 'Mana palete (jebkuri zīmoli)' },
+    mineHow: { en: 'Build your own palette from different brands: pick a series below and tick paints — they are added here. Untick a paint here to remove it.', ru: 'Соберите палитру из разных брендов: ниже выберите серию и отметьте краски — они добавятся сюда. Снимите галочку здесь, чтобы убрать краску.', lv: 'Saliec paleti no dažādiem zīmoliem: zemāk izvēlies sēriju un atzīmē krāsas — tās pievienosies šeit. Noņem ķeksīti šeit, lai krāsu izņemtu.' },
+    mineEmpty: { en: 'Your palette is empty: add paints below.', ru: 'Палитра пока пустая: добавьте краски ниже.', lv: 'Palete vēl tukša: pievieno krāsas zemāk.' },
+    addFrom: { en: 'Add paints from', ru: 'Добавить краски из', lv: 'Pievienot krāsas no' },
+    baseShort: { en: 'basic pigment', ru: 'базовый пигмент', lv: 'pamata pigments' },
     find: { en: 'Find a paint', ru: 'Найти краску', lv: 'Atrast krāsu' },
     cloudIn: { en: '💾 Saved in your profile: the same paints on any device.', ru: '💾 Сохраняется в вашем профиле: те же краски на любом устройстве.', lv: '💾 Saglabājas tavā profilā: tās pašas krāsas jebkurā ierīcē.' },
     cloudOut: { en: '💾 Sign in and your paints will be saved in your profile, on any device.', ru: '💾 Войдите — и отмеченные краски сохранятся в профиле, на любом устройстве.', lv: '💾 Ienāc — un atzīmētās krāsas saglabāsies tavā profilā jebkurā ierīcē.' },
@@ -295,19 +300,25 @@
   function prepLine(L) {
     L.paints.forEach((x, i) => {
       const id = 'b:' + L.id + ':' + i, n = x[0], ru = x[7] || n;
-      P[id] = prep({ id, m: x[3], t: x[4], n: [n, ru, n], ci: x[2].replace(/,/g, ', ') + (x[6] ? ' ≈' : ''), strong: STRONG.test(x[2]) ? 1 : 0, blk: /^PBk\d+$/.test(x[2]) ? 1 : 0 });
+      P[id] = prep({ id, m: x[3], t: x[4], n: [n, ru, n], ci: x[2].replace(/,/g, ', ') + (x[6] ? ' ≈' : ''), strong: STRONG.test(x[2]) ? 1 : 0, blk: /^PBk\d+$/.test(x[2]) ? 1 : 0, br: L.brand + ' ' + L.name });
     });
     L.ready = 1;
   }
-  const pkey = m => 'pp-mix-p-' + m + (lineOf(m) ? '-' + brandOf(m) : '');
-  const allIds = m => { const L = lineOf(m); return L ? L.paints.map((_, i) => 'b:' + L.id + ':' + i) : MEDIA[m].all; };
-  const defaultOn = m => { const L = lineOf(m); return L ? L.starter.map(i => 'b:' + L.id + ':' + i) : MEDIA[m].on.slice(); };
-  const myPaints = m => { const s = ls.get(pkey(m)); if (s === '-') return []; const all = allIds(m); const v = s ? s.split(',').filter(id => all.includes(id)) : null; return v && v.length ? v : defaultOn(m); };
+  // «★ Моя палитра» (бренд '*'): свой набор из любых серий и базовых пигментов этого материала, ключ pp-mix-p-<материал>-mine
+  const isMine = m => brandOf(m) === '*';
+  const lineById = id => BR && BR.lines.find(l => l.id === id);
+  const ensureId = id => { if (P[id]) return true; const m = /^b:([a-z0-9-]+):\d+$/.exec(id), L = m && lineById(m[1]); if (L && !L.ready) prepLine(L); return !!P[id]; };
+  const pkey = m => 'pp-mix-p-' + m + (isMine(m) ? '-mine' : lineOf(m) ? '-' + brandOf(m) : '');
+  const minePaints = m => (ls.get('pp-mix-p-' + m + '-mine') || '').split(',').filter(id => id && id !== '-' && ensureId(id));
+  const allIds = m => { if (isMine(m)) return minePaints(m); const L = lineOf(m); return L ? L.paints.map((_, i) => 'b:' + L.id + ':' + i) : MEDIA[m].all; };
+  const defaultOn = m => { if (isMine(m)) return []; const L = lineOf(m); return L ? L.starter.map(i => 'b:' + L.id + ':' + i) : MEDIA[m].on.slice(); };
+  const myPaints = m => { if (isMine(m)) return minePaints(m); const s = ls.get(pkey(m)); if (s === '-') return []; const all = allIds(m); const v = s ? s.split(',').filter(id => all.includes(id)) : null; return v && v.length ? v : defaultOn(m); };
+  const srcOf = id => P[id] && P[id].br ? P[id].br : t('baseShort');
 
   app.innerHTML = `<nav class="mx-tabs" role="tablist"><button type="button" role="tab" data-tab="find"></button><button type="button" role="tab" data-tab="play"></button><button type="button" role="tab" data-tab="pigs"></button></nav>
     <div class="mx-pane mx-find" data-pane="find"><div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
       <label class="mx-brw">🎨 ${t('brand')} <select class="mx-brand"></select></label><p class="mx-hint mx-bsrc" hidden></p>
-      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><p class="mx-hint mx-cloud"></p><input class="mx-pfind" type="search" placeholder="🔍 ${t('find')}" hidden><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
+      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><p class="mx-hint mx-cloud"></p><input class="mx-pfind" type="search" placeholder="🔍 ${t('find')}" hidden><div class="mx-pg"></div><div class="mx-add" hidden><p class="mx-sub">${t('addFrom')}</p><select class="mx-brand mx-src"></select><input class="mx-sfind" type="search" placeholder="🔍 ${t('find')}"><div class="mx-pg mx-pgb mx-pk"></div></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
     <div class="mx-step"><h2>${t('m2')}</h2>
       <div class="mx-pickrow"><label class="mx-color"><input type="color" value="${target}" aria-label="${t('pick')}"><span class="mx-tsw"></span></label>
         <input class="mx-hex" type="text" maxlength="7" spellcheck="false" aria-label="HEX" value="${target}">
@@ -320,18 +331,34 @@
   const $ = s => app.querySelector(s);
 
   function brandOptions() {
-    const cur = lineOf(medium) ? brandOf(medium) : '';
-    return `<option value="">${t('baseSet')}</option>` + (BR ? BR.lines.filter(l => l.medium === medium).map(l => `<option value="${l.id}"${l.id === cur ? ' selected' : ''}>${esc(l.brand + ' — ' + l.name)} (${l.paints.length})</option>`).join('') : (brandOf(medium) ? `<option selected>…</option>` : ''));
+    const cur = isMine(medium) ? '*' : lineOf(medium) ? brandOf(medium) : '';
+    return `<option value="">${t('baseSet')}</option><option value="*"${cur === '*' ? ' selected' : ''}>★ ${t('myPal')} (${minePaints(medium).length})</option>` + (BR ? BR.lines.filter(l => l.medium === medium).map(l => `<option value="${l.id}"${l.id === cur ? ' selected' : ''}>${esc(l.brand + ' — ' + l.name)} (${l.paints.length})</option>`).join('') : (brandOf(medium) ? `<option selected>…</option>` : ''));
   }
+  const paintRow = (id, on, src) => `<label class="mx-p"><input type="checkbox" value="${id}"${on ? ' checked' : ''}><i style="background:linear-gradient(90deg,${P[id].m} 50%,${P[id].t} 50%)"></i><span>${esc(nm(id))}<small>${src ? esc(srcOf(id)) + ' · ' : ''}${P[id].ci}</small></span></label>`;
+  // «Добавить из…»: серия или базовые пигменты → отмеченные попадают в «Мою палитру»
+  let pickSrc = '';
+  function renderPicker() {
+    const sel = $('.mx-src'), lines = BR ? BR.lines.filter(l => l.medium === medium) : [];
+    if (pickSrc && !lines.some(l => l.id === pickSrc)) pickSrc = '';
+    sel.innerHTML = `<option value="">${t('baseSet')}</option>` + lines.map(l => `<option value="${l.id}"${l.id === pickSrc ? ' selected' : ''}>${esc(l.brand + ' — ' + l.name)} (${l.paints.length})</option>`).join('');
+    const L = pickSrc && lineById(pickSrc); if (L && !L.ready) prepLine(L);
+    const ids = L ? L.paints.map((_, i) => 'b:' + L.id + ':' + i) : MEDIA[medium].all, mine = minePaints(medium);
+    $('.mx-pk').innerHTML = ids.map(id => paintRow(id, mine.includes(id), false)).join('');
+    $('.mx-sfind').value = '';
+  }
+  let keepPicker = false; // галочка в «Добавить из…» — список подбора не перерисовываем (поиск и прокрутка остаются)
   function renderMedia() {
     app.querySelectorAll('[data-m]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.m === medium)));
-    app.querySelectorAll('.mx-brand').forEach(sel => { sel.innerHTML = brandOptions(); });
-    const L = lineOf(medium), bs = $('.mx-bsrc'); bs.hidden = !L; if (L) bs.textContent = t('brandSrc').replace('{src}', L.src);
-    $('.mx-pg').classList.toggle('mx-pgb', !!L); $('.mx-pfind').hidden = !L; $('.mx-pfind').value = '';
+    app.querySelectorAll('.mx-brand:not(.mx-src)').forEach(sel => { sel.innerHTML = brandOptions(); });
+    const mine = isMine(medium), L = mine ? null : lineOf(medium), bs = $('.mx-bsrc'); bs.hidden = !L && !mine; bs.textContent = mine ? t('mineHow') : L ? t('brandSrc').replace('{src}', L.src) : '';
+    $('.mx-pg:not(.mx-pk)').classList.toggle('mx-pgb', !!L); $('.mx-pfind').hidden = !L; $('.mx-pfind').value = '';
+    app.querySelectorAll('.mx-all, .mx-reset').forEach(b => { b.hidden = mine; });
+    if (mine) $('.mx-mine').open = true;
     const on = myPaints(medium);
-    $('.mx-pg').innerHTML = allIds(medium).map(id => `<label class="mx-p"><input type="checkbox" value="${id}"${on.includes(id) ? ' checked' : ''}><i style="background:linear-gradient(90deg,${P[id].m} 50%,${P[id].t} 50%)"></i><span>${esc(nm(id))}<small>${P[id].ci}</small></span></label>`).join('') +
+    $('.mx-pg:not(.mx-pk)').innerHTML = allIds(medium).map(id => paintRow(id, on.includes(id), mine)).join('') + (mine && !on.length ? `<p class="mx-hint">${t('mineEmpty')}</p>` : '') +
       (MEDIA[medium].water || L ? '' : `<label class="mx-p"><input type="checkbox" checked disabled><i style="background:${WHITE_HEX}"></i><span>${t('white')}<small>PW6</small></span></label>`);
     $('.mx-cnt').textContent = '(' + on.length + ')';
+    $('.mx-add').hidden = !mine; if (mine && !keepPicker) renderPicker();
     const w = MEDIA[medium].water;
     $('.mx-unit').innerHTML = `<b>${t('unitT')}:</b> ${w ? t('unitBrush') : t('unitPea')}<br>💡 ${w ? t('stWater') : t('stOpaque') + ' ' + (medium === 'gouache' ? t('stGouache') : t('stAcrylic'))}`;
   }
@@ -529,17 +556,26 @@
     if (e.target.closest('.mx-more')) palChips();
   });
   app.addEventListener('change', e => {
+    if (e.target.matches('.mx-src')) { pickSrc = e.target.value; renderPicker(); return; }
+    if (e.target.matches('.mx-pk input')) {
+      const key = 'pp-mix-p-' + medium + '-mine', cur = minePaints(medium).filter(id => id !== e.target.value);
+      if (e.target.checked) cur.push(e.target.value);
+      ls.set(key, cur.join(',') || '-'); keepPicker = true; renderMedia(); keepPicker = false; run(); return;
+    }
     if (e.target.matches('.mx-brand')) {
+      // первая «Моя палитра» — начинаем с того, что было отмечено в прежнем наборе
+      if (e.target.value === '*' && !minePaints(medium).length) ls.set('pp-mix-p-' + medium + '-mine', myPaints(medium).join(',') || '-');
       ls.set('pp-mix-b-' + medium, e.target.value);
       loadBrands().then(() => { renderMedia(); run(); if (app.querySelector('.mx-tubes')) { renderShelf(); renderPuddle(false); } });
       return;
     }
-    if (e.target.matches('.mx-pg input')) { const v = [...app.querySelectorAll('.mx-pg input:checked:not(:disabled)')].map(x => x.value); ls.set(pkey(medium), v.join(',') || '-'); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
+    if (e.target.matches('.mx-pg:not(.mx-pk) input')) { const v = [...app.querySelectorAll('.mx-pg:not(.mx-pk) input:checked:not(:disabled)')].map(x => x.value); ls.set(pkey(medium), v.join(',') || '-'); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
     if (e.target.matches('input[type=color]')) setTarget(e.target.value, 'pick');
     if (e.target.matches('.mx-ph input')) photo(e.target.files[0]);
   });
   // поиск краски в длинной серии
-  app.addEventListener('input', e => { if (e.target.matches('.mx-pfind')) { const q = e.target.value.trim().toLowerCase(); app.querySelectorAll('.mx-pg .mx-p').forEach(l => { l.hidden = q && !l.textContent.toLowerCase().includes(q); }); } });
+  app.addEventListener('input', e => { if (e.target.matches('.mx-sfind')) { const q = e.target.value.trim().toLowerCase(); app.querySelectorAll('.mx-pk .mx-p').forEach(l => { l.hidden = q && !l.textContent.toLowerCase().includes(q); }); } });
+  app.addEventListener('input', e => { if (e.target.matches('.mx-pfind')) { const q = e.target.value.trim().toLowerCase(); app.querySelectorAll('.mx-pg:not(.mx-pk) .mx-p').forEach(l => { l.hidden = q && !l.textContent.toLowerCase().includes(q); }); } });
   // ползунок сравнения «нужен | получится»: тянем границу
   app.addEventListener('input', e => { if (e.target.matches('.mx-strip input')) e.target.parentNode.style.setProperty('--x', e.target.value + '%'); });
   let pickT = 0;
@@ -599,7 +635,7 @@
   let play = { items: {}, white: 0, d: 0.4 }, portion = 1, plPath = [], plPrev = null;
   let NAMES = null;
   fetch('/assets/palette-names.json').then(r => r.ok ? r.json() : null).then(x => { NAMES = (x || []).map(n => ({ n, lab: labOfHex(n[3]) })); renderPuddle(false); }).catch(() => {});
-  const plItems = () => Object.keys(play.items).filter(id => play.items[id] > 0 && P[id]).map(id => [P[id], play.items[id]]);
+  const plItems = () => Object.keys(play.items).filter(id => play.items[id] > 0 && ensureId(id)).map(id => [P[id], play.items[id]]);
   const plHex = () => {
     const it = plItems(), water = !!MEDIA[medium].water;
     if (!it.length) return water ? '#FBFAF6' : (play.white ? WHITE_HEX : null);
@@ -622,7 +658,7 @@
   }
   function renderShelf() {
     const water = !!MEDIA[medium].water, box = app.querySelector('.mx-tubes'); if (!box) return;
-    const mine = myPaints(medium), shelf = lineOf(medium) && mine.length ? mine : allIds(medium);
+    const mine = myPaints(medium), shelf = (lineOf(medium) || isMine(medium)) && mine.length ? mine : allIds(medium);
     box.innerHTML = shelf.map(id => `<button type="button" class="mx-tube" data-add="${id}" title="${esc(nm(id))} · ${P[id].ci}"><i style="--c:${P[id].m};--t:${P[id].t}"></i><span>${esc(nm(id).replace(/ \(.*\)$/, ''))}</span></button>`).join('') +
       (water ? '' : `<button type="button" class="mx-tube" data-add="white" title="${t('white')} · PW6"><i style="--c:${WHITE_HEX};--t:#FFFFFF"></i><span>${t('white')}</span></button>`);
     app.querySelector('.mx-wat').hidden = !water;

@@ -10,7 +10,7 @@ const LINE = /^[a-z0-9-]{1,40}$/, IDS = /^(-|[a-z0-9:,-]{0,6000})$/, HEX = /^#[0
 function clean(d) {
   const out = { b: {}, p: {}, s: [] };
   if (!d || typeof d !== 'object') return out;
-  for (const m of MEDIA) if (d.b && typeof d.b[m] === 'string' && (d.b[m] === '' || LINE.test(d.b[m]))) out.b[m] = d.b[m];
+  for (const m of MEDIA) if (d.b && typeof d.b[m] === 'string' && (d.b[m] === '' || d.b[m] === '*' || LINE.test(d.b[m]))) out.b[m] = d.b[m]; // '*' — «Моя палитра» из разных брендов (ключ p: «материал-mine»)
   let n = 0;
   for (const [k, v] of Object.entries(d.p && typeof d.p === 'object' ? d.p : {})) {
     const [m, ...rest] = k.split('-'), line = rest.join('-');

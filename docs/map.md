@@ -102,7 +102,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/ideas-admin.js` (9K) — Кабинет → «💡 Темы для блога» (admin.js открывает PPIdeasAdmin.mount(main)): кнопка — сайт : PPIdeasAdmin, ERR, fmt, mount, text
 - `site/assets/ink-course.js` (27K) — Курс «Тушь: скетчинг без страха» (/ink/, docs/ink.md) — по книге Алины «Ink Sketching: Cre: KEY, PLAN, ICONS, has, send
 - `site/assets/mail-admin.js` (9K) — Кабинет → «✉️ Письма» (admin.js открывает PPMailAdmin.mount(main)): кто согласился на пись: PPMailAdmin, CAT, ERR, KEY, mount
-- `site/assets/mixing.js` (88K) — «Смешивание цветов» /color-mixing/ (docs/palettes.md): материал → цвет → рецепты из настоя: MEDIA, WHITE_HEX, CMF, mixHex, renderPuddle
+- `site/assets/mixing.js` (94K) — «Смешивание цветов» /color-mixing/ (docs/palettes.md): материал → цвет → рецепты из настоя: MEDIA, WHITE_HEX, CMF, mixHex, mixLab
 - `site/assets/news.js` (47K) — «Конвертик» — одна очередь новостей птички на всех страницах (этап 4 А).: PPNews, KINDS, COL, BOXES, feed
 - `site/assets/palettes.js` (40K) — страница /palettes/, палитра из фото, добавление палитр админом: PPPalette, NAMES, ADD_G, BADGE, isAdmin
 - `site/assets/pancakes.js` (113K) — Игра «Блинная Полли» (/pancakes/, docs/games.md): Полли печёт блины жителям Воббленда: PAN, SAY, BAKE, setPhase, bakeCol

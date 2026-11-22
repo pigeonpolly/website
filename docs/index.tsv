@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 441, страниц 58, маршрутов 221, таблиц 80, ключей meta 73, имён 6002, разделов доков 253
+# файлов 441, страниц 58, маршрутов 221, таблиц 80, ключей meta 73, имён 6012, разделов доков 253
 file	build.py	build.py	0	897 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -71,9 +71,9 @@ file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
 file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	389 строк, 77 КБ
-file	docs/palettes.md	docs/palettes.md	0	78 строк, 42 КБ
+file	docs/palettes.md	docs/palettes.md	0	80 строк, 43 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	209 строк, 54 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	210 строк, 54 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/postcards.md	docs/postcards.md	0	25 строк, 6 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
@@ -137,8 +137,8 @@ file	site/assets/ideas-admin.js	site/assets/ideas-admin.js	0	79 строк, 9 К
 file	site/assets/ink-course.css	site/assets/ink-course.css	0	113 строк, 7 КБ
 file	site/assets/ink-course.js	site/assets/ink-course.js	0	254 строк, 27 КБ
 file	site/assets/mail-admin.js	site/assets/mail-admin.js	0	73 строк, 9 КБ
-file	site/assets/mixing.css	site/assets/mixing.css	0	157 строк, 16 КБ
-file	site/assets/mixing.js	site/assets/mixing.js	0	748 строк, 88 КБ
+file	site/assets/mixing.css	site/assets/mixing.css	0	159 строк, 16 КБ
+file	site/assets/mixing.js	site/assets/mixing.js	0	803 строк, 94 КБ
 file	site/assets/news.js	site/assets/news.js	0	451 строк, 47 КБ
 file	site/assets/norway.css	site/assets/norway.css	0	16 строк, 1 КБ
 file	site/assets/palettes.js	site/assets/palettes.js	0	439 строк, 40 КБ
@@ -2914,78 +2914,88 @@ sym	penalty	site/assets/mixing.js	95	const
 sym	coarse	site/assets/mixing.js	97	fn
 sym	refine	site/assets/mixing.js	112	fn
 sym	toUnits	site/assets/mixing.js	133	fn
-sym	solve	site/assets/mixing.js	154	fn
-sym	app	site/assets/mixing.js	173	const
-sym	gi	site/assets/mixing.js	175	const
-sym	esc	site/assets/mixing.js	252	const
-sym	nm	site/assets/mixing.js	253	const
-sym	ink	site/assets/mixing.js	254	const
-sym	SYNC	site/assets/mixing.js	256	const
-sym	applying	site/assets/mixing.js	257	const
-sym	ls	site/assets/mixing.js	258	const
-sym	plural	site/assets/mixing.js	259	const
-sym	frac	site/assets/mixing.js	264	const
-sym	qs	site/assets/mixing.js	267	const
-sym	medium	site/assets/mixing.js	268	const
-sym	target	site/assets/mixing.js	269	const
-sym	BR	site/assets/mixing.js	271	const
-sym	STRONG	site/assets/mixing.js	272	const
-sym	loadBrands	site/assets/mixing.js	273	const
-sym	brandOf	site/assets/mixing.js	274	const
-sym	lineOf	site/assets/mixing.js	275	const
-sym	prepLine	site/assets/mixing.js	276	fn
-sym	pkey	site/assets/mixing.js	283	const
-sym	allIds	site/assets/mixing.js	284	const
-sym	defaultOn	site/assets/mixing.js	285	const
-sym	myPaints	site/assets/mixing.js	286	const
-sym	brandOptions	site/assets/mixing.js	303	fn
-sym	renderMedia	site/assets/mixing.js	307	fn
-sym	amt	site/assets/mixing.js	319	const
-sym	sw	site/assets/mixing.js	324	const
-sym	describe	site/assets/mixing.js	326	fn
-sym	tune	site/assets/mixing.js	345	fn
-sym	recipeHTML	site/assets/mixing.js	367	fn
-sym	WHEEL	site/assets/mixing.js	394	const
-sym	WN	site/assets/mixing.js	395	const
-sym	WH	site/assets/mixing.js	396	const
-sym	wheelPos	site/assets/mixing.js	398	const
-sym	wheelSVG	site/assets/mixing.js	405	fn
-sym	RULES	site/assets/mixing.js	418	const
-sym	PINFO	site/assets/mixing.js	428	const
-sym	PT	site/assets/mixing.js	447	const
-sym	pigmentsHTML	site/assets/mixing.js	456	fn
-sym	job	site/assets/mixing.js	464	const
-sym	run	site/assets/mixing.js	465	fn
-sym	setTarget	site/assets/mixing.js	493	fn
-sym	pickT	site/assets/mixing.js	526	const
-sym	photo	site/assets/mixing.js	531	fn
-sym	pals	site/assets/mixing.js	550	const
-sym	palChips	site/assets/mixing.js	551	fn
-sym	PL	site/assets/mixing.js	561	const
-sym	pl	site/assets/mixing.js	579	const
-sym	play	site/assets/mixing.js	580	const
-sym	NAMES	site/assets/mixing.js	581	const
-sym	plItems	site/assets/mixing.js	583	const
-sym	plHex	site/assets/mixing.js	584	const
-sym	portions	site/assets/mixing.js	589	const
-sym	playHTML	site/assets/mixing.js	590	fn
-sym	renderShelf	site/assets/mixing.js	604	fn
-sym	setWater	site/assets/mixing.js	614	fn
-sym	renderPuddle	site/assets/mixing.js	619	fn
-sym	savedGet	site/assets/mixing.js	648	const
-sym	renderSaved	site/assets/mixing.js	649	fn
-sym	addPaint	site/assets/mixing.js	654	fn
-sym	plReset	site/assets/mixing.js	661	fn
-sym	plRandom	site/assets/mixing.js	662	fn
-sym	setTab	site/assets/mixing.js	669	fn
-sym	who	site/assets/mixing.js	691	fn
-sym	syncT	site/assets/mixing.js	692	const
-sym	collect	site/assets/mixing.js	693	fn
-sym	push	site/assets/mixing.js	699	fn
-sym	syncSoon	site/assets/mixing.js	706	fn
-sym	applyPrefs	site/assets/mixing.js	707	fn
-sym	cloudNote	site/assets/mixing.js	720	fn
-sym	pull	site/assets/mixing.js	724	fn
+sym	shortlist	site/assets/mixing.js	155	fn
+sym	solve	site/assets/mixing.js	171	fn
+sym	app	site/assets/mixing.js	192	const
+sym	gi	site/assets/mixing.js	194	const
+sym	esc	site/assets/mixing.js	276	const
+sym	nm	site/assets/mixing.js	277	const
+sym	ink	site/assets/mixing.js	278	const
+sym	SYNC	site/assets/mixing.js	280	const
+sym	applying	site/assets/mixing.js	281	const
+sym	ls	site/assets/mixing.js	282	const
+sym	plural	site/assets/mixing.js	283	const
+sym	frac	site/assets/mixing.js	288	const
+sym	qs	site/assets/mixing.js	291	const
+sym	medium	site/assets/mixing.js	292	const
+sym	target	site/assets/mixing.js	293	const
+sym	BR	site/assets/mixing.js	295	const
+sym	STRONG	site/assets/mixing.js	296	const
+sym	loadBrands	site/assets/mixing.js	297	const
+sym	brandOf	site/assets/mixing.js	298	const
+sym	lineOf	site/assets/mixing.js	299	const
+sym	prepLine	site/assets/mixing.js	300	fn
+sym	isMine	site/assets/mixing.js	308	const
+sym	lineById	site/assets/mixing.js	309	const
+sym	ensureId	site/assets/mixing.js	310	const
+sym	pkey	site/assets/mixing.js	311	const
+sym	minePaints	site/assets/mixing.js	312	const
+sym	allIds	site/assets/mixing.js	313	const
+sym	defaultOn	site/assets/mixing.js	314	const
+sym	myPaints	site/assets/mixing.js	315	const
+sym	srcOf	site/assets/mixing.js	316	const
+sym	brandOptions	site/assets/mixing.js	333	fn
+sym	paintRow	site/assets/mixing.js	337	const
+sym	pickSrc	site/assets/mixing.js	339	const
+sym	renderPicker	site/assets/mixing.js	340	fn
+sym	keepPicker	site/assets/mixing.js	349	const
+sym	renderMedia	site/assets/mixing.js	350	fn
+sym	amt	site/assets/mixing.js	365	const
+sym	sw	site/assets/mixing.js	370	const
+sym	describe	site/assets/mixing.js	372	fn
+sym	tune	site/assets/mixing.js	391	fn
+sym	recipeHTML	site/assets/mixing.js	413	fn
+sym	WHEEL	site/assets/mixing.js	440	const
+sym	WN	site/assets/mixing.js	441	const
+sym	WH	site/assets/mixing.js	442	const
+sym	wheelPos	site/assets/mixing.js	444	const
+sym	wheelSVG	site/assets/mixing.js	451	fn
+sym	RULES	site/assets/mixing.js	464	const
+sym	PINFO	site/assets/mixing.js	474	const
+sym	PT	site/assets/mixing.js	493	const
+sym	pigmentsHTML	site/assets/mixing.js	502	fn
+sym	job	site/assets/mixing.js	510	const
+sym	run	site/assets/mixing.js	511	fn
+sym	setTarget	site/assets/mixing.js	539	fn
+sym	pickT	site/assets/mixing.js	581	const
+sym	photo	site/assets/mixing.js	586	fn
+sym	pals	site/assets/mixing.js	605	const
+sym	palChips	site/assets/mixing.js	606	fn
+sym	PL	site/assets/mixing.js	616	const
+sym	pl	site/assets/mixing.js	634	const
+sym	play	site/assets/mixing.js	635	const
+sym	NAMES	site/assets/mixing.js	636	const
+sym	plItems	site/assets/mixing.js	638	const
+sym	plHex	site/assets/mixing.js	639	const
+sym	portions	site/assets/mixing.js	644	const
+sym	playHTML	site/assets/mixing.js	645	fn
+sym	renderShelf	site/assets/mixing.js	659	fn
+sym	setWater	site/assets/mixing.js	669	fn
+sym	renderPuddle	site/assets/mixing.js	674	fn
+sym	savedGet	site/assets/mixing.js	703	const
+sym	renderSaved	site/assets/mixing.js	704	fn
+sym	addPaint	site/assets/mixing.js	709	fn
+sym	plReset	site/assets/mixing.js	716	fn
+sym	plRandom	site/assets/mixing.js	717	fn
+sym	setTab	site/assets/mixing.js	724	fn
+sym	who	site/assets/mixing.js	746	fn
+sym	syncT	site/assets/mixing.js	747	const
+sym	collect	site/assets/mixing.js	748	fn
+sym	push	site/assets/mixing.js	754	fn
+sym	syncSoon	site/assets/mixing.js	761	fn
+sym	applyPrefs	site/assets/mixing.js	762	fn
+sym	cloudNote	site/assets/mixing.js	775	fn
+sym	pull	site/assets/mixing.js	779	fn
 sym	esc	site/assets/news.js	8	const
 sym	pl	site/assets/news.js	11	const
 sym	KINDS	site/assets/news.js	32	const
