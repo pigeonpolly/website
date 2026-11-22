@@ -15,7 +15,12 @@ U({
   <h4>Придаточное первым — инверсия в главном</h4>
   <p>Всё придаточное занимает <b>первое место</b>, значит, дальше — глагол: <i><u>Når det regner</u>, <b>leser</b> jeg.</i> <i><u>Hvis du vil</u>, <b>kan</b> vi gå.</i></p>
   <h4>som, at и om</h4>
-  <ul><li><i>som</i> — который: <i>Jenta som tegner, heter Alina.</i></li><li><i>at</i> — что: <i>Jeg tror at det blir fint.</i> (часто опускается: <i>Jeg tror det blir fint</i>)</li><li><i>om</i> — ли: <i>Jeg vet ikke om han kommer.</i> (не путать с <i>hvis</i> — «если»)</li></ul>`,
+  <ul><li><i>som</i> — который: <i>Jenta som tegner, heter Alina.</i></li><li><i>at</i> — что: <i>Jeg tror at det blir fint.</i> (часто опускается: <i>Jeg tror det blir fint</i>)</li><li><i>om</i> — ли: <i>Jeg vet ikke om han kommer.</i> (не путать с <i>hvis</i> — «если»)</li></ul>
+  <h4>som можно пропустить</h4>
+  <p>Если <i>som</i> — не подлежащее придаточного, его часто опускают: <i>Boka (som) jeg leser, er spennende.</i> — Книга, которую я читаю, интересная. А если подлежащее — нельзя: <i>Jenta <b>som</b> tegner…</i></p>
+  <h4>Где: der / hvor</h4>
+  <p>«Где» в придаточном о месте — <i>der</i> или <i>hvor</i>: <i>Byen der jeg bor, er liten.</i> — Город, где я живу, маленький.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Придаточное — это предложение внутри другого предложения, и ему не нужно правило «глагол вторым». Поэтому наречия встают прямо перед глаголом — так же в шведском и датском. А в немецком придаточное ушло ещё дальше: там глагол уезжает в самый конец (<i>…weil er nicht kommt</i>).</p></div>`,
   simple: 'в придаточном (at, fordi, som, hvis…) ikke — ПЕРЕД глаголом: …at han ikke kommer. Придаточное первым — потом глагол: Når det regner, leser jeg.',
   exm: [['Jeg vet at han ikke kommer.', 'Я знаю, что он не придёт.'], ['Når det regner, leser jeg.', 'Когда идёт дождь, я читаю.'], ['Jenta som tegner, heter Alina.', 'Девушку, которая рисует, зовут Алина.'], ['Jeg vet ikke om bussen går.', 'Не знаю, ходит ли автобус.']],
   conf: [['*at han kommer ikke* / *at han ikke kommer*', 'В придаточном <i>ikke</i> — перед глаголом.', '«Она говорит, что не устала»:|Hun sier at hun ikke er trøtt.|Hun sier at hun er ikke trøtt.|Hun sier ikke at hun er trøtt. # BRA: ikke перед глаголом.'],
@@ -64,7 +69,8 @@ BK('b1-1', 'Kapittel 13. Hytta i fjellet', ['Om kvelden satt de tre vennene på 
 U({
   id: 'b1-2', lvl: 'B1', t: 'Сильные глаголы: gikk, så, drakk', en: 'Sterke verb',
   goals: ['знать прошедшее 30 частых сильных глаголов', 'рассказывать историю в прошлом без «snakkede»', 'узнавать ряды гласных: *drikke — drakk — drukket*'],
-  th: `<p>Сильные глаголы не берут окончание в прошедшем — они <b>меняют гласную</b>, как английские <i>sing — sang — sung</i>. Их меньше сотни, но это самые частые глаголы языка.</p>
+  th: `<div class="scheme"><h4>🧩 Слабый и сильный глагол</h4><div class="tbl"><table><thead><tr><th></th><th>как образует прошлое</th><th>пример</th></tr></thead><tbody><tr><td>слабый</td><td>добавляет окончание</td><td><i>snakke — snakk<b>et</b> — har snakk<b>et</b></i></td></tr><tr><td>сильный</td><td>меняет гласную</td><td><i>dr<b>i</b>kke — dr<b>a</b>kk — har dr<b>u</b>kket</i></td></tr><tr><td>полусильный</td><td>и то, и другое</td><td><i>s<b>e</b>lge — s<b>o</b>lg<b>te</b> — har s<b>o</b>lg<b>t</b></i></td></tr></tbody></table></div><p class="f">сильный: <span class="e">меняем гласную</span>, окончания в прошлом нет</p></div>
+  <p>Сильные глаголы не берут окончание в прошедшем — они <b>меняют гласную</b>, как английские <i>sing — sang — sung</i>. Их меньше сотни, но это самые частые глаголы языка.</p>
   <h4>Ряды гласных — помогают запомнить</h4>
   <div class="tbl"><table><thead><tr><th>Ряд</th><th>Примеры</th></tr></thead><tbody>
   <tr><td>i — a — u</td><td><i>drikke — drakk — drukket</i> (пить), <i>synge — sang — sunget</i>, <i>finne — fant — funnet</i>, <i>springe — sprang — sprunget</i></td></tr>
@@ -75,7 +81,10 @@ U({
   <h4>Полусильные</h4>
   <p>Есть глаголы, которые и меняют гласную, и берут окончание: <i>selge — solgte — solgt</i> (продавать), <i>fortelle — fortalte — fortalt</i>, <i>spørre — spurte — spurt</i>, <i>vite — visste — visst</i>, <i>gjøre — gjorde — gjort</i>.</p>
   <h4>Perfektum: har или er?</h4>
-  <p>Обычно <i>har</i>: <i>Jeg har gått.</i> Но с глаголами движения и изменения можно и <i>er</i> — тогда подчёркивается результат: <i>Han er reist</i> (он уехал — и его нет). <i>Sola er gått ned.</i> Оба варианта правильные; <i>har</i> — всегда безопасно.</p>`,
+  <p>Обычно <i>har</i>: <i>Jeg har gått.</i> Но с глаголами движения и изменения можно и <i>er</i> — тогда подчёркивается результат: <i>Han er reist</i> (он уехал — и его нет). <i>Sola er gått ned.</i> Оба варианта правильные; <i>har</i> — всегда безопасно.</p>
+  <h4>Как учить</h4>
+  <p>Учите тройками вслух, как стишок: <i>drikke — drakk — drukket</i>. Начните с десятки самых частых: <i>være, ha, gå, komme, se, få, gi, si, ta, bli</i> — на них держится половина любого разговора.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Смена гласной — самый древний способ сказать «прошло». Он старше и норвежского, и английского: отсюда <i>sing — sang — sung</i> и немецкое <i>singen — sang — gesungen</i>. Новых сильных глаголов язык больше не создаёт: всё новое спрягается по-слабому — <i>google → googlet</i>, <i>chatte → chattet</i>. Поэтому сильных глаголов меньше сотни, и их число понемногу тает.</p></div>`,
   simple: 'сильные глаголы меняют гласную: drikke — drakk — drukket, gå — gikk — gått, se — så — sett. Учите тройками вслух.',
   exm: [['I går gikk vi en lang tur.', 'Вчера мы долго гуляли.'], ['Hun drakk tre kopper kaffe.', 'Она выпила три чашки кофе.'], ['Har du sett filmen?', 'Ты смотрел фильм?'], ['Vi fant en gammel nøkkel.', 'Мы нашли старый ключ.']],
   conf: [['*gikk* / *gådde*', '<i>gå</i> — сильный глагол: <i>gikk</i>, <i>har gått</i>. «Gådde» не бывает.', '«Вчера я ходила в магазин»:|I går gikk jeg i butikken.|I går gådde jeg i butikken.|I går gått jeg i butikken. # gå — gikk — gått.'],
@@ -134,7 +143,11 @@ U({
   <h4>sin, si, sitt, sine — «свой»</h4>
   <p>Если владелец — подлежащее в 3-м лице (<i>han, hun, de, Pelle</i>), «свой» — это <b>sin</b> (<i>si, sitt, sine</i>). <i>hans/hennes</i> — значит, чужой:</p>
   <ul><li><i>Pelle tar kartet <b>sitt</b>.</i> — Пелле берёт свою карту.</li><li><i>Pelle tar kartet <b>hans</b>.</i> — Пелле берёт его карту (чью-то другую, например дедушки).</li></ul>
-  <p>С <i>jeg, du, vi</i> — обычные <i>min, din, vår</i>: <i>Jeg tar kartet mitt.</i> И <i>sin</i> не бывает в подлежащем: <i>Kona hans er lege</i>, а не «kona sin».</p>`,
+  <p>С <i>jeg, du, vi</i> — обычные <i>min, din, vår</i>: <i>Jeg tar kartet mitt.</i> И <i>sin</i> не бывает в подлежащем: <i>Kona hans er lege</i>, а не «kona sin».</p>
+  <h4>seg selv и hverandre</h4>
+  <ul><li><i>seg selv</i> — «сам себя», когда важно, что именно себя: <i>Han ser <b>seg selv</b> i speilet.</i> — Он видит себя в зеркале. <i>Ta vare på deg selv!</i> — Береги себя!</li>
+  <li><i>hverandre</i> — «друг друга»: <i>Vi elsker <b>hverandre</b>.</i> <i>De ringer til <b>hverandre</b> hver dag.</i></li></ul>
+  <div class="box why"><h4>🤔 Почему так</h4><p><i>seg</i> — родня русского «себя». И русское «-ся» — это то же самое слово: когда-то говорили «мыть ся», то есть «мыть себя», а потом «ся» приросло к глаголу. В норвежском оно так и осталось отдельным словом — и поэтому меняется по лицам: <i>meg, deg, seg</i>.</p></div>`,
   simple: 'glede seg, sette seg: seg → meg/deg/oss/dere. sin = свой (у он/она/они): Han tar boka si. hans = его (чужая).',
   exm: [['Jeg gleder meg til ferien!', 'Жду не дождусь отпуска!'], ['Sett deg, er du snill.', 'Садись, пожалуйста.'], ['Hun føler seg trøtt i dag.', 'Она сегодня чувствует себя уставшей.'], ['Pelle tar kartet sitt.', 'Пелле берёт свою карту.']],
   conf: [['*sin* / *hans*', '<i>Han vasker bilen sin</i> — свою машину; <i>Han vasker bilen hans</i> — чужую (другого мужчины).', '«Мари читает свою книгу»:|Mari leser boka si.|Mari leser boka hennes.|Mari leser boka sin. # Своя — si (ei bok).'],
@@ -193,7 +206,10 @@ U({
   <ul><li><i>Brevet <b>ble skrevet</b> av bestefar.</i> — Письмо было написано дедушкой.</li><li><i>Han <b>blir</b> ofte <b>spurt</b> om det.</i> — Его часто об этом спрашивают.</li><li><i>Hytta <b>har blitt</b> solgt.</i> — Хитту продали.</li></ul>
   <p><b>av</b> — «кем»: <i>Bildet ble malt <b>av</b> Munch.</i></p>
   <h4>Осторожно: глаголы на -s, которые не пассив</h4>
-  <p>Некоторые глаголы всегда с <i>-s</i>: <i>å synes</i> — считать, казаться, <i>å trives</i> — хорошо себя чувствовать (где-то), <i>å møtes</i> — встречаться, <i>å finnes</i> — существовать. <i>Jeg trives i Norge</i> — мне хорошо в Норвегии.</p>`,
+  <p>Некоторые глаголы всегда с <i>-s</i>: <i>å synes</i> — считать, казаться, <i>å trives</i> — хорошо себя чувствовать (где-то), <i>å møtes</i> — встречаться, <i>å finnes</i> — существовать. <i>Jeg trives i Norge</i> — мне хорошо в Норвегии.</p>
+  <h4>-s в рецептах и о свойствах</h4>
+  <p>Только <i>-s</i> (а не <i>bli</i>) говорят о свойствах и в рецептах: <i>Salt løses i vann.</i> — Соль растворяется в воде. <i>Saften kokes i 20 minutter.</i> — Сок варят 20 минут. А <i>bli</i> — когда важен конкретный случай: <i>Porten stenges klokka ti</i> (по правилам) — <i>I går ble porten stengt klokka ni</i> (вчера, один раз).</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Окончание <i>-s</i> — это бывшее слово «себя». В древненорвежском к глаголу приклеивали <i>sik</i> («себя»), оно сократилось до <i>-sk</i>, потом до <i>-s</i>. Ровно то же случилось в русском с «-ся»: <i>selges</i> — «продаётся», дословно «продаёт себя». Поэтому <i>-s</i>-глаголы и похожи на русские на «-ся».</p></div>`,
   simple: 'selges, må gjøres — правила и объявления. ble bygget, ble skrevet — конкретное событие в прошлом. av — кем.',
   exm: [['Huset ble bygget i 1950.', 'Дом был построен в 1950 году.'], ['Leilighet selges.', 'Продаётся квартира.'], ['Døra må lukkes.', 'Дверь нужно закрывать.'], ['Bildet ble malt av Munch.', 'Картина была написана Мунком.']],
   conf: [['*selges* / *blir solgt*', 'В объявлениях и правилах — <i>-s</i>: <i>Bil selges</i>. О конкретном случае — <i>bli</i>: <i>Bilen ble solgt i går</i>.', 'Объявление «Продаётся велосипед»:|Sykkel selges.|Sykkel blir solgt i går.|Sykkel selger. # Объявление — s-пассив.'],
@@ -242,7 +258,8 @@ BK('b1-4', 'Kapittel 16. Brevet på bordet', ['Hytta lå ved et lite vann, høyt
 U({
   id: 'b1-5', lvl: 'B1', t: 'Сравнение: større, størst, mer', en: 'Gradbøying av adjektiv',
   goals: ['сравнивать: *høyere enn, den høyeste*', 'знать неправильные формы: *god — bedre — best, stor — større — størst*', 'говорить «такой же … как»: *like … som*'],
-  th: `<h4>Обычно: -ere и -est</h4>
+  th: `<div class="scheme"><h4>🧩 Три ступени</h4><div class="tbl"><table><thead><tr><th></th><th>какой</th><th>более</th><th>самый</th></tr></thead><tbody><tr><td>обычно</td><td><i>høy</i></td><td><i>høy<b>ere</b></i></td><td><i>høy<b>est</b></i></td></tr><tr><td>на -ig</td><td><i>billig</i></td><td><i>billig<b>ere</b></i></td><td><i>billig<b>st</b></i></td></tr><tr><td>длинные</td><td><i>praktisk</i></td><td><i><b>mer</b> praktisk</i></td><td><i><b>mest</b> praktisk</i></td></tr><tr><td>особые</td><td><i>god</i></td><td><i>bedre</i></td><td><i>best</i></td></tr></tbody></table></div><p class="f">чем — <span class="e">enn</span> · такой же, как — <span class="e">like … som</span></p></div>
+  <h4>Обычно: -ere и -est</h4>
   <p><i>høy — høy<b>ere</b> — høy<b>est</b></i> (высокий), <i>kald — kald<b>ere</b> — kald<b>est</b></i>, <i>billig — billig<b>ere</b> — billig<b>st</b></i> (на -ig — просто <i>-st</i>). «Чем» — <b>enn</b>: <i>Galdhøpiggen er høyere enn Glittertind.</i></p>
   <h4>Неправильные — учить наизусть</h4>
   <div class="tbl"><table><thead><tr><th></th><th>сравн.</th><th>превосх.</th></tr></thead><tbody>
@@ -259,7 +276,12 @@ U({
   <h4>«Самый …» перед словом</h4>
   <p>Как с обычными прилагательными: <i>den høy<b>este</b> toppen</i> (самая высокая вершина) — артикль + <i>-e</i> + окончание. После <i>er</i>: <i>Denne toppen er høyest.</i></p>
   <h4>Такой же … как</h4>
-  <p><i><b>like</b> stor <b>som</b></i> — такой же большой, как. <i>ikke så … som</i> — не такой … как: <i>Oslo er ikke så regnfull som Bergen.</i></p>`,
+  <p><i><b>like</b> stor <b>som</b></i> — такой же большой, как. <i>ikke så … som</i> — не такой … как: <i>Oslo er ikke så regnfull som Bergen.</i></p>
+  <h4>Ещё три полезные конструкции</h4>
+  <ul><li><i>jo … desto / jo</i> — чем … тем: <i><b>Jo</b> mer jeg leser, <b>desto</b> mer forstår jeg.</i> (после <i>desto</i> — инверсия)</li>
+  <li><i>så … som mulig</i> — как можно …: <i>Kom så fort som mulig!</i> — Приходи как можно скорее!</li>
+  <li><i>mer og mer / bedre og bedre</i> — всё больше, всё лучше: <i>Det blir kaldere og kaldere.</i></li></ul>
+  <div class="box why"><h4>🤔 Почему так</h4><p><i>stor — større</i>, <i>gammel — eldre</i>, <i>lang — lengre</i>: гласная меняется из-за древнего звука <i>i</i> в старом окончании, который «тянул» гласную корня вперёд. Окончание давно пропало, а след остался. Тот же след — в английском <i>old — elder</i> и немецком <i>alt — älter</i>.</p></div>`,
   simple: 'høyere enn, den høyeste. god — bedre — best, stor — større — størst, gammel — eldre — eldst. Длинные — mer/mest. like … som — такой же … как.',
   exm: [['Galdhøpiggen er det høyeste fjellet i Norge.', 'Гальхёпигген — самая высокая гора Норвегии.'], ['Bergen er mer regnfull enn Oslo.', 'В Бергене дождливее, чем в Осло.'], ['Broren min er eldre enn meg.', 'Мой брат старше меня.'], ['Kaffen her er like god som i Italia.', 'Кофе здесь такой же хороший, как в Италии.']],
   conf: [['*godere* / *bedre*', '<i>god — bedre — best</i>. «Godere» не бывает.', '«Сегодня погода лучше»:|Været er bedre i dag.|Været er godere i dag.|Været er mer god i dag. # god → bedre.'],
@@ -318,7 +340,12 @@ U({
   <h4>Пары</h4>
   <ul><li><i>både … og</i> — и … и: <i>Hun snakker både norsk og engelsk.</i></li><li><i>enten … eller</i> — или … или: <i>Vi tar enten tog eller buss.</i></li><li><i>verken … eller</i> — ни … ни: <i>Jeg liker verken fisk eller kjøtt.</i></li></ul>
   <h4>når или da?</h4>
-  <p>Оба — «когда». <b>da</b> — один раз в прошлом: <i>Da jeg var barn, bodde jeg i Riga.</i> <b>når</b> — настоящее, будущее и «каждый раз» в прошлом: <i>Når jeg er trøtt, drikker jeg kaffe. Når vi kom hjem, var mamma alltid glad.</i></p>`,
+  <p>Оба — «когда». <b>da</b> — один раз в прошлом: <i>Da jeg var barn, bodde jeg i Riga.</i> <b>når</b> — настоящее, будущее и «каждый раз» в прошлом: <i>Når jeg er trøtt, drikker jeg kaffe. Når vi kom hjem, var mamma alltid glad.</i></p>
+  <h4>Ещё четыре частые связки</h4>
+  <ul><li><i>nemlig</i> — «дело в том, что, ведь»; стоит после глагола: <i>Jeg kan ikke komme. Jeg er <b>nemlig</b> syk.</i></li>
+  <li><i>ellers</i> — иначе, а то: <i>Skynd deg, <b>ellers</b> kommer vi for sent.</i></li>
+  <li><i>imidlertid</i> — однако (книжное): <i>Planen var god. Den var <b>imidlertid</b> dyr.</i></li>
+  <li><i>i stedet</i> — вместо этого: <i>Vi tok ikke bussen. Vi gikk <b>i stedet</b>.</i></li></ul>`,
   simple: 'derfor, likevel, dessuten в начале — инверсия: Derfor er jeg trøtt. fordi — без неё. da — один раз в прошлом, når — всегда/будущее.',
   exm: [['Det regnet. Derfor ble vi hjemme.', 'Шёл дождь. Поэтому мы остались дома.'], ['Det var kaldt. Likevel gikk vi på tur.', 'Было холодно. Тем не менее мы пошли гулять.'], ['Da jeg var barn, bodde jeg i Riga.', 'Когда я была ребёнком, я жила в Риге.'], ['Hun snakker både norsk og latvisk.', 'Она говорит и по-норвежски, и по-латышски.']],
   conf: [['*fordi* / *derfor*', '<i>fordi</i> — «потому что» (придаточное, без инверсии); <i>derfor</i> — «поэтому» (с инверсией).', '«Я устала, поэтому ложусь»:|Jeg er trøtt. Derfor legger jeg meg.|Jeg er trøtt. Derfor jeg legger meg.|Jeg er trøtt fordi legger jeg meg. # derfor + инверсия.'],

@@ -230,7 +230,8 @@ U({
   <li><i>Kunne du …?</i> — не могли бы вы …? (вежливее, чем <i>kan du</i>): <i>Kunne du hjelpe meg?</i></li>
   <li><i>Jeg vil gjerne …</i> — мне бы хотелось …, вежливо в магазине и кафе: <i>Jeg vil gjerne ha en vaffel.</i></li></ul>
   <div class="tbl"><table><thead><tr><th>инфинитив</th><th>сейчас</th><th>в прошлом</th></tr></thead><tbody><tr><td><i>å kunne</i></td><td><i>kan</i></td><td><i>kunne</i></td></tr><tr><td><i>å ville</i></td><td><i>vil</i></td><td><i>ville</i></td></tr><tr><td><i>å skulle</i></td><td><i>skal</i></td><td><i>skulle</i></td></tr><tr><td><i>å måtte</i></td><td><i>må</i></td><td><i>måtte</i></td></tr><tr><td><i>å burde</i></td><td><i>bør</i></td><td><i>burde</i></td></tr></tbody></table></div>
-  <p>Прошедшая форма модальных совпадает с инфинитивом без <i>å</i>: <i>Jeg måtte jobbe i går.</i> — Вчера мне пришлось работать.</p>`,
+  <p>Прошедшая форма модальных совпадает с инфинитивом без <i>å</i>: <i>Jeg måtte jobbe i går.</i> — Вчера мне пришлось работать.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p><i>skal</i> и <i>vil</i> — родня английских <i>shall</i> и <i>will</i>. В английском они стали «будущим временем», а в норвежском сохранили старый смысл: <i>skal</i> — «так положено, так решено», <i>vil</i> — «хочу». Поэтому <i>Jeg vil komme</i> — это прежде всего «я хочу прийти», а план «я приду» — <i>Jeg skal komme</i>.</p></div>`,
   simple: 'skal — план, kommer til å — прогноз, vil — хочу. После kan/vil/skal/må/bør — инфинитив без å. må ikke = нельзя.',
   exm: [['Jeg skal reise til Bergen i morgen.', 'Завтра я еду в Берген.'], ['Det kommer til å regne.', 'Будет дождь.'], ['Kan du hjelpe meg?', 'Можешь мне помочь?'], ['Du må ikke røyke her.', 'Здесь нельзя курить.']],
   conf: [['*må ikke* / *trenger ikke*', '<i>Du må ikke</i> — нельзя. <i>Du trenger ikke</i> — не обязательно.', '«Тебе не обязательно приходить»:|Du trenger ikke å komme.|Du må ikke komme.|Du skal ikke komme. # må ikke = запрет.'],
@@ -299,7 +300,8 @@ U({
   <div class="tbl"><table><thead><tr><th>куда?</th><th>где?</th></tr></thead><tbody><tr><td><i>hjem</i> — домой</td><td><i>hjemme</i> — дома</td></tr><tr><td><i>ut</i> — наружу</td><td><i>ute</i> — снаружи, на улице</td></tr><tr><td><i>inn</i> — внутрь</td><td><i>inne</i> — внутри</td></tr><tr><td><i>opp</i> — наверх</td><td><i>oppe</i> — наверху</td></tr><tr><td><i>ned</i> — вниз</td><td><i>nede</i> — внизу</td></tr></tbody></table></div>
   <p><i>Jeg går <b>ut</b>.</i> — Я выхожу (на улицу). <i>Det er kaldt <b>ute</b>.</i> — На улице холодно.</p>
   <h4>hos — слово, которого нет в русском</h4>
-  <p><i>hos</i> — «у кого-то, в гостях, в его доме или кабинете»: <i>Jeg er <b>hos</b> mormor.</i> — Я у бабушки. <i>Hun er <b>hos</b> tannlegen.</i> — Она у зубного. Но «у меня есть» — это не <i>hos</i>, а <i>Jeg har …</i></p>`,
+  <p><i>hos</i> — «у кого-то, в гостях, в его доме или кабинете»: <i>Jeg er <b>hos</b> mormor.</i> — Я у бабушки. <i>Hun er <b>hos</b> tannlegen.</i> — Она у зубного. Но «у меня есть» — это не <i>hos</i>, а <i>Jeg har …</i></p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему <i>på Hamar</i>, но <i>i Oslo</i>? Носители и сами не всегда объяснят. Одно из объяснений: <i>på</i> осталось у мест, которые когда-то были хутором, холмом или островом — «на хуторе», «на холме». Города, выросшие из хуторов, сохранили своё <i>på</i>. Поэтому вместе с названием места учите и предлог.</p></div>`,
   simple: 'i — внутри, страна, город; på — поверхность, остров, работа/школа. til — куда. om morgenen — по утрам; om en time — через час.',
   exm: [['Jeg bor i Riga, men jeg jobber på Lofoten i sommer.', 'Я живу в Риге, но этим летом работаю на Лофотенах.'], ['Vi går på kino på fredag.', 'В пятницу мы идём в кино.'], ['Toget går om en time.', 'Поезд через час.'], ['Om vinteren går vi på ski.', 'Зимой мы катаемся на лыжах.']],
   conf: [['*i fem år* / *om fem år*', '<i>i fem år</i> — пять лет (длительность); <i>om fem år</i> — через пять лет.', '«Через час»:|om en time|i en time|for en time siden # om = через.'],
@@ -366,7 +368,11 @@ U({
   <h4>Чей?</h4>
   <p><i>Hvem sin bil er det?</i> — Чья это машина? (дословно «кто свою машину»). Ответ: <i>Det er min.</i> — Моя. <i>Den er hennes.</i> — Её. Книжный вариант вопроса — <i>Hvis bil er det?</i></p>
   <h4>Пелле — его или свой?</h4>
-  <p>Коротко на будущее: <i>Pelle elsker bestemora <b>si</b></i> — свою бабушку; <i>Pelle elsker bestemora <b>hans</b></i> — бабушку другого (например, друга). Подробно — в уроке B1.3.</p>`,
+  <p>Коротко на будущее: <i>Pelle elsker bestemora <b>si</b></i> — свою бабушку; <i>Pelle elsker bestemora <b>hans</b></i> — бабушку другого (например, друга). Подробно — в уроке B1.3.</p>
+  <h4>Карта Пелле: четыре способа сказать «чья»</h4>
+  <div class="tbl"><table><thead><tr><th>как</th><th>пример</th><th>где звучит</th></tr></thead><tbody><tr><td>имя + <b>-s</b></td><td><i>Pelle<b>s</b> kart</i>, <i>Norge<b>s</b> hovedstad</i></td><td>везде, особенно в письме</td></tr><tr><td>… <b>til</b> + имя</td><td><i>kartet <b>til</b> Pelle</i></td><td>в разговоре</td></tr><tr><td>имя + <b>sin</b></td><td><i>Pelle <b>sitt</b> kart</i></td><td>разговорное</td></tr><tr><td>местоимение</td><td><i>kartet <b>hans</b></i></td><td>когда ясно, о ком речь</td></tr></tbody></table></div>
+  <p>Важно: после <i>-s</i> существительное — <b>без окончания</b>: <i>Pelles kart</i>, а не «Pelles kartet». Апостроф не ставят (только если имя уже кончается на <i>s</i>: <i>Lars' bil</i>). О частях вещей говорят через предлог: <i>taket <b>på</b> huset</i> — крыша дома, <i>døra <b>til</b> kjøkkenet</i> — дверь кухни.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p><i>Hvem sin bil?</i> и разговорное <i>Pelle sin bil</i> (машина Пелле) пришли от ганзейских купцов: в XIV–XVI веках немцы из Ганзы держали в руках торговлю Бергена, и норвежцы переняли их оборот «Пелле свою машину». Норвежцы даже называют его <i>garpegenitiv</i> — «родительный падеж ганзейца» (<i>garp</i> — прозвище ганзейского купца).</p></div>`,
   simple: 'bilen min, boka mi, huset mitt, barna mine. hans — его, hennes — её, deres — их. Притяжательное — после слова.',
   exm: [['Bilen min er gammel.', 'Моя машина старая.'], ['Hvor er nøklene mine?', 'Где мои ключи?'], ['Huset vårt ligger ved sjøen.', 'Наш дом стоит у моря.'], ['Katten hennes heter Pepper.', 'Её кота зовут Пеппер.']],
   conf: [['*huset min* / *huset mitt*', 'С et-словом — <i>mitt</i>: <i>huset mitt, kartet mitt</i>.', '«Моя карта» (et kart):|kartet mitt|kartet min|kartet mi # et → mitt.'],

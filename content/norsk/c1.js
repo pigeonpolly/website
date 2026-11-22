@@ -63,7 +63,8 @@ BK('c1-1', 'Kapittel 25. Et brev fra Polarinstituttet', ['Høsten kom tidlig til
 U({
   id: 'c1-2', lvl: 'C1', t: 'Выделение и инверсия: «Det var Pelle som…»', en: 'Utbrytning og framheving',
   goals: ['выделять главное конструкцией *Det er/var … som*', 'ставить в начало дополнение или наречие для акцента: *Fisk liker jeg ikke*', 'понимать стилистическую инверсию: *Aldri har jeg sett…*'],
-  th: `<h4>Utbrytning: Det er … som</h4>
+  th: `<div class="scheme"><h4>🧩 Выделить одно слово</h4><div class="tbl"><table><thead><tr><th>обычно</th><th>с выделением</th><th>смысл</th></tr></thead><tbody><tr><td><i>Pelle fant kartet.</i></td><td><i><b>Det var</b> Pelle <b>som</b> fant kartet.</i></td><td>именно Пелле</td></tr><tr><td><i>Pelle fant kartet.</i></td><td><i><b>Det var</b> kartet (som) Pelle fant.</i></td><td>именно карту</td></tr><tr><td><i>Vi reiser i morgen.</i></td><td><i><b>Det er</b> i morgen vi reiser.</i></td><td>именно завтра</td></tr><tr><td><i>Jeg liker ikke fisk.</i></td><td><i><b>Fisk</b> liker jeg ikke.</i></td><td>вот рыбу — нет</td></tr></tbody></table></div><p class="f"><span class="e">Det er / Det var</span> + что выделяем + <span class="e">som</span> + остальное</p></div>
+  <h4>Utbrytning: Det er … som</h4>
   <p>Чтобы подчеркнуть одну часть предложения, норвежцы «вырывают» её в рамку <b>Det er / Det var … som</b> (как английское <i>It was … who/that</i>):</p>
   <ul><li><i>Pelle fant kartet.</i> → <i><b>Det var Pelle som</b> fant kartet.</i> (именно Пелле, а не Мари)</li>
   <li><i>Vi reiser i morgen.</i> → <i><b>Det er i morgen</b> vi reiser.</i> (именно завтра; <i>som</i> можно опустить, если выделено не подлежащее)</li>
@@ -122,7 +123,8 @@ BK('c1-2', 'Kapittel 26. Øya som reddet ham', ['Den kvelden fortalte bestefar a
 U({
   id: 'c1-3', lvl: 'C1', t: 'Нереальное и пожелания: hadde jeg bare…', en: 'Hypotetiske setninger og ønsker',
   goals: ['говорить о нереальном в настоящем и прошлом: *Hvis jeg var… / Hadde jeg visst…*', 'выражать сожаление и пожелания: *Om jeg bare kunne…, Gid…*', 'узнавать застывшие формы конъюнктива: *Leve kongen! Gud bevare…*'],
-  th: `<h4>Нереальное сейчас: preteritum</h4>
+  th: `<div class="scheme"><h4>🧩 Реальное и нереальное</h4><div class="tbl"><table><thead><tr><th></th><th>если …</th><th>то …</th></tr></thead><tbody><tr><td>реально</td><td><i>Hvis jeg <b>har</b> tid,</i></td><td><i><b>kommer</b> jeg.</i></td></tr><tr><td>нереально сейчас</td><td><i>Hvis jeg <b>hadde</b> tid,</i></td><td><i><b>ville</b> jeg komme / <b>hadde</b> jeg kommet.</i></td></tr><tr><td>нереально в прошлом</td><td><i>Hvis jeg <b>hadde hatt</b> tid,</i></td><td><i><b>hadde</b> jeg kommet.</i></td></tr><tr><td>без hvis</td><td><i><b>Hadde</b> jeg hatt tid,</i></td><td><i>hadde jeg kommet.</i></td></tr></tbody></table></div><p class="f">нереальное = <span class="e">шаг назад во времени</span>: har → hadde → hadde hatt</p></div>
+  <h4>Нереальное сейчас: preteritum</h4>
   <p><i>Hvis jeg <b>var</b> yngre, <b>ville</b> jeg reist selv.</i> — Будь я моложе, поехал бы сам. В главной части — <i>ville</i> + инфинитив, а в разговоре часто <i>hadde</i> + причастие: <i>…hadde jeg reist selv.</i></p>
   <h4>Нереальное в прошлом: pluskvamperfektum</h4>
   <p><i>Hvis jeg <b>hadde visst</b> det, <b>hadde</b> jeg <b>kommet</b>.</i> А без <i>hvis</i> — с инверсией (очень по-норвежски!): <i><b>Hadde jeg visst</b> det, hadde jeg kommet.</i></p>
@@ -195,7 +197,8 @@ U({
   <h4>Где частица</h4>
   <p>С существительным — частица до или после: <i>Han slo <b>av</b> lyset / slo lyset <b>av</b></i>. С безударным местоимением — <b>после</b> него: <i>Han slo det <b>av</b></i>, а не «slo av det». С модальным и в придаточном частица остаётся после глагола: <i>…fordi han ikke ville gi <b>opp</b></i>.</p>
   <h4>Слитные двойники</h4>
-  <p>Многие сочетания имеют «книжного» слитного близнеца с другим оттенком: <i>å sette i gang</i> = начать (разг.), <i>å igangsette</i> — инициировать (канц.); <i>å legge fram</i> — представить, <i>et framlegg</i> — предложение (документ).</p>`,
+  <p>Многие сочетания имеют «книжного» слитного близнеца с другим оттенком: <i>å sette i gang</i> = начать (разг.), <i>å igangsette</i> — инициировать (канц.); <i>å legge fram</i> — представить, <i>et framlegg</i> — предложение (документ).</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему рядом живут <i>sette i gang</i> и <i>igangsette</i>, <i>legge fram</i> и <i>framlegge</i>? Раздельные — исконно норвежские. Слитные с приставками (<i>be-, an-, for-</i>) и их «склеенные» двойники пришли из нижненемецкого и датского письма — поэтому звучат официально. <i>betale, begynne, anbefale</i> (рекомендовать) — тоже оттуда.</p></div>`,
   simple: 'глагол + частица = новое значение: gi opp, finne ut, se opp til. Местоимение — перед частицей: slå det av.',
   exm: [['Vi må finne ut hva som skjedde.', 'Нам надо выяснить, что случилось.'], ['Ikke gi opp!', 'Не сдавайся!'], ['Pelle ser opp til bestefar.', 'Пелле равняется на дедушку.'], ['Jobben går ut på å telle fugler.', 'Работа заключается в подсчёте птиц.']],
   conf: [['*slå av det* / *slå det av*', 'Безударное местоимение — <b>перед</b> частицей: <i>slå det av, ta den på</i>.', '«Выключи его (свет)»:|Slå det av!|Slå av det!|Av slå det! # Местоимение перед частицей.'],

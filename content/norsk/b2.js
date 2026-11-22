@@ -15,7 +15,10 @@ U({
   <h4>Где стоят</h4>
   <p>Как <i>ikke</i>: после глагола в главном предложении (<i>Han er <b>jo</b> her</i>), перед глаголом в придаточном (<i>…fordi han <b>jo</b> er her</i>). <i>da</i> в просьбах и восклицаниях — в конце.</p>
   <h4>Осторожно с da</h4>
-  <p><i>Hei da!</i> — «ну, пока!» (тепло). Но <i>Hva er det da?</i> с раздражённой интонацией — «ну и что это ещё такое?». Слушайте интонацию. А «Ja da» и «Nei da» — «да-да, конечно», «да нет, что вы».</p>`,
+  <p><i>Hei da!</i> — «ну, пока!» (тепло). Но <i>Hva er det da?</i> с раздражённой интонацией — «ну и что это ещё такое?». Слушайте интонацию. А «Ja da» и «Nei da» — «да-да, конечно», «да нет, что вы».</p>
+  <h4>С чего начать</h4>
+  <p>Не нужно учить все частицы сразу. Три шаблона дают 80 % «живого» звучания: <i>Du kommer <b>vel</b>?</i> (ты ведь придёшь?) · <i>Det vet du <b>jo</b>.</i> (ты же знаешь) · <i>Kom <b>da</b>!</i> (ну пойдём же!).</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>В немецком есть такие же «пустые» словечки — <i>ja, doch, wohl</i>, и они родня норвежским: <i>jo</i> ~ <i>ja</i>, <i>vel</i> ~ <i>wohl</i>. Учебники их обычно пропускают, а в живой речи они в каждом втором предложении — поэтому речь из учебника звучит «как робот».</p></div>`,
   simple: 'jo — «ведь, сам знаешь», vel — «наверное, ведь да?», da — «ну же!», nå — «ну, вообще-то», visst — «говорят». Стоят там же, где ikke.',
   exm: [['Det regner jo alltid i Bergen.', 'В Бергене же всегда дождь.'], ['Du kommer vel i morgen?', 'Ты ведь придёшь завтра?'], ['Kom igjen da!', 'Ну давай же!'], ['Han er visst flyttet til Oslo.', 'Говорят, он переехал в Осло.']],
   conf: [['*jo* (частица) / *jo* (да)', '<i>Jo!</i> отдельно — «да» на отрицательный вопрос. <i>jo</i> внутри фразы — «ведь».', '«Det er jo søndag» значит…|ведь сегодня воскресенье|да, воскресенье|разве воскресенье? # jo внутри фразы — «ведь».'],
@@ -73,7 +76,9 @@ U({
   <p>Форма после <i>har</i> может стоять перед существительным: <i>en <b>stjålet</b> sykkel</i> (украденный велосипед), <i>et <b>åpnet</b> brev</i>, <i>de <b>stjålne</b> pengene</i>. Мн. ч. и определённая форма — с <i>-e</i>: <i>de malte bildene</i>, <i>den glemte paraplyen</i>.</p>
   <h4>Presens partisipp: -ende</h4>
   <p>Окончание <b>-ende</b> — «делающий»: <i>en <b>sovende</b> katt</i> (спящая кошка), <i>et <b>spennende</b> eventyr</i> (захватывающее приключение), <i>et <b>overraskende</b> svar</i>. Не меняется по роду и числу!</p>
-  <p>Ещё <i>-ende</i> — наречие образа действия: <i>Hun kom <b>gående</b></i> — пришла пешком. <i>Han ble <b>sittende</b></i> — он остался сидеть.</p>`,
+  <p>Ещё <i>-ende</i> — наречие образа действия: <i>Hun kom <b>gående</b></i> — пришла пешком. <i>Han ble <b>sittende</b></i> — он остался сидеть.</p>
+  <h4>Hadde det ikke vært for … — если бы не …</h4>
+  <p><i>Hadde det ikke vært for deg, hadde jeg gitt opp.</i> — Если бы не ты, я бы сдался. Очень частый оборот в рассказах и благодарностях.</p>`,
   simple: 'hadde + форма = «ещё раньше» или «если бы». en stjålet sykkel — причастие как прилагательное. -ende = «делающий»: en sovende katt.',
   exm: [['Da vi kom, hadde toget allerede gått.', 'Когда мы пришли, поезд уже ушёл.'], ['Hvis jeg hadde visst det, hadde jeg kommet.', 'Если бы я знала, я бы пришла.'], ['Politiet fant den stjålne sykkelen.', 'Полиция нашла украденный велосипед.'], ['Det var et spennende eventyr.', 'Это было захватывающее приключение.']],
   conf: [['*hadde gått* / *gikk*', '<i>gikk</i> — просто в прошлом. <i>hadde gått</i> — раньше другого события в прошлом.', '«Когда я позвонила, он уже уснул»:|Da jeg ringte, hadde han allerede sovnet.|Da jeg ringte, sovnet han allerede.|Da jeg ringte, har han sovnet. # Раньше другого события — hadde.'],
@@ -136,7 +141,9 @@ U({
   <li>со словом — слово + <b>прямой порядок</b> (без инверсии!): <i>«Hvor bor du?» → Han spurte hvor jeg <b>bodde</b>.</i></li>
   <li>если вопросительное слово — подлежащее, добавляется <b>som</b>: <i>«Hvem kommer?» → Hun lurte på <b>hvem som</b> kom. «Hva skjedde?» → Jeg vet ikke <b>hva som</b> skjedde.</i></li></ul>
   <h4>Просьбы и приказы</h4>
-  <p><i>«Kom hit!» → Han ba meg (om å) komme.</i> <i>«Ikke rør!» → Hun sa at jeg ikke skulle røre.</i></p>`,
+  <p><i>«Kom hit!» → Han ba meg (om å) komme.</i> <i>«Ikke rør!» → Hun sa at jeg ikke skulle røre.</i></p>
+  <h4>Глаголы для пересказа</h4>
+  <p>Не только <i>sa</i>: <i>fortalte</i> (рассказал), <i>mente</i> (считал), <i>spurte</i> (спросил), <i>lurte på</i> (интересовался, хотел узнать), <i>svarte</i> (ответил), <i>lovet</i> (пообещал), <i>påsto</i> (утверждал), <i>innrømmet</i> (признал). <i>Hun lovet at hun skulle ringe.</i> — Она обещала позвонить.</p>`,
   simple: 'Han sa at han var … (время назад, ikke перед глаголом). Вопрос да/нет → om, со словом → прямой порядок. hvem/hva как подлежащее → hvem som, hva som.',
   exm: [['Han sa at han var trøtt.', 'Он сказал, что устал.'], ['Hun spurte om jeg ville ha kaffe.', 'Она спросила, хочу ли я кофе.'], ['Jeg lurer på hvor han bor.', 'Мне интересно, где он живёт.'], ['Ingen vet hva som skjedde.', 'Никто не знает, что случилось.']],
   conf: [['*hvor bor han* / *hvor han bor*', 'В косвенном вопросе — прямой порядок: <i>Jeg vet ikke hvor han bor.</i>', '«Я не знаю, где он живёт»:|Jeg vet ikke hvor han bor.|Jeg vet ikke hvor bor han.|Jeg vet ikke om hvor han bor. # Косвенный вопрос — без инверсии.'],
@@ -185,8 +192,9 @@ BK('b2-3', 'Kapittel 21. Adressen', ['På lappen sto det en adresse i Bjørvika,
 U({
   id: 'b2-4', lvl: 'B2', t: 'Составные слова и словообразование', en: 'Sammensatte ord og orddannelse',
   goals: ['понимать и строить длинные составные слова: *vaffelhjerte, fjelltur*', 'не делать ошибку «særskriving»: *røykfritt*, а не *røyk fritt*', 'узнавать суффиксы и приставки: *-het, -else, -lig, -som, u-*'],
-  th: `<h4>Слова-конструкторы</h4>
-  <p>В норвежском новые слова часто склеивают из старых. <b>Главное слово — последнее</b>, оно же даёт род: <i>en fjell + en tur = en fjelltur</i> (поход в горы), <i>et kaffe + en kopp = en kaffekopp</i>, <i>et barn + en hage = en barnehage</i> (детский сад, «детский сад» буквально!).</p>
+  th: `<div class="scheme"><h4>🧩 Как собрать слово</h4><div class="tbl"><table><thead><tr><th>часть 1</th><th>+ часть 2 (главная)</th><th>= слово (род — от части 2)</th></tr></thead><tbody><tr><td><i>et fjell</i> — гора</td><td><i>en tur</i> — поход</td><td><i><b>en</b> fjelltur</i> — поход в горы</td></tr><tr><td><i>en kaffe</i></td><td><i>en kopp</i></td><td><i><b>en</b> kaffekopp</i></td></tr><tr><td><i>en sol</i> — солнце</td><td><i>et lys</i> — свет</td><td><i><b>et</b> sollys</i></td></tr><tr><td><i>et arbeid</i> — работа</td><td>-s- + <i>en dag</i></td><td><i><b>en</b> arbeidsdag</i></td></tr></tbody></table></div><p class="f">главное слово — <span class="e">последнее</span>, оно даёт род</p></div>
+  <h4>Слова-конструкторы</h4>
+  <p>В норвежском новые слова часто склеивают из старых. <b>Главное слово — последнее</b>, оно же даёт род: <i>et fjell + en tur = en fjelltur</i> (поход в горы), <i>en kaffe + en kopp = en kaffekopp</i>, <i>et barn + en hage = en barnehage</i> (детский сад, «детский сад» буквально!).</p>
   <p>Иногда между частями появляется соединительная <b>-s-</b> или <b>-e-</b>: <i>arbeid<b>s</b>dag</i> (рабочий день), <i>sjømann<b>s</b>lue</i>, <i>barn<b>e</b>bok</i> (детская книга).</p>
   <h4>Særskriving — опасная ошибка</h4>
   <p>Составное слово пишется <b>слитно</b>. Если разбить его на части, смысл меняется, иногда смешно:</p>
@@ -198,11 +206,12 @@ U({
   <tr><td><i>-lig, -ig</i></td><td>прилагательное</td><td><i>vennlig</i> (дружелюбный), <i>farlig</i>, <i>koselig</i></td></tr>
   <tr><td><i>-som</i></td><td>склонный к</td><td><i>morsom</i> (смешной), <i>ensom</i> (одинокий), <i>arbeidsom</i></td></tr>
   <tr><td><i>-er, -ing</i></td><td>человек, действие</td><td><i>lærer, maler; trening, reising</i></td></tr>
-  <tr><td><i>u-</i></td><td>не-</td><td><i>umulig</i> (невозможный), <i>uvanlig</i>, <i>uvær</i> (непогода)</td></tr></tbody></table></div>`,
+  <tr><td><i>u-</i></td><td>не-</td><td><i>umulig</i> (невозможный), <i>uvanlig</i>, <i>uvær</i> (непогода)</td></tr></tbody></table></div>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Суффиксы <i>-het, -else, -eri, -inne</i> и приставки <i>be-, an-</i> — не норвежские, а нижненемецкие. В XIV–XVI веках торговлей в Бергене заправляла Ганза, и вместе с товарами пришли сотни слов: <i>handel</i> (торговля), <i>skap</i> (шкаф), <i>spiker</i> (гвоздь), <i>lykke</i> (счастье), <i>klok</i> (умный), <i>betale</i> (платить), <i>begynne</i> (начинать).</p><p>Норвежский учёный Финн Хёднебё показал это на фразе: <i>Skredderen tenkte at trøya passet fortreffelig, men kunden klaget…</i> («Портной думал, что куртка сидит превосходно, но заказчик жаловался…») — в его полной фразе из двадцати слов норвежские только <i>at, og</i> и <i>var</i>. Всё остальное — из немецкого.</p></div>`,
   simple: 'составное слово — слитно, главное — последнее: fjelltur, kaffekopp. Раздельно — другой смысл (røykfritt ≠ røyk fritt). -het, -else, -lig, -som, u- — строим новые слова.',
   exm: [['Vi tok en lang fjelltur i helgen.', 'На выходных мы долго ходили в горы.'], ['Restauranten er røykfri.', 'В ресторане не курят.'], ['Det var en uforglemmelig opplevelse.', 'Это было незабываемое впечатление.'], ['Barna er i barnehagen.', 'Дети в детском саду.']],
   conf: [['*røykfritt* / *røyk fritt*', 'Слитно — «некурящее». Раздельно — «кури свободно». Составные слова — всегда слитно.', 'Табличка «здесь не курят»:|Røykfritt område|Røyk fritt område|Røyk-fritt område # Составное — слитно.'],
-    ['*en kaffekopp* / *et kaffekopp*', 'Род даёт <b>последнее</b> слово: <i>et kaffe + en kopp = en kaffekopp</i>.', 'Род слова «barnehage» (et barn + en hage):|en barnehage|et barnehage|ei barnehage # Последнее слово — en hage.']],
+    ['*en kaffekopp* / *et kaffekopp*', 'Род даёт <b>последнее</b> слово: <i>en kaffe + en kopp = en kaffekopp</i>.', 'Род слова «barnehage» (et barn + en hage):|en barnehage|et barnehage|ei barnehage # Последнее слово — en hage.']],
   words: [['en fjelltur', 'поход в горы', 'Vi gikk en lang fjelltur.'], ['en barnehage', 'детский сад', 'Barna er i barnehagen.'], ['en opplevelse', 'впечатление, переживание', 'Det var en fin opplevelse.'], ['frihet', 'свобода', 'Friheten er viktig.'], ['umulig', 'невозможный', 'Det er umulig!'], ['morsom', 'смешной, весёлый', 'For en morsom film!'], ['ensom', 'одинокий', 'Han følte seg ensom.'], ['uvær', 'непогода', 'Det var uvær hele natten.'], ['solnedgang', 'закат', 'Vi så solnedgangen fra taket.'], ['vennlig', 'дружелюбный', 'Damen var veldig vennlig.']],
   ex: [
     { t: 'gap', h: 'Соберите составное слово.', q: ['fjell + tur = ___|fjelltur', 'kaffe + kopp = ___|kaffekopp', 'arbeid + dag = ___ (с -s-)|arbeidsdag', 'sol + nedgang = ___|solnedgang', 'barn + hage = ___|barnehage', 'vaffel + hjerte = ___|vaffelhjerte'] },
@@ -259,7 +268,10 @@ U({
   <h4>Вежливый отказ</h4>
   <p>Норвежцы отказывают мягко, но прямо: <i>Dessverre har jeg ikke anledning.</i> — «К сожалению, у меня нет возможности». <i>Takk for invitasjonen, men…</i> Причину можно не объяснять подробно.</p>
   <h4>De — почти никогда</h4>
-  <p>Вежливое <i>De</i> встречается только в очень старомодном стиле или в письмах королю. Даже налоговая пишет вам <i>du</i>.</p>`,
+  <p>Вежливое <i>De</i> встречается только в очень старомодном стиле или в письмах королю. Даже налоговая пишет вам <i>du</i>.</p>
+  <h4>Четыре «спасибо», без которых нельзя</h4>
+  <div class="tbl"><table><thead><tr><th>фраза</th><th>когда</th><th>смысл</th></tr></thead><tbody><tr><td><i>Takk for maten!</i></td><td>встаёте из-за стола</td><td>«спасибо за еду» — говорят всегда, даже дома</td></tr><tr><td><i>Takk for sist!</i></td><td>встречаете того, с кем недавно виделись</td><td>«спасибо за прошлый раз» — было приятно</td></tr><tr><td><i>Takk for i dag!</i></td><td>конец рабочего дня, занятия</td><td>«спасибо за сегодня»</td></tr><tr><td><i>Takk for nå!</i></td><td>прощаетесь до скорого</td><td>«пока, спасибо»</td></tr></tbody></table></div>
+  <p>Ответ на благодарность — <i>Bare hyggelig!</i> (не за что, с удовольствием) или <i>Takk i like måte</i> — «и вам того же».</p>`,
   simple: 'официально = коротко, на du, с gjerne/vennligst/takk. Конец — Med vennlig hilsen. Отказ: Dessverre … Takk for …, men …',
   exm: [['Jeg vil gjerne vite om rommet er ledig.', 'Я хотела бы узнать, свободна ли комната.'], ['På forhånd takk!', 'Заранее спасибо!'], ['Dessverre har jeg ikke anledning til å komme.', 'К сожалению, у меня нет возможности прийти.'], ['Med vennlig hilsen, Alina', 'С уважением, Алина']],
   conf: [['*Kjære herr Hansen* / *Hei, Per*', 'В норвежских письмах — по имени и на «du». «Kjære herr…» звучит как XIX век.', 'Начало письма незнакомому менеджеру отеля:|Hei!|Kjære høyt ærede herre!|Halla, kompis! # Нейтрально — Hei!'],
@@ -322,7 +334,8 @@ U({
   <tr><td><i>boken / boka, husene</i></td><td><i>boka, husa</i></td></tr>
   <tr><td><i>Jeg snakker ikke norsk.</i></td><td><i>Eg snakkar ikkje norsk.</i></td></tr>
   <tr><td><i>å være, han var</i></td><td><i>å vere, han var</i></td></tr></tbody></table></div>
-  <p>Если вы понимаете букмол, нюнорск вы прочитаете почти сразу. Это не другой язык — это другой «почерк».</p>`,
+  <p>Если вы понимаете букмол, нюнорск вы прочитаете почти сразу. Это не другой язык — это другой «почерк».</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему у Норвегии две письменные нормы? После 400 лет унии с Данией (до 1814 года) страна писала по-датски. В XIX веке появилось два пути к «своему» языку. Учитель Кнуд Кнудсен предлагал постепенно норвежизировать датское письмо — из этого вырос <b>букмол</b> (тогда — риксмол, «государственный язык»). Сельский самоучка Ивар Осен объездил страну, записал диалекты и собрал из них новый язык — <b>нюнорск</b> (тогда — ланнсмол, «язык страны»).</p><p>Весь XX век их пытались слить в один общий «самнорск» — реформами 1917 и 1938 годов. Не вышло: обе стороны протестовали, родители даже исправляли учебники детей. В итоге остались две нормы, а реформы оставили в букмоле много равноправных вариантов — отсюда <i>boka / boken</i>.</p></div>`,
   simple: 'норвежцы говорят на диалектах — и это норма. eg/æ = jeg, ikkje/itj = ikke, kva = hva. Нюнорск — вторая письменная норма: eg, ikkje, kva, korleis.',
   exm: [['Eg snakkar ikkje norsk. (nynorsk)', 'Я не говорю по-норвежски. (нюнорск)'], ['Kva heiter du? (nynorsk)', 'Как тебя зовут? (нюнорск)'], ['Æ e så glad! (nordnorsk)', 'Я так рада! (северный диалект)'], ['Korleis går det? (nynorsk)', 'Как дела? (нюнорск)']],
   conf: [['*nynorsk* / *dialekt*', 'Нюнорск — <b>письменная</b> норма. Диалект — как человек <b>говорит</b>. Житель Бергена говорит на диалекте, а пишет чаще всего на букмоле.', 'Что такое нюнорск?|вторая письменная норма норвежского|диалект Осло|старинный язык викингов # Нюнорск — письменная норма.'],
