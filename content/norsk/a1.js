@@ -3,7 +3,8 @@
 U({
   id: 'a1-1', lvl: 'A1', t: 'Алфавит, звуки и «Hei!»', en: 'Alfabetet og uttale',
   goals: ['читать норвежские буквы æ, ø, å и сочетания kj, sj, skj', 'здороваться, прощаться и благодарить', 'представиться: *Jeg heter …*'],
-  th: `<p>Норвежский — германский язык, близкий родственник английского, немецкого, шведского и датского. Есть две письменные нормы: <b>bokmål</b> («книжный язык», им пишет около 85–90 % норвежцев) и <b>nynorsk</b> («новонорвежский»). Мы учим букмол.</p>
+  th: `<div class="scheme"><h4>🧩 Пишется → читается</h4><div class="tbl"><table><thead><tr><th>пишется</th><th>читается</th><th>пример</th></tr></thead><tbody><tr><td><b>o</b></td><td>часто «у»</td><td><i>bok</i> [бу:к], <i>god</i> [гу:]</td></tr><tr><td><b>kj, tj</b>, <b>k</b> перед i, y</td><td>«хь»</td><td><i>kjøpe</i> [хьёпе], <i>kino</i> [хьину]</td></tr><tr><td><b>sj, skj, rs</b>, <b>sk</b> перед i, y</td><td>«ш»</td><td><i>ski</i> [ши:], <i>norsk</i> [ношк]</td></tr><tr><td><b>hv, hj</b></td><td><i>h</i> молчит</td><td><i>hva</i> [ва], <i>hjem</i> [йем]</td></tr><tr><td><b>g</b> перед i, y, ei; <b>gj</b></td><td>«й»</td><td><i>gi</i> [йи:], <i>gjøre</i> [йёре]</td></tr><tr><td><b>-d</b> после гласной в конце</td><td>молчит</td><td><i>god</i> [гу:], <i>med</i> [ме:]</td></tr><tr><td><b>-ig</b> в конце</td><td>«и»</td><td><i>koselig</i> [кусели]</td></tr><tr><td><b>det</b></td><td>[де] — <i>t</i> молчит</td><td><i>Det er fint.</i> [де эр финт]</td></tr><tr><td>двойная согласная</td><td>гласная перед ней короткая</td><td><i>takk</i> — коротко, <i>tak</i> — долго</td></tr></tbody></table></div></div>
+  <p>Норвежский — германский язык, близкий родственник английского, немецкого, шведского и датского. Есть две письменные нормы: <b>bokmål</b> («книжный язык», им пишет около 85–90 % норвежцев) и <b>nynorsk</b> («новонорвежский»). Мы учим букмол.</p>
   <h4>Алфавит: 26 латинских букв + три свои</h4>
   <div class="tbl"><table><thead><tr><th>Буква</th><th>Как звучит</th><th>Пример</th></tr></thead><tbody>
   <tr><td><b>æ</b></td><td>широкое «э», как в «этот»</td><td><i>været</i> — погода, <i>lære</i> — учить</td></tr>
@@ -24,7 +25,11 @@ U({
   <p>Норвежский «поёт»: у слов есть тон. Не пугайтесь — вас поймут и без идеального тона. Просто слушайте 🔊 и повторяйте мелодию целиком.</p>
   <h4>Первые фразы</h4>
   <p><i>Hei!</i> — привет. <i>God morgen!</i> — доброе утро. <i>Ha det!</i> — пока. <i>Takk!</i> / <i>Tusen takk!</i> — спасибо / огромное спасибо («тысяча спасибо»). <i>Jeg heter …</i> — меня зовут … <i>Hva heter du?</i> — как тебя зовут?</p>
-  <p>В Норвегии почти все на «ты» (<i>du</i>) — с коллегами, начальником, врачом и даже премьер-министром. Вежливое <i>De</i> почти не используется.</p>`,
+  <p>В Норвегии почти все на «ты» (<i>du</i>) — с коллегами, начальником, врачом и даже премьер-министром. Вежливое <i>De</i> почти не используется.</p>
+  <h4>Двойные гласные (дифтонги)</h4>
+  <div class="tbl"><table><thead><tr><th>пишется</th><th>читается</th><th>пример</th></tr></thead><tbody><tr><td><b>ei</b></td><td>«эй»</td><td><i>nei</i> [нэй] — нет, <i>vei</i> — дорога</td></tr><tr><td><b>øy</b></td><td>«ёй»</td><td><i>øy</i> — остров, <i>høy</i> — высокий</td></tr><tr><td><b>au</b></td><td>«эу»</td><td><i>sau</i> — овца, <i>august</i></td></tr></tbody></table></div>
+  <p>И ещё одна мелочь: <i>jeg</i> читается [яй], <i>meg</i> и <i>deg</i> — [май] и [дай]. Это не исключения для запоминания по одному — так читаются все самые частые маленькие слова, и через неделю это перестаёт удивлять.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему пишут одно, а читают другое? С 1380 по 1814 год Норвегия была в унии с Данией, и писать привыкли по-датски, а говорили по-своему. Потом правописание много раз приближали к речи — главные реформы были в 1907, 1917 и 1938 годах, — но кое-где датская запись осталась: отсюда немое <i>h</i> в <i>hva</i> и немое <i>d</i> в <i>god</i>.</p><p>Буквы <b>å</b> раньше вообще не было: писали <i>aa</i>, как в датском. Её ввели реформой 1917 года, обязательной она стала годом позже. Поэтому в старых названиях и фамилиях ещё встречается <i>aa</i>: <i>Aalesund</i> — сейчас <i>Ålesund</i>.</p><p>А пары вроде <i>tak</i> (крыша) и <i>takk</i> (спасибо) различают на письме с 1907 года — двойную согласную тогда ввели как раз чтобы не путать такие слова.</p></div>`,
   simple: 'æ — «э», ø — «ё» по-немецки, å — «о», o — часто «у». kj — «хь», sj и skj — «ш». Двойная согласная — короткий звук.',
   exm: [['Hei! Jeg heter Alina.', 'Привет! Меня зовут Алина.'], ['Hva heter du?', 'Как тебя зовут?'], ['Tusen takk!', 'Большое спасибо!'], ['God morgen! Ha en fin dag!', 'Доброе утро! Хорошего дня!']],
   conf: [['*takk* / *tak*', 'Двойная согласная — короткий гласный: <i>takk</i> [так] — спасибо; <i>tak</i> [та:к] — крыша.', '«Спасибо» по-норвежски:|takk|tak|tack # Две k — короткий звук.'],
@@ -71,7 +76,8 @@ BK('a1-1', 'Kapittel 1. Pelle på Røst', ['Dette er Pelle. Pelle er en lundefug
 U({
   id: 'a1-2', lvl: 'A1', t: 'Местоимения и «быть»: jeg er', en: 'Pronomen og verbet «å være»',
   goals: ['говорить, кто вы и откуда: *Jeg er fra Latvia*', 'знать все личные местоимения', 'не путать *er* (есть) и *har* (имеет)'],
-  th: `<p>Хорошая новость: норвежский глагол <b>не меняется по лицам</b>. «Я есть, ты есть, они есть» — всегда <b>er</b>. Никаких am/is/are!</p>
+  th: `<div class="scheme"><h4>🧩 Одна форма для всех</h4><div class="tbl"><table><thead><tr><th>кто</th><th>быть</th><th>иметь</th></tr></thead><tbody><tr><td><i>jeg</i> — я</td><td><i>jeg <b>er</b></i></td><td><i>jeg <b>har</b></i></td></tr><tr><td><i>du</i> — ты</td><td><i>du <b>er</b></i></td><td><i>du <b>har</b></i></td></tr><tr><td><i>han, hun</i> — он, она</td><td><i>han <b>er</b></i></td><td><i>hun <b>har</b></i></td></tr><tr><td><i>vi</i> — мы</td><td><i>vi <b>er</b></i></td><td><i>vi <b>har</b></i></td></tr><tr><td><i>dere</i> — вы</td><td><i>dere <b>er</b></i></td><td><i>dere <b>har</b></i></td></tr><tr><td><i>de</i> — они</td><td><i>de <b>er</b></i></td><td><i>de <b>har</b></i></td></tr></tbody></table></div><p class="f">кто угодно + <span class="e">er</span> · кто угодно + <span class="e">har</span></p></div>
+  <p>Хорошая новость: норвежский глагол <b>не меняется по лицам</b>. «Я есть, ты есть, они есть» — всегда <b>er</b>. Никаких am/is/are!</p>
   <div class="tbl"><table><thead><tr><th>Местоимение</th><th>Перевод</th><th>å være (быть)</th><th>å ha (иметь)</th></tr></thead><tbody>
   <tr><td><i>jeg</i> [яй]</td><td>я</td><td><i>jeg er</i></td><td><i>jeg har</i></td></tr>
   <tr><td><i>du</i></td><td>ты</td><td><i>du er</i></td><td><i>du har</i></td></tr>
@@ -86,7 +92,16 @@ U({
   <ul><li>кто: <i>Jeg er kunstner.</i> — Я художник. (без артикля перед профессией!)</li><li>откуда: <i>Jeg er fra Latvia.</i></li><li>какой: <i>Pelle er søt.</i> — Пелле милый.</li><li>где: <i>Vi er hjemme.</i> — Мы дома.</li><li>возраст: <i>Jeg er tretti år.</i> — Мне тридцать лет. (не «har»!)</li></ul>
   <h4>Вопрос: просто меняем местами</h4>
   <p><i>Du er trøtt.</i> → <i><b>Er</b> du trøtt?</i> — Ты устал? С вопросительным словом: <i>Hvor <b>er</b> du fra?</i> — Откуда ты? <i>Hvor gammel <b>er</b> du?</i> — Сколько тебе лет?</p>
-  <p>Ответы: <i>Ja</i> — да. <i>Nei</i> — нет. А на отрицательный вопрос «да» звучит как <b>jo</b>: <i>Er du ikke trøtt? — Jo!</i> (Ты не устал? — Ещё как устал!)</p>`,
+  <p>Ответы: <i>Ja</i> — да. <i>Nei</i> — нет. А на отрицательный вопрос «да» звучит как <b>jo</b>: <i>Er du ikke trøtt? — Jo!</i> (Ты не устал? — Ещё как устал!)</p>
+  <h4>Меня, тебя, его: вторая форма местоимений</h4>
+  <p>Как в русском «я — меня», у норвежских местоимений есть вторая форма. Она нужна <b>после глагола</b> (кого? кому?) и <b>после предлога</b> (с кем? для кого?).</p>
+  <div class="tbl"><table><thead><tr><th>кто?</th><th>кого? кому?</th><th>пример</th></tr></thead><tbody><tr><td><i>jeg</i></td><td><i><b>meg</b></i> [май]</td><td><i>Kan du hjelpe meg?</i> — Можешь мне помочь?</td></tr><tr><td><i>du</i></td><td><i><b>deg</b></i> [дай]</td><td><i>Jeg savner deg.</i> — Скучаю по тебе.</td></tr><tr><td><i>han</i></td><td><i><b>ham</b></i> (или <i>han</i>)</td><td><i>Jeg kjenner ham.</i> — Я его знаю.</td></tr><tr><td><i>hun</i></td><td><i><b>henne</b></i></td><td><i>Vi snakker med henne.</i> — Мы говорим с ней.</td></tr><tr><td><i>vi</i></td><td><i><b>oss</b></i></td><td><i>Kom til oss!</i> — Приходи к нам!</td></tr><tr><td><i>dere</i></td><td><i>dere</i> (не меняется)</td><td><i>Jeg ser dere.</i></td></tr><tr><td><i>de</i></td><td><i><b>dem</b></i> [дем]</td><td><i>Jeg liker dem.</i> — Они мне нравятся.</td></tr></tbody></table></div>
+  <h4>Den или det — когда говорим о предмете</h4>
+  <p>«Он, она, оно» о вещах зависит от рода норвежского слова (урок A1.4): <b>den</b> — для слов с <i>en/ei</i>, <b>det</b> — для слов с <i>et</i>. <i>Bilen? <b>Den</b> er ny.</i> — Машина? Она новая. <i>Huset? <b>Det</b> er stort.</i> — Дом? Он большой.</p>
+  <h4>Det — «это» и «пустое» подлежащее</h4>
+  <p><i>Det er Pelle.</i> — Это Пелле. <i>Det er en katt.</i> — Это кошка. А ещё <i>det</i> ставят там, где по-русски подлежащего нет вовсе: <i><b>Det</b> regner.</i> — Идёт дождь. <i><b>Det</b> er kaldt.</i> — Холодно. <i><b>Det</b> er fint!</i> — Отлично! В норвежском предложении подлежащее есть всегда, и если его нет по смыслу — его место занимает <i>det</i>.</p>
+  <h4>Hvordan har du det? — Как дела?</h4>
+  <p>Дословно «как ты это имеешь?». Отвечают: <i>Bra, takk! Og du?</i> — Хорошо, спасибо! А ты? Короткий вариант — <i>Hvordan går det?</i> («как идёт?»).</p>`,
   simple: 'er — для всех: jeg er, du er, de er. har — тоже для всех. Возраст — через er: Jeg er 30 år.',
   exm: [['Jeg er fra Latvia.', 'Я из Латвии.'], ['Hun er kunstner.', 'Она художница.'], ['Hvor er du fra?', 'Откуда ты?'], ['Vi er hjemme i dag.', 'Мы сегодня дома.']],
   conf: [['*Jeg er 30 år* / *Jeg har 30 år*', 'Возраст — через <i>er</i>: <i>Jeg er 30 år (gammel)</i>. «Har 30 år» — русская ловушка.', '«Мне 25 лет»:|Jeg er 25 år.|Jeg har 25 år.|Meg er 25 år. # Возраст — через er.'],
@@ -134,7 +149,8 @@ BK('a1-2', 'Kapittel 2. Hvor er bestefar?', ['Pelle har en mamma. Mamma er blid.
 U({
   id: 'a1-3', lvl: 'A1', t: 'Presens: глагол + r', en: 'Presens — nåtid',
   goals: ['ставить глагол в настоящее время: *snakke → snakker*', 'говорить, что вы делаете обычно и сейчас', 'использовать *å* перед инфинитивом'],
-  th: `<p>Ещё одна приятная новость: настоящее время (<b>presens</b>) образуется почти всегда одинаково — <b>к инфинитиву добавляется -r</b>. И форма одна для всех лиц.</p>
+  th: `<div class="scheme"><h4>🧩 Формула presens</h4><p class="f">å snakke → snakke<span class="e">r</span></p><div class="tbl"><table><thead><tr><th>кто</th><th>å snakke — говорить</th><th>å bo — жить</th><th>å være — быть</th></tr></thead><tbody><tr><td><i>jeg</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr><tr><td><i>du</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr><tr><td><i>han / hun</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr><tr><td><i>vi</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr><tr><td><i>dere</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr><tr><td><i>de</i></td><td><i>snakke<b>r</b></i></td><td><i>bo<b>r</b></i></td><td><i>er</i></td></tr></tbody></table></div><p>Убрали <i>å</i>, добавили <b>-r</b> — и форма одна для всех шести «кто». Подробности — ниже.</p></div>
+  <p>Ещё одна приятная новость: настоящее время (<b>presens</b>) образуется почти всегда одинаково — <b>к инфинитиву добавляется -r</b>. И форма одна для всех лиц.</p>
   <div class="tbl"><table><thead><tr><th>Инфинитив</th><th>Presens</th><th>Пример</th></tr></thead><tbody>
   <tr><td><i>å snakke</i> — говорить</td><td><i>snakker</i></td><td><i>Jeg snakker norsk.</i></td></tr>
   <tr><td><i>å bo</i> — жить</td><td><i>bor</i></td><td><i>Hun bor i Oslo.</i></td></tr>
@@ -145,7 +161,14 @@ U({
   <h4>Presens = «обычно» и «сейчас»</h4>
   <p>В норвежском нет отдельного «длительного» времени, как английское <i>I am drinking</i>. <i>Jeg drikker kaffe</i> — это и «я пью кофе (обычно)», и «я пью кофе (сейчас)». Хотите подчеркнуть «прямо сейчас» — скажите <i>Jeg holder på å drikke kaffe</i> или просто добавьте <i>nå</i>: <i>Jeg drikker kaffe nå.</i></p>
   <h4>Частица <i>å</i></h4>
-  <p><i>å</i> перед глаголом — как английское <i>to</i>: <i>å spise</i> — есть, <i>Jeg liker å tegne</i> — я люблю рисовать. Но после модальных глаголов (<i>kan, vil, skal, må, bør</i>) <i>å</i> <b>не ставится</b>: <i>Jeg kan tegne. Vi må gå.</i></p>`,
+  <p><i>å</i> перед глаголом — как английское <i>to</i>: <i>å spise</i> — есть, <i>Jeg liker å tegne</i> — я люблю рисовать. Но после модальных глаголов (<i>kan, vil, skal, må, bør</i>) <i>å</i> <b>не ставится</b>: <i>Jeg kan tegne. Vi må gå.</i></p>
+  <h4>Как узнать инфинитив</h4>
+  <p>Инфинитив — это форма из словаря, с <i>å</i> впереди. Почти все инфинитивы кончаются на <b>-e</b> (<i>snakke, tegne, spise</i>) или это короткое слово на ударную гласную (<i>bo, gå, se, ha, tro</i>). В обоих случаях просто добавляем <b>-r</b>: <i>snakker, går, ser, har, tror</i>. Ничего не отрезаем.</p>
+  <p>Читается окончание <i>-er</i> как [эр], а <i>r</i> — лёгкое, почти незаметное (в Осло) или картавое (на западе страны). Оба варианта нормальные.</p>
+  <h4>Просьба и команда: Kom! Spis!</h4>
+  <p>Повелительное наклонение (<i>imperativ</i>) — ещё проще: <b>инфинитив без ‑e</b>. <i>å snakke → Snakk!</i> (говори!), <i>å spise → Spis!</i>, <i>å lese → Les!</i>, <i>å komme → Kom!</i> Если инфинитив кончается не на -e, он не меняется: <i>Gå!</i> (иди!), <i>Se!</i> (смотри!). Форма одна — и для «ты», и для «вы».</p>
+  <p>«Не делай» — <i>ikke</i> впереди: <i>Ikke gå!</i> — Не уходи! А вежливое «пожалуйста» — <i>vær så snill</i>, дословно «будь так добр»: здесь <i>vær</i> — это повелительное от <i>være</i>.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Тысячу лет назад, в древнескандинавском, глагол менялся по лицам почти как в русском: <i>ek kalla</i> (я зову), <i>þú kallar</i> (ты зовёшь), <i>vér köllum</i> (мы зовём)… Окончания постепенно стёрлись, и победило одно — <b>-r</b>. Теперь оно для всех.</p><p>А почему у <i>kan, skal, må, vet</i> нет ‑r? Это очень древние формы <b>прошедшего</b> времени, которые со временем стали значить настоящее: «узнал» → «знаю». Учёные называют их претерито-презентными («прошедшие-настоящие»). Прошедшее время никогда не имело этого ‑r — вот его и нет. <i>vil</i> ведёт себя так же.</p></div>`,
   simple: 'инфинитив + r = настоящее время, для всех. snakke → snakker. Исключения: er, gjør, sier, vet, vil, kan, skal, må.',
   exm: [['Jeg snakker litt norsk.', 'Я немного говорю по-норвежски.'], ['Alina tegner fugler hver dag.', 'Алина рисует птиц каждый день.'], ['Vi drikker kaffe nå.', 'Мы сейчас пьём кофе.'], ['Hva gjør du?', 'Что ты делаешь?']],
   conf: [['*Jeg kan snakke* / *Jeg kan å snakke*', 'После <i>kan, vil, skal, må</i> — без <i>å</i>: <i>Jeg kan snakke norsk</i>. После <i>liker</i> — с <i>å</i>: <i>Jeg liker å snakke</i>.', '«Я умею рисовать»:|Jeg kan tegne.|Jeg kan å tegne.|Jeg kan tegner. # После kan — голый инфинитив.'],
@@ -193,7 +216,8 @@ BK('a1-3', 'Kapittel 3. Bestefar synger', ['Hver morgen fisker Pelle. Han spiser
 U({
   id: 'a1-4', lvl: 'A1', t: 'Существительные: en, ei, et', en: 'Substantiv og kjønn',
   goals: ['различать три рода: *en bil, ei bok, et hus*', 'ставить множественное число: *biler, bøker, hus*', 'учить слова сразу с артиклем'],
-  th: `<p>В норвежском три рода, как в русском: мужской, женский и средний. Род показывает <b>неопределённый артикль</b> перед словом — как английское <i>a/an</i>, но их три.</p>
+  th: `<div class="scheme"><h4>🧩 Род и множественное число</h4><div class="tbl"><table><thead><tr><th>род</th><th>один</th><th>много</th></tr></thead><tbody><tr><td>мужской</td><td><b>en</b> bil</td><td>bil<b>er</b></td></tr><tr><td>женский</td><td><b>ei</b> (en) bok</td><td>bøk<b>er</b></td></tr><tr><td>средний</td><td><b>et</b> eple</td><td>eple<b>r</b></td></tr><tr><td>средний, короткое слово</td><td><b>et</b> hus</td><td>hus (без окончания)</td></tr></tbody></table></div><p class="f">артикль — перед словом · много — <span class="e">+er</span></p></div>
+  <p>В норвежском три рода, как в русском: мужской, женский и средний. Род показывает <b>неопределённый артикль</b> перед словом — как английское <i>a/an</i>, но их три.</p>
   <div class="tbl"><table><thead><tr><th>Род</th><th>Артикль</th><th>Примеры</th></tr></thead><tbody>
   <tr><td>мужской</td><td><b>en</b></td><td><i>en bil</i> (машина), <i>en katt</i>, <i>en venn</i></td></tr>
   <tr><td>женский</td><td><b>ei</b> (или en)</td><td><i>ei bok</i> (книга), <i>ei jente</i> (девочка), <i>ei hytte</i> (домик)</td></tr>
@@ -205,7 +229,18 @@ U({
   <li>Короткие слова среднего рода — <b>без окончания</b>: <i>et hus → hus</i>, <i>et barn → barn</i> (дети), <i>et år → år</i>.</li>
   <li>Исключения: <i>en mann → menn</i>, <i>ei bok → bøker</i>, <i>et øye → øyne</i> (глаза), <i>en sko → sko</i>.</li></ul>
   <h4>Когда артикль не нужен</h4>
-  <p>Перед профессией и национальностью (<i>Hun er lege</i>), перед «неисчисляемым» (<i>Jeg drikker kaffe</i>), и с <i>har</i> в устойчивых выражениях: <i>Jeg har bil</i> — у меня есть машина (вообще).</p>`,
+  <p>Перед профессией и национальностью (<i>Hun er lege</i>), перед «неисчисляемым» (<i>Jeg drikker kaffe</i>), и с <i>har</i> в устойчивых выражениях: <i>Jeg har bil</i> — у меня есть машина (вообще).</p>
+  <h4>Как угадать род</h4>
+  <p>Правила нет, но есть подсказки, которые часто срабатывают:</p>
+  <ul><li>большинство слов о людях и животных — <b>en</b>: <i>en mann, en venn, en katt</i> (но <i>et barn</i> — ребёнок, <i>et menneske</i> — человек);</li>
+  <li>на <i>-sjon, -het, -ing</i> — <b>en</b>: <i>en stasjon, en frihet</i> (свобода), <i>en regning</i> (счёт);</li>
+  <li>на <i>-um, -eri, -ment</i> — <b>et</b>: <i>et museum, et bakeri</i> (пекарня), <i>et dokument</i>;</li>
+  <li>не знаете — говорите <b>en</b>: так вы окажетесь правы примерно в трёх случаях из четырёх.</li></ul>
+  <h4>Один: en или ett?</h4>
+  <p>Число «1» тоже меняется по роду: <i>en bil</i> — машина (или одна машина), но <i><b>ett</b> hus</i> — <b>один</b> дом. <i>et</i> — артикль, <i>ett</i> с двумя <i>t</i> — число, когда важно, что именно один.</p>
+  <h4>Det er … — «это …» и «есть …»</h4>
+  <p><i>Det er en katt.</i> — Это кошка. <i>Det er en katt i hagen.</i> — В саду (есть) кошка. «Есть, имеется» по-норвежски часто звучит как <i>det er</i>: <i>Det er mange fjell i Norge.</i> — В Норвегии много гор.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему женский род можно заменять мужским? Сотни лет норвежцы писали по-датски, а в датском всего два рода — «общий» (<i>en</i>) и средний (<i>et</i>). Формы женского рода вернули в книжный язык реформой 1917 года, но выбор оставили. Сейчас они снова в моде: <i>boka, jenta, hytta</i> звучат естественно и «по-норвежски».</p></div>`,
   simple: 'en — мужской (и большинство слов), ei — женский (можно en), et — средний. Мн. ч.: + er; короткие et-слова — без окончания.',
   exm: [['Jeg har en katt og et hus.', 'У меня есть кот и дом.'], ['Hun leser ei bok.', 'Она читает книгу.'], ['Vi har to barn.', 'У нас двое детей.'], ['Pelle har mange venner.', 'У Пелле много друзей.']],
   conf: [['*et hus* / *en hus*', 'Род не по-русски: «дом» — <i>et hus</i>, «машина» — <i>en bil</i>. Учите с артиклем.', '«Дом» по-норвежски:|et hus|en hus|ei hus # hus — средний род.'],
@@ -253,7 +288,8 @@ BK('a1-4', 'Kapittel 4. En sekk og et kart', ['Pelle pakker en sekk. Han tar med
 U({
   id: 'a1-5', lvl: 'A1', t: 'Порядок слов: глагол на втором месте', en: 'Ordstilling: V2 og spørsmål',
   goals: ['ставить глагол на второе место: *I dag drikker jeg kaffe*', 'задавать вопросы: *Drikker du kaffe? Hva drikker du?*', 'знать вопросительные слова *hva, hvor, når, hvem, hvorfor, hvordan*'],
-  th: `<p>Главное правило норвежского: <b>в обычном предложении глагол стоит на втором месте</b>. Не «второе слово», а <b>второе место</b>: первое место может занимать целая группа слов.</p>
+  th: `<div class="scheme"><h4>🧩 Глагол — всегда второй</h4><div class="tbl"><table><thead><tr><th>1 место</th><th>2 место</th><th>дальше</th></tr></thead><tbody><tr><td><i>Jeg</i></td><td><i><b>drikker</b></i></td><td><i>kaffe i dag.</i></td></tr><tr><td><i>I dag</i></td><td><i><b>drikker</b></i></td><td><i>jeg kaffe.</i></td></tr><tr><td><i>Hva</i></td><td><i><b>drikker</b></i></td><td><i>du?</i></td></tr><tr><td>—</td><td><i><b>Drikker</b></i></td><td><i>du kaffe?</i> (вопрос «да/нет»: глагол первым)</td></tr></tbody></table></div></div>
+  <p>Главное правило норвежского: <b>в обычном предложении глагол стоит на втором месте</b>. Не «второе слово», а <b>второе место</b>: первое место может занимать целая группа слов.</p>
   <div class="tbl"><table><thead><tr><th>1 место</th><th>2 место (глагол)</th><th>подлежащее</th><th>остальное</th></tr></thead><tbody>
   <tr><td><i>Jeg</i></td><td><i>drikker</i></td><td></td><td><i>kaffe i dag.</i></td></tr>
   <tr><td><i>I dag</i></td><td><i>drikker</i></td><td><i>jeg</i></td><td><i>kaffe.</i></td></tr>
@@ -263,7 +299,12 @@ U({
   <h4>Вопрос «да/нет»: глагол — первым</h4>
   <p><i>Du drikker kaffe.</i> → <i><b>Drikker</b> du kaffe?</i> Никаких вспомогательных «do» — просто переставили.</p>
   <h4>Вопрос со словом: слово + глагол + подлежащее</h4>
-  <ul><li><i>hva</i> — что: <i>Hva drikker du?</i></li><li><i>hvor</i> — где, куда: <i>Hvor bor du?</i></li><li><i>når</i> — когда: <i>Når kommer du?</i></li><li><i>hvem</i> — кто: <i>Hvem er det?</i></li><li><i>hvorfor</i> — почему: <i>Hvorfor er du trøtt?</i></li><li><i>hvordan</i> — как: <i>Hvordan går det?</i></li><li><i>hvor mye / hvor mange</i> — сколько: <i>Hvor mye koster det?</i></li></ul>`,
+  <ul><li><i>hva</i> — что: <i>Hva drikker du?</i></li><li><i>hvor</i> — где, куда: <i>Hvor bor du?</i></li><li><i>når</i> — когда: <i>Når kommer du?</i></li><li><i>hvem</i> — кто: <i>Hvem er det?</i></li><li><i>hvorfor</i> — почему: <i>Hvorfor er du trøtt?</i></li><li><i>hvordan</i> — как: <i>Hvordan går det?</i></li><li><i>hvor mye / hvor mange</i> — сколько: <i>Hvor mye koster det?</i></li></ul>
+  <h4>Что не занимает место: og, men, eller</h4>
+  <p>Связки <i>og</i> (и), <i>men</i> (но), <i>eller</i> (или), <i>for</i> (ведь), <i>så</i> (так что) стоят как бы на «нулевом» месте и счёт не сбивают: <i>Jeg er trøtt, <b>men</b> jeg jobber.</i> <i>Men i dag <b>jobber</b> jeg ikke.</i> — после <i>men</i> снова считаем с первого места.</p>
+  <h4>Предлог уходит в конец вопроса</h4>
+  <p>Русское «с кем?», «откуда?» норвежцы разбивают: вопросительное слово — в начало, предлог — в конец. <i>Hvem snakker du <b>med</b>?</i> — С кем ты говоришь? <i>Hvor kommer du <b>fra</b>?</i> — Откуда ты? <i>Hva tenker du <b>på</b>?</i> — О чём думаешь?</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>«Глагол на втором месте» — общая черта почти всех германских языков: так же устроены немецкий, нидерландский, шведский, датский. Английский это правило почти потерял — осталось только в оборотах вроде <i>Never have I seen…</i> Поэтому тем, кто знает английский, инверсия кажется странной, а тем, кто знает немецкий, — родной.</p></div>`,
   simple: 'глагол — всегда на втором месте. Начали с «I dag» — дальше глагол, потом «jeg». Вопрос — глагол первым.',
   exm: [['I dag drikker jeg te.', 'Сегодня я пью чай.'], ['Bor du i Oslo?', 'Ты живёшь в Осло?'], ['Hvor bor du?', 'Где ты живёшь?'], ['Om kvelden leser vi.', 'Вечером мы читаем.']],
   conf: [['*I dag jeg drikker* / *I dag drikker jeg*', 'После «I dag», «Nå», «Om kvelden» глагол — сразу, подлежащее — за ним.', '«Сегодня я работаю»:|I dag jobber jeg.|I dag jeg jobber.|Jeg i dag jobber. # Глагол на втором месте.'],
@@ -310,7 +351,8 @@ BK('a1-5', 'Kapittel 5. Mari i Bodø', ['Pelle flyr til Bodø. Bodø er en stor 
 U({
   id: 'a1-6', lvl: 'A1', t: 'ikke, числа и время', en: 'Nektelse, tall og klokka',
   goals: ['отрицать: *Jeg liker ikke regn*', 'считать до 100 и называть цену', 'говорить время и дни недели'],
-  th: `<p><b>ikke</b> — «не». В простом предложении оно стоит <b>после глагола</b>: <i>Jeg liker <b>ikke</b> regn.</i> (дословно «я люблю не дождь»). Если есть модальный глагол — после него: <i>Jeg kan <b>ikke</b> svømme.</i></p>
+  th: `<div class="scheme"><h4>🧩 Где стоит ikke</h4><div class="tbl"><table><thead><tr><th>1 место</th><th>глагол</th><th>(кто) ikke</th><th>дальше</th></tr></thead><tbody><tr><td><i>Jeg</i></td><td><i>liker</i></td><td><i><b>ikke</b></i></td><td><i>regn.</i></td></tr><tr><td><i>Jeg</i></td><td><i>kan</i></td><td><i><b>ikke</b></i></td><td><i>svømme.</i></td></tr><tr><td><i>I dag</i></td><td><i>jobber</i></td><td><i>jeg <b>ikke</b>.</i></td><td></td></tr></tbody></table></div><p class="f">глагол → (кто) → <span class="e">ikke</span></p></div>
+  <p><b>ikke</b> — «не». В простом предложении оно стоит <b>после глагола</b>: <i>Jeg liker <b>ikke</b> regn.</i> (дословно «я люблю не дождь»). Если есть модальный глагол — после него: <i>Jeg kan <b>ikke</b> svømme.</i></p>
   <p>С инверсией — после подлежащего: <i>I dag jobber jeg <b>ikke</b>.</i> А в придаточных предложениях <i>ikke</i> встаёт перед глаголом — это тема B1.</p>
   <h4>Числа</h4>
   <p>0 null, 1 en/ett, 2 to, 3 tre, 4 fire, 5 fem, 6 seks, 7 sju, 8 åtte, 9 ni, 10 ti, 11 elleve, 12 tolv, 13 tretten, 14 fjorten, 15 femten, 16 seksten, 17 sytten, 18 atten, 19 nitten, 20 tjue, 21 tjueen, 30 tretti, 40 førti, 50 femti, 60 seksti, 70 sytti, 80 åtti, 90 nitti, 100 hundre.</p>
@@ -318,7 +360,17 @@ U({
   <h4>Сколько времени?</h4>
   <p><i>Hva er klokka?</i> — Который час? <i>Klokka er tre.</i> — Три часа. <i>halv fire</i> — <b>половина четвёртого</b> (3:30)! Как в русском «половина»: смотрим на следующий час. <i>kvart over tre</i> — 3:15, <i>kvart på fire</i> — 3:45, <i>ti over tre</i> — 3:10.</p>
   <h4>Дни недели — с маленькой буквы</h4>
-  <p><i>mandag, tirsdag, onsdag, torsdag, fredag, lørdag, søndag</i>. «В понедельник» — <i>på mandag</i>; «по понедельникам» — <i>på mandager</i> или <i>hver mandag</i>.</p>`,
+  <p><i>mandag, tirsdag, onsdag, torsdag, fredag, lørdag, søndag</i>. «В понедельник» — <i>på mandag</i>; «по понедельникам» — <i>på mandager</i> или <i>hver mandag</i>.</p>
+  <h4>Числа: что читается не как пишется</h4>
+  <div class="tbl"><table><thead><tr><th>число</th><th>пишется</th><th>звучит примерно</th></tr></thead><tbody><tr><td>1</td><td><i>en / ett</i></td><td>[эн], [этт]</td></tr><tr><td>7</td><td><i>sju</i></td><td>[шу]</td></tr><tr><td>8</td><td><i>åtte</i></td><td>[отте]</td></tr><tr><td>20</td><td><i>tjue</i></td><td>[хьюэ]</td></tr><tr><td>30</td><td><i>tretti</i></td><td>[третти]</td></tr><tr><td>40</td><td><i>førti</i></td><td>[фёрти]</td></tr><tr><td>22</td><td><i>tjueto</i></td><td>[хьюэту]</td></tr><tr><td>100</td><td><i>hundre</i></td><td>[хундре]</td></tr></tbody></table></div>
+  <h4>Время целиком: от 3:00 до 4:00</h4>
+  <div class="tbl"><table><thead><tr><th>время</th><th>по-норвежски</th><th>дословно</th></tr></thead><tbody><tr><td>3:00</td><td><i>klokka tre</i></td><td>три часа</td></tr><tr><td>3:10</td><td><i>ti over tre</i></td><td>десять после трёх</td></tr><tr><td>3:15</td><td><i>kvart over tre</i></td><td>четверть после трёх</td></tr><tr><td>3:25</td><td><i>fem på halv fire</i></td><td>пять до половины четвёртого</td></tr><tr><td>3:30</td><td><i>halv fire</i></td><td>половина четвёртого</td></tr><tr><td>3:35</td><td><i>fem over halv fire</i></td><td>пять после половины четвёртого</td></tr><tr><td>3:45</td><td><i>kvart på fire</i></td><td>четверть до четырёх</td></tr><tr><td>3:50</td><td><i>ti på fire</i></td><td>десять до четырёх</td></tr></tbody></table></div>
+  <p><i>over</i> — «после», <i>på</i> — «до». Минуты от :20 до :40 считают от половины: <i>fem på halv</i>, <i>fem over halv</i>. В расписаниях и на вокзале говорят проще, по-цифровому: <i>klokka femten tretti</i> — 15:30.</p>
+  <h4>Никакой, ничего, никогда</h4>
+  <ul><li><i>ingen</i> — никакой, ни одного: <i>Jeg har <b>ingen</b> bil.</i> = <i>Jeg har <b>ikke</b> bil.</i> — У меня нет машины.</li>
+  <li><i>ingenting</i> или <i>ikke noe</i> — ничего: <i>Jeg vet ikke noe.</i> — Я ничего не знаю.</li>
+  <li><i>aldri</i> — никогда; стоит там же, где <i>ikke</i>: <i>Jeg drikker <b>aldri</b> kaffe.</i></li>
+  <li>Двойного отрицания, как в русском «никогда ничего не», нет: одно отрицательное слово на предложение.</li></ul>`,
   simple: 'ikke — после глагола: Jeg liker ikke … halv fire = 3:30 (половина четвёртого). Дни недели — с маленькой буквы.',
   exm: [['Jeg liker ikke regn.', 'Я не люблю дождь.'], ['Klokka er halv fire.', 'Сейчас половина четвёртого.'], ['Det koster femti kroner.', 'Это стоит пятьдесят крон.'], ['På lørdag jobber jeg ikke.', 'В субботу я не работаю.']],
   conf: [['*halv fire* / *3:30*', '<i>halv fire</i> — «половина четвёртого», то есть 3:30, а не 4:30. Как по-русски.', '«halv åtte» — это…|7:30|8:30|8:00 # Смотрим на следующий час.'],

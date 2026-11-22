@@ -64,7 +64,8 @@ BK('b2-1', 'Kapittel 19. Krysset på kartet', ['Neste morgen satt de på en benk
 U({
   id: 'b2-2', lvl: 'B2', t: 'Давнопрошедшее и причастия', en: 'Pluskvamperfektum og partisipp',
   goals: ['говорить о том, что случилось ещё раньше: *Han hadde allerede dratt*', 'использовать причастия как прилагательные: *en stjålet sykkel, et åpent vindu*', 'понимать формы на *-ende*: *en sovende katt, gående*'],
-  th: `<h4>Pluskvamperfektum: hadde + причастие</h4>
+  th: `<div class="scheme"><h4>🧩 Три шага назад</h4><div class="tbl"><table><thead><tr><th></th><th>форма</th><th>пример</th></tr></thead><tbody><tr><td>уже (сейчас есть результат)</td><td><i><b>har</b> + форма</i></td><td><i>Toget <b>har gått</b>.</i> — Поезд ушёл.</td></tr><tr><td>тогда-то</td><td>preteritum</td><td><i>Vi <b>kom</b> klokka åtte.</i> — Мы пришли в восемь.</td></tr><tr><td>ещё раньше, чем «тогда»</td><td><i><b>hadde</b> + форма</i></td><td><i>Toget <b>hadde gått</b>.</i> — Поезд уже ушёл (до того).</td></tr><tr><td>«если бы» о прошлом</td><td><i><b>hadde</b> + форма</i></td><td><i>Hvis jeg <b>hadde visst</b> det…</i></td></tr></tbody></table></div></div>
+  <h4>Pluskvamperfektum: hadde + причастие</h4>
   <p>Когда рассказываете в прошлом и надо сказать о том, что было <b>ещё раньше</b> — <i>hadde</i> + та же форма, что после <i>har</i>:</p>
   <p><i>Da vi kom, <b>hadde</b> toget allerede <b>gått</b>.</i> — Когда мы пришли, поезд уже ушёл. <i>Hun var trøtt fordi hun ikke <b>hadde sovet</b>.</i> — Она устала, потому что не спала.</p>
   <p>Так же в нереальных условиях о прошлом: <i>Hvis jeg <b>hadde visst</b> det, <b>hadde</b> jeg <b>kommet</b>.</i> — Если бы я знала, я бы пришла.</p>

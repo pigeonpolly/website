@@ -3,7 +3,8 @@
 U({
   id: 'b1-1', lvl: 'B1', t: 'Придаточные: at, fordi, som, hvis — и где тогда ikke', en: 'Leddsetninger og BRA-ord',
   goals: ['строить сложные предложения с *at, fordi, som, hvis, når, om*', 'ставить *ikke* и *alltid* перед глаголом в придаточном', 'делать инверсию после придаточного: *Når det regner, leser jeg*'],
-  th: `<p>Придаточное предложение начинается со связующего слова (<i>at</i> — что, <i>fordi</i> — потому что, <i>som</i> — который, <i>hvis</i> — если, <i>når</i> — когда, <i>om</i> — ли, <i>selv om</i> — хотя, <i>mens</i> — пока). В нём <b>свой порядок слов</b>.</p>
+  th: `<div class="scheme"><h4>🧩 Главное и придаточное</h4><div class="tbl"><table><thead><tr><th></th><th>начало</th><th>кто</th><th>ikke / aldri…</th><th>глагол</th><th>дальше</th></tr></thead><tbody><tr><td>главное</td><td><i>Han</i></td><td></td><td></td><td><i>kommer</i></td><td><i><b>ikke</b>.</i></td></tr><tr><td>придаточное</td><td><i>…at</i></td><td><i>han</i></td><td><i><b>ikke</b></i></td><td><i>kommer.</i></td><td></td></tr><tr><td>придаточное</td><td><i>…fordi</i></td><td><i>hun</i></td><td><i><b>alltid</b></i></td><td><i>drikker</i></td><td><i>kaffe.</i></td></tr></tbody></table></div><p class="f">в главном: глагол → <span class="e">ikke</span> · в придаточном: <span class="e">ikke</span> → глагол</p></div>
+  <p>Придаточное предложение начинается со связующего слова (<i>at</i> — что, <i>fordi</i> — потому что, <i>som</i> — который, <i>hvis</i> — если, <i>når</i> — когда, <i>om</i> — ли, <i>selv om</i> — хотя, <i>mens</i> — пока). В нём <b>свой порядок слов</b>.</p>
   <h4>Правило BRA: наречия — перед глаголом</h4>
   <p>В главном предложении <i>ikke</i> стоит после глагола. В придаточном — <b>перед</b> ним. Это касается и других коротких наречий: <i>ikke, aldri, alltid, ofte, også, bare, gjerne</i>. Норвежские учителя называют их «BRA-ord» (по первым буквам: <b>b</b>isetning — <b>r</b>ekkefølge — <b>a</b>dverb).</p>
   <div class="tbl"><table><thead><tr><th>Главное</th><th>Придаточное</th></tr></thead><tbody>
@@ -182,7 +183,8 @@ BK('b1-3', 'Kapittel 15. Elgen Erik', ['Etter seks timer i fjellet satte de seg 
 U({
   id: 'b1-4', lvl: 'B1', t: 'Пассив: selges, ble bygget', en: 'Passiv',
   goals: ['понимать объявления и тексты в пассиве: *Leilighet selges*', 'строить пассив двумя способами: *-s* и *bli + partisipp*', 'знать, когда какой выбрать'],
-  th: `<p>Пассив — «действие делается с кем-то/чем-то»: <i>Дом построен. Вафли продаются.</i> В норвежском два способа.</p>
+  th: `<div class="scheme"><h4>🧩 Пассив во всех временах</h4><div class="tbl"><table><thead><tr><th></th><th>способ 1: -s</th><th>способ 2: bli + форма</th></tr></thead><tbody><tr><td>сейчас, обычно</td><td><i>Huset selge<b>s</b>.</i></td><td><i>Huset <b>blir</b> solgt.</i></td></tr><tr><td>после модального</td><td><i>Huset må selge<b>s</b>.</i></td><td><i>Huset må <b>bli</b> solgt.</i></td></tr><tr><td>в прошлом</td><td>—</td><td><i>Huset <b>ble</b> solgt.</i></td></tr><tr><td>уже</td><td>—</td><td><i>Huset <b>har blitt</b> solgt.</i></td></tr></tbody></table></div><p class="f">объявления и правила — <span class="e">‑s</span> · события — <span class="e">ble + форма</span> · кем — <span class="e">av</span></p></div>
+  <p>Пассив — «действие делается с кем-то/чем-то»: <i>Дом построен. Вафли продаются.</i> В норвежском два способа.</p>
   <h4>1. s-пассив: глагол + s</h4>
   <p>К инфинитиву добавляем <b>-s</b>: <i>selge → selges</i>, <i>gjøre → gjøres</i>. Используется в настоящем времени, особенно после модальных, и в объявлениях, правилах, инструкциях:</p>
   <ul><li><i>Leilighet <b>selges</b>.</i> — Продаётся квартира.</li><li><i>Døra <b>må lukkes</b>.</i> — Дверь нужно закрывать.</li><li><i>Norsk <b>snakkes</b> her.</i> — Здесь говорят по-норвежски.</li><li><i>Billetter <b>kan kjøpes</b> på nett.</i> — Билеты можно купить онлайн.</li></ul>

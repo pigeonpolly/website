@@ -3,7 +3,8 @@
 U({
   id: 'a2-1', lvl: 'A2', t: 'Определённая форма: bilen, huset', en: 'Bestemt form',
   goals: ['говорить «эта машина / та книга»: *bilen, boka, huset*', 'ставить определённую форму во множественном: *bilene, husa*', 'понимать, когда норвежец говорит «вообще», а когда «конкретно»'],
-  th: `<p>В норвежском артикль «тот самый» (<i>the</i> в английском) — <b>не отдельное слово, а окончание</b>. Его приклеивают к концу существительного.</p>
+  th: `<div class="scheme"><h4>🧩 Одно слово — четыре формы</h4><div class="tbl"><table><thead><tr><th></th><th>какой-то</th><th>тот самый</th><th>какие-то</th><th>те самые</th></tr></thead><tbody><tr><td>en</td><td><i>en bil</i></td><td><i>bil<b>en</b></i></td><td><i>bil<b>er</b></i></td><td><i>bil<b>ene</b></i></td></tr><tr><td>ei</td><td><i>ei bok</i></td><td><i>bok<b>a</b></i></td><td><i>bøk<b>er</b></i></td><td><i>bøk<b>ene</b></i></td></tr><tr><td>et</td><td><i>et hus</i></td><td><i>hus<b>et</b></i></td><td><i>hus</i></td><td><i>hus<b>ene</b></i></td></tr></tbody></table></div><p class="f">«тот самый» = окончание: <span class="e">‑en · ‑a · ‑et · ‑ene</span></p></div>
+  <p>В норвежском артикль «тот самый» (<i>the</i> в английском) — <b>не отдельное слово, а окончание</b>. Его приклеивают к концу существительного.</p>
   <div class="tbl"><table><thead><tr><th>Род</th><th>какой-то</th><th>тот самый</th><th>какие-то (мн.)</th><th>те самые (мн.)</th></tr></thead><tbody>
   <tr><td>en</td><td><i>en bil</i></td><td><i>bil<b>en</b></i></td><td><i>biler</i></td><td><i>bil<b>ene</b></i></td></tr>
   <tr><td>ei</td><td><i>ei bok</i></td><td><i>bok<b>a</b></i> (или <i>boken</i>)</td><td><i>bøker</i></td><td><i>bøk<b>ene</b></i></td></tr>
@@ -14,7 +15,13 @@ U({
   <li>что и так понятно: <i>Hvor er <b>toalettet</b>?</i> — Где туалет? <i>Sola skinner.</i> — Солнце светит.</li>
   <li>«вообще» про явление: <i>Livet er kort.</i> — Жизнь коротка.</li></ul>
   <h4>Ei-слова: -a или -en?</h4>
-  <p>Можно и так и так: <i>boka</i> и <i>boken</i>, <i>jenta</i> и <i>jenten</i>. Окончание <i>-a</i> звучит более разговорно и «по-норвежски», <i>-en</i> — более книжно. Выберите одно и держитесь его.</p>`,
+  <p>Можно и так и так: <i>boka</i> и <i>boken</i>, <i>jenta</i> и <i>jenten</i>. Окончание <i>-a</i> звучит более разговорно и «по-норвежски», <i>-en</i> — более книжно. Выберите одно и держитесь его.</p>
+  <h4>Как это звучит</h4>
+  <p>В окончании <i>-et</i> буква <i>t</i> не читается: <i>huset</i> [хусе], <i>eplet</i> [эпле]. Поэтому на слух <i>huset</i> и <i>huse</i> почти одинаковы — смотрите на контекст.</p>
+  <h4>Там, где по-русски «свой» или ничего</h4>
+  <ul><li>о частях тела и вещах при себе норвежцы говорят «тот самый», а не «мой»: <i>Jeg vasker <b>hendene</b>.</i> — Я мою руки. <i>Hun tar <b>jakka</b>.</i> — Она берёт (свою) куртку.</li>
+  <li>после <i>alle</i> (все) и <i>hele</i> (весь) — тоже определённая форма: <i>alle barna</i> — все дети, <i>hele dagen</i> — весь день.</li></ul>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Окончание <i>-en, -et</i> когда-то было отдельным словом «тот» (древнескандинавское <i>inn, it</i>), которое ставили после существительного: «человек тот». Со временем оно приросло к слову. Так же устроены шведский, датский и исландский, а вот в английском и немецком «тот» остался впереди: <i>the car, das Haus</i>.</p></div>`,
   simple: 'тот самый = окончание: bilen, boka, huset. Мн.: bilene, bøkene, husene. Слова на -e не удваивают: jenta, eplet.',
   exm: [['Jeg har en katt. Katten heter Pepper.', 'У меня есть кот. Кота зовут Пеппер.'], ['Hvor er toalettet?', 'Где туалет?'], ['Barna leker i hagen.', 'Дети играют в саду.'], ['Boka er på bordet.', 'Книга на столе.']],
   conf: [['*en bil* / *bilen*', '<i>en bil</i> — какая-то машина; <i>bilen</i> — та самая, о которой речь. Отдельного «the» нет.', '«Машина красная» (наша, о которой говорим):|Bilen er rød.|En bil er rød.|Den bil er rød. # Конкретная — bilen.'],
@@ -63,7 +70,8 @@ BK('a2-1', 'Kapittel 7. Kokken Ole', ['Båten er stor og fin. Pelle og Mari finn
 U({
   id: 'a2-2', lvl: 'A2', t: 'Прилагательные: stor, stort, store', en: 'Adjektiv',
   goals: ['согласовывать прилагательное: *en stor bil, et stort hus, store biler*', 'говорить «тот большой дом»: *det store huset*', 'знать особые слова *liten, gammel, ny, god*'],
-  th: `<p>Прилагательное в норвежском меняется — но всего на две буквы: <b>-t</b> для среднего рода и <b>-e</b> для множественного числа и определённой формы.</p>
+  th: `<div class="scheme"><h4>🧩 Три окончания прилагательного</h4><div class="tbl"><table><thead><tr><th></th><th>какой-то</th><th>много / тот самый</th></tr></thead><tbody><tr><td>en</td><td><i>en stor bil</i> — без окончания</td><td><i>store biler</i> — <b>-e</b></td></tr><tr><td>et</td><td><i>et stor<b>t</b> hus</i> — <b>-t</b></td><td><i>store hus</i> — <b>-e</b></td></tr><tr><td>тот самый</td><td>—</td><td><i><b>den</b> stor<b>e</b> bil<b>en</b></i>, <i><b>det</b> stor<b>e</b> hus<b>et</b></i></td></tr></tbody></table></div><p class="f">en — ничего · et — <span class="e">‑t</span> · много и «тот самый» — <span class="e">‑e</span></p></div>
+  <p>Прилагательное в норвежском меняется — но всего на две буквы: <b>-t</b> для среднего рода и <b>-e</b> для множественного числа и определённой формы.</p>
   <div class="tbl"><table><thead><tr><th></th><th>en</th><th>et</th><th>мн. ч. / тот самый</th></tr></thead><tbody>
   <tr><td>большой</td><td><i>en stor bil</i></td><td><i>et stor<b>t</b> hus</i></td><td><i>stor<b>e</b> biler</i></td></tr>
   <tr><td>красивый</td><td><i>en fin dag</i></td><td><i>et fin<b>t</b> bilde</i></td><td><i>fin<b>e</b> dager</i></td></tr>
@@ -75,7 +83,13 @@ U({
   <h4>Без -t</h4>
   <p>Прилагательные на <i>-ig, -isk</i> и некоторые другие не берут -t: <i>et koselig hus, et norsk ord, et billig eple</i>. А <i>god</i> → <i>godt</i>, <i>gammel</i> → <i>gammelt / gamle</i>.</p>
   <h4>Особое: liten (маленький)</h4>
-  <p><i>en liten bil, ei lita hytte, et lite hus, små hus, den lille bilen, de små barna</i>. Не пугайтесь: <i>små</i> — просто «маленькие».</p>`,
+  <p><i>en liten bil, ei lita hytte, et lite hus, små hus, den lille bilen, de små barna</i>. Не пугайтесь: <i>små</i> — просто «маленькие».</p>
+  <h4>Ещё несколько мелочей</h4>
+  <ul><li>Прилагательное уже кончается на <i>-t</i> — второе не добавляем: <i>en lett sekk → et lett spørsmål</i> (лёгкий вопрос).</li>
+  <li>Кончается на ударную гласную — <b>-tt</b>: <i>ny → nytt</i>, <i>blå → blått</i>, <i>fri → fritt</i>.</li>
+  <li>Кончается на <i>-e</i> — не меняется вовсе: <i>et moderne hus, moderne hus</i>.</li>
+  <li><i>godt</i> читается [гот]: <i>d</i> молчит.</li></ul>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Почему у прилагательных на <i>-ig</i> нет <i>-t</i>? Раньше было: писали <i>et ærligt menneske</i> (честный человек), как по-датски. Но норвежцы это <i>t</i> не произносили, и реформа 1907 года просто убрала его из письма: теперь <i>et ærlig menneske, et koselig hus</i>.</p></div>`,
   simple: 'en stor — et stort — store. «Тот большой дом» = det store huset (артикль + -e + окончание). На -ig — без -t.',
   exm: [['Vi har et stort hus.', 'У нас большой дом.'], ['Det er en fin dag i dag.', 'Сегодня хороший день.'], ['Den røde bilen er min.', 'Та красная машина — моя.'], ['De små barna sover.', 'Маленькие дети спят.']],
   conf: [['*et stor hus* / *et stort hus*', 'Со словом на <i>et</i> прилагательное получает <b>-t</b>.', '«Красивый дом»:|et fint hus|et fin hus|et fine hus # et → -t.'],
@@ -124,7 +138,8 @@ BK('a2-2', 'Kapittel 8. Den gamle byen', ['Båten kommer til Trondheim. Det er e
 U({
   id: 'a2-3', lvl: 'A2', t: 'Прошлое: spiste, har spist', en: 'Preteritum og perfektum',
   goals: ['рассказывать о прошлом: *I går spiste jeg vafler*', 'выбирать окончание слабого глагола: -et, -te, -de, -dde', 'различать *spiste* (вчера) и *har spist* (уже, в жизни)'],
-  th: `<p>У норвежских глаголов два главных прошедших: <b>preteritum</b> («сделал тогда-то») и <b>perfektum</b> (<i>har</i> + форма — «уже сделал, есть результат»).</p>
+  th: `<div class="scheme"><h4>🧩 Один глагол во всех временах</h4><div class="tbl"><table><thead><tr><th></th><th>сейчас</th><th>тогда-то</th><th>уже</th></tr></thead><tbody><tr><td>говорить</td><td><i>snakker</i></td><td><i>snakk<b>et</b></i></td><td><i><b>har</b> snakket</i></td></tr><tr><td>есть</td><td><i>spiser</i></td><td><i>spis<b>te</b></i></td><td><i><b>har</b> spist</i></td></tr><tr><td>жить</td><td><i>bor</i></td><td><i>bo<b>dde</b></i></td><td><i><b>har</b> bodd</i></td></tr><tr><td>быть</td><td><i>er</i></td><td><i>var</i></td><td><i><b>har</b> vært</i></td></tr></tbody></table></div><p class="f">прошлое «когда» — <span class="e">‑et / ‑te / ‑de / ‑dde</span> · «уже» — <span class="e">har + форма</span></p></div>
+  <p>У норвежских глаголов два главных прошедших: <b>preteritum</b> («сделал тогда-то») и <b>perfektum</b> (<i>har</i> + форма — «уже сделал, есть результат»).</p>
   <h4>Слабые глаголы: четыре группы</h4>
   <div class="tbl"><table><thead><tr><th>Группа</th><th>Инфинитив</th><th>Preteritum</th><th>Perfektum</th></tr></thead><tbody>
   <tr><td>1: -et (самая большая; двойная согласная или группа согласных)</td><td><i>å snakke, å jobbe</i></td><td><i>snakk<b>et</b>, jobb<b>et</b></i></td><td><i>har snakket</i></td></tr>
@@ -135,7 +150,15 @@ U({
   <h4>Preteritum или perfektum?</h4>
   <ul><li><b>Preteritum</b> — есть «когда»: <i>I går spiste jeg vafler. I 2020 bodde vi i Bergen.</i></li>
   <li><b>Perfektum</b> — время не важно, важен результат или опыт: <i>Jeg har spist.</i> (я сыт). <i>Har du vært i Norge?</i> (бывал когда-нибудь?) <i>Vi har bodd her i fem år</i> (и живём до сих пор).</li></ul>
-  <p>Как английские Past Simple и Present Perfect — и правило почти то же.</p>`,
+  <p>Как английские Past Simple и Present Perfect — и правило почти то же.</p>
+  <h4>Как угадать группу</h4>
+  <p>Посмотрите, что стоит перед последним <i>-e</i> инфинитива:</p>
+  <ul><li>две согласные (<i>snakk-e, jobb-e, vask-e</i>) → <b>-et</b>: <i>snakket, jobbet, vasket</i>;</li>
+  <li>одна согласная (<i>spis-e, les-e, kjøp-e</i>) → <b>-te</b>: <i>spiste, leste, kjøpte</i>;</li>
+  <li>короткий глагол на гласную (<i>bo, tro, nå</i>) → <b>-dde</b>: <i>bodde, trodde</i>.</li></ul>
+  <p>Подсказка срабатывает часто, но не всегда — сомневаетесь, проверьте на ordbokene.no. А в разговоре и газетах вместо <i>-et</i> часто пишут <i>-a</i>: <i>snakka, jobba</i> — это тоже правильный букмол.</p>
+  <p>Читается: <i>snakket</i> — [снакке], конечное <i>t</i> молчит, как в <i>huset</i>.</p>
+  <div class="box why"><h4>🤔 Почему так</h4><p>Глаголы вроде <i>bo — bodde — bodd</i> получили свои формы на <i>-dde</i> только в 1907 году: раньше по-датски писали <i>naaede</i> («достиг»), а реформа записала так, как говорили норвежцы, — <i>nådde</i>.</p></div>`,
   simple: 'snakket / spiste / levde / bodde. Есть «когда» (i går) — preteritum. Нет «когда», важен результат или опыт — har + форма.',
   exm: [['I går spiste jeg vafler.', 'Вчера я ела вафли.'], ['Har du vært i Norge?', 'Ты бывал в Норвегии?'], ['Vi bodde i Bergen i to år.', 'Мы два года жили в Бергене.'], ['Jeg har lest boka.', 'Я прочитала книгу.']],
   conf: [['*I går har jeg spist* / *I går spiste jeg*', 'Если есть точное «когда» в прошлом (<i>i går, i fjor, for to år siden</i>) — preteritum.', '«Вчера я работал»:|I går jobbet jeg.|I går har jeg jobbet.|I går jeg jobbet. # Есть «вчера» — preteritum (и инверсия!).'],
@@ -184,7 +207,8 @@ BK('a2-3', 'Kapittel 9. Et postkort', ['Om kvelden skrev Pelle et postkort til b
 U({
   id: 'a2-4', lvl: 'A2', t: 'Будущее и модальные: skal, vil, kan, må', en: 'Framtid og modalverb',
   goals: ['говорить о планах: *Jeg skal reise til Bergen*', 'выражать желание, умение и необходимость: *vil, kan, må, bør*', 'не ставить *å* и *-r* после модального глагола'],
-  th: `<p>Отдельного будущего времени в норвежском нет. Будущее выражают так:</p>
+  th: `<div class="scheme"><h4>🧩 Модальный + голый инфинитив</h4><p class="f">kan / vil / skal / må / bør + <span class="e">инфинитив без å и без ‑r</span></p><div class="tbl"><table><thead><tr><th>хочу сказать</th><th>как</th><th>пример</th></tr></thead><tbody><tr><td>план, «так решено»</td><td><i>skal</i> + инф.</td><td><i>Jeg skal reise i morgen.</i></td></tr><tr><td>прогноз</td><td><i>kommer til å</i> + инф.</td><td><i>Det kommer til å regne.</i></td></tr><tr><td>хочу</td><td><i>vil</i> + инф.</td><td><i>Jeg vil lære norsk.</i></td></tr><tr><td>есть слово времени</td><td>просто presens</td><td><i>I morgen reiser jeg.</i></td></tr></tbody></table></div></div>
+  <p>Отдельного будущего времени в норвежском нет. Будущее выражают так:</p>
   <ul><li><b>skal</b> + инфинитив — план, договорённость: <i>Jeg <b>skal</b> reise til Bergen i morgen.</i> (так решено)</li>
   <li><b>kommer til å</b> + инфинитив — прогноз: <i>Det <b>kommer til å</b> regne.</i> (будет дождь)</li>
   <li><b>vil</b> + инфинитив — желание (и иногда прогноз): <i>Jeg <b>vil</b> lære norsk.</i> — хочу выучить.</li>
@@ -199,7 +223,14 @@ U({
   <tr><td><i>får</i></td><td>разрешено</td><td><i>Får jeg sitte her?</i></td></tr></tbody></table></div>
   <p>Правило: после модального — <b>голый инфинитив</b>, без <i>å</i> и без <i>-r</i>: <i>Jeg kan snakke</i> (не «kan å snakke», не «kan snakker»).</p>
   <h4>Осторожно: må ikke</h4>
-  <p><i>Du må ikke røyke her</i> — здесь <b>нельзя</b> курить (запрет!). «Не обязательно» — <i>Du trenger ikke (å) komme</i>.</p>`,
+  <p><i>Du må ikke røyke her</i> — здесь <b>нельзя</b> курить (запрет!). «Не обязательно» — <i>Du trenger ikke (å) komme</i>.</p>
+  <h4>Полезные сочетания</h4>
+  <ul><li><i>Vil du ha …?</i> — хочешь …? (дословно «хочешь иметь»): <i>Vil du ha kaffe?</i> <i>Jeg vil ha te.</i></li>
+  <li><i>Skal vi …?</i> — давай …?: <i>Skal vi gå?</i> — Пойдём? <i>Skal vi ta en kaffe?</i></li>
+  <li><i>Kunne du …?</i> — не могли бы вы …? (вежливее, чем <i>kan du</i>): <i>Kunne du hjelpe meg?</i></li>
+  <li><i>Jeg vil gjerne …</i> — мне бы хотелось …, вежливо в магазине и кафе: <i>Jeg vil gjerne ha en vaffel.</i></li></ul>
+  <div class="tbl"><table><thead><tr><th>инфинитив</th><th>сейчас</th><th>в прошлом</th></tr></thead><tbody><tr><td><i>å kunne</i></td><td><i>kan</i></td><td><i>kunne</i></td></tr><tr><td><i>å ville</i></td><td><i>vil</i></td><td><i>ville</i></td></tr><tr><td><i>å skulle</i></td><td><i>skal</i></td><td><i>skulle</i></td></tr><tr><td><i>å måtte</i></td><td><i>må</i></td><td><i>måtte</i></td></tr><tr><td><i>å burde</i></td><td><i>bør</i></td><td><i>burde</i></td></tr></tbody></table></div>
+  <p>Прошедшая форма модальных совпадает с инфинитивом без <i>å</i>: <i>Jeg måtte jobbe i går.</i> — Вчера мне пришлось работать.</p>`,
   simple: 'skal — план, kommer til å — прогноз, vil — хочу. После kan/vil/skal/må/bør — инфинитив без å. må ikke = нельзя.',
   exm: [['Jeg skal reise til Bergen i morgen.', 'Завтра я еду в Берген.'], ['Det kommer til å regne.', 'Будет дождь.'], ['Kan du hjelpe meg?', 'Можешь мне помочь?'], ['Du må ikke røyke her.', 'Здесь нельзя курить.']],
   conf: [['*må ikke* / *trenger ikke*', '<i>Du må ikke</i> — нельзя. <i>Du trenger ikke</i> — не обязательно.', '«Тебе не обязательно приходить»:|Du trenger ikke å komme.|Du må ikke komme.|Du skal ikke komme. # må ikke = запрет.'],
@@ -248,7 +279,8 @@ BK('a2-4', 'Kapittel 10. Stormen', ['Pelle og Mari ville fly til Bergen med en g
 U({
   id: 'a2-5', lvl: 'A2', t: 'Предлоги: i, på, til, om', en: 'Preposisjoner',
   goals: ['различать *i* и *på*: *i Norge, på Lofoten, på jobb*', 'говорить о времени: *i går, om morgenen, på mandag, i fem år*', 'не путать *til* (куда) и *i* (где)'],
-  th: `<p>Предлоги — самое «нелогичное» в норвежском. Учите их вместе со словом, как сочетание.</p>
+  th: `<div class="scheme"><h4>🧩 Главные предлоги</h4><div class="tbl"><table><thead><tr><th>предлог</th><th>значит</th><th>пример</th></tr></thead><tbody><tr><td><i><b>i</b></i></td><td>в, внутри</td><td><i>i Oslo, i huset</i></td></tr><tr><td><i><b>på</b></i></td><td>на; на острове, на работе</td><td><i>på bordet, på jobb</i></td></tr><tr><td><i><b>til</b></i></td><td>куда</td><td><i>til Bergen</i></td></tr><tr><td><i><b>fra</b></i></td><td>откуда, от</td><td><i>fra Riga</i></td></tr><tr><td><i><b>hos</b></i></td><td>у кого-то (дома, в кабинете)</td><td><i>hos legen, hos meg</i></td></tr><tr><td><i><b>med</b></i></td><td>с; на транспорте</td><td><i>med Pelle, med buss</i></td></tr><tr><td><i><b>uten</b></i></td><td>без</td><td><i>kaffe uten melk</i></td></tr></tbody></table></div></div>
+  <p>Предлоги — самое «нелогичное» в норвежском. Учите их вместе со словом, как сочетание.</p>
   <h4>Где: i или på?</h4>
   <ul><li><b>i</b> — внутри, в стране, в городе: <i>i Norge, i Oslo, i huset, i bilen, i stua</i>.</li>
   <li><b>på</b> — на поверхности, на острове, во многих учреждениях: <i>på bordet, på Lofoten, på jobb, på skolen, på kino, på butikken, på kjøkkenet, på badet</i>.</li></ul>
@@ -261,7 +293,13 @@ U({
   <tr><td><i>om</i></td><td>регулярно (части дня, сезоны); «через»</td><td><i>om morgenen, om vinteren, om en time</i> (через час)</td></tr>
   <tr><td><i>på</i></td><td>дни недели, праздники</td><td><i>på mandag, på søndager, på julaften</i></td></tr>
   <tr><td><i>for … siden</i></td><td>назад</td><td><i>for to år siden</i></td></tr></tbody></table></div>
-  <p>Ловушка: <i>i fem år</i> — в течение пяти лет; <i>om fem år</i> — через пять лет; <i>for fem år siden</i> — пять лет назад.</p>`,
+  <p>Ловушка: <i>i fem år</i> — в течение пяти лет; <i>om fem år</i> — через пять лет; <i>for fem år siden</i> — пять лет назад.</p>
+  <h4>Куда и где: два разных слова</h4>
+  <p>Для нескольких наречий есть пара: короткое — «куда», с <i>-e</i> на конце — «где».</p>
+  <div class="tbl"><table><thead><tr><th>куда?</th><th>где?</th></tr></thead><tbody><tr><td><i>hjem</i> — домой</td><td><i>hjemme</i> — дома</td></tr><tr><td><i>ut</i> — наружу</td><td><i>ute</i> — снаружи, на улице</td></tr><tr><td><i>inn</i> — внутрь</td><td><i>inne</i> — внутри</td></tr><tr><td><i>opp</i> — наверх</td><td><i>oppe</i> — наверху</td></tr><tr><td><i>ned</i> — вниз</td><td><i>nede</i> — внизу</td></tr></tbody></table></div>
+  <p><i>Jeg går <b>ut</b>.</i> — Я выхожу (на улицу). <i>Det er kaldt <b>ute</b>.</i> — На улице холодно.</p>
+  <h4>hos — слово, которого нет в русском</h4>
+  <p><i>hos</i> — «у кого-то, в гостях, в его доме или кабинете»: <i>Jeg er <b>hos</b> mormor.</i> — Я у бабушки. <i>Hun er <b>hos</b> tannlegen.</i> — Она у зубного. Но «у меня есть» — это не <i>hos</i>, а <i>Jeg har …</i></p>`,
   simple: 'i — внутри, страна, город; på — поверхность, остров, работа/школа. til — куда. om morgenen — по утрам; om en time — через час.',
   exm: [['Jeg bor i Riga, men jeg jobber på Lofoten i sommer.', 'Я живу в Риге, но этим летом работаю на Лофотенах.'], ['Vi går på kino på fredag.', 'В пятницу мы идём в кино.'], ['Toget går om en time.', 'Поезд через час.'], ['Om vinteren går vi på ski.', 'Зимой мы катаемся на лыжах.']],
   conf: [['*i fem år* / *om fem år*', '<i>i fem år</i> — пять лет (длительность); <i>om fem år</i> — через пять лет.', '«Через час»:|om en time|i en time|for en time siden # om = через.'],
@@ -310,7 +348,8 @@ BK('a2-5', 'Kapittel 11. Jenta på Bryggen', ['I Bergen regnet det. Det regnet p
 U({
   id: 'a2-6', lvl: 'A2', t: 'Притяжательные: min, din, hans', en: 'Eiendomspronomen',
   goals: ['говорить «мой, твой, его, её»: *bilen min, boka mi, huset mitt*', 'ставить притяжательное после слова — как норвежцы', 'различать *hans* (его) и *hennes* (её)'],
-  th: `<p>«Мой» в норвежском согласуется с родом и числом существительного:</p>
+  th: `<div class="scheme"><h4>🧩 «Мой» — после слова</h4><div class="tbl"><table><thead><tr><th></th><th>en</th><th>ei</th><th>et</th><th>много</th></tr></thead><tbody><tr><td>мой</td><td><i>bilen <b>min</b></i></td><td><i>boka <b>mi</b></i></td><td><i>huset <b>mitt</b></i></td><td><i>barna <b>mine</b></i></td></tr><tr><td>твой</td><td><i>bilen <b>din</b></i></td><td><i>boka <b>di</b></i></td><td><i>huset <b>ditt</b></i></td><td><i>barna <b>dine</b></i></td></tr><tr><td>его / её</td><td><i>bilen <b>hans</b></i> / <i><b>hennes</b></i></td><td>так же</td><td>так же</td><td>так же</td></tr></tbody></table></div><p class="f">слово с окончанием + <span class="e">min / mi / mitt / mine</span></p></div>
+  <p>«Мой» в норвежском согласуется с родом и числом существительного:</p>
   <div class="tbl"><table><thead><tr><th></th><th>en</th><th>ei</th><th>et</th><th>мн. ч.</th></tr></thead><tbody>
   <tr><td>мой</td><td><i>min</i></td><td><i>mi</i></td><td><i>mitt</i></td><td><i>mine</i></td></tr>
   <tr><td>твой</td><td><i>din</i></td><td><i>di</i></td><td><i>ditt</i></td><td><i>dine</i></td></tr>
@@ -323,7 +362,11 @@ U({
   <h4>Семья — особый случай</h4>
   <p>С короткими семейными словами — без окончания: <i>mora mi</i> или <i>min mor</i>, <i>faren min</i>, <i>søstera mi</i>. А с <i>mamma</i> и <i>pappa</i>: <i>mamma</i> — просто «мама», без притяжательного.</p>
   <h4>Его и её: hans, hennes</h4>
-  <p><i>Lars har en bil. Bilen hans er rød.</i> <i>Mari har ei bok. Boka hennes er spennende.</i> (А про «свой» — <i>sin</i> — поговорим на B1.)</p>`,
+  <p><i>Lars har en bil. Bilen hans er rød.</i> <i>Mari har ei bok. Boka hennes er spennende.</i> (А про «свой» — <i>sin</i> — поговорим на B1.)</p>
+  <h4>Чей?</h4>
+  <p><i>Hvem sin bil er det?</i> — Чья это машина? (дословно «кто свою машину»). Ответ: <i>Det er min.</i> — Моя. <i>Den er hennes.</i> — Её. Книжный вариант вопроса — <i>Hvis bil er det?</i></p>
+  <h4>Пелле — его или свой?</h4>
+  <p>Коротко на будущее: <i>Pelle elsker bestemora <b>si</b></i> — свою бабушку; <i>Pelle elsker bestemora <b>hans</b></i> — бабушку другого (например, друга). Подробно — в уроке B1.3.</p>`,
   simple: 'bilen min, boka mi, huset mitt, barna mine. hans — его, hennes — её, deres — их. Притяжательное — после слова.',
   exm: [['Bilen min er gammel.', 'Моя машина старая.'], ['Hvor er nøklene mine?', 'Где мои ключи?'], ['Huset vårt ligger ved sjøen.', 'Наш дом стоит у моря.'], ['Katten hennes heter Pepper.', 'Её кота зовут Пеппер.']],
   conf: [['*huset min* / *huset mitt*', 'С et-словом — <i>mitt</i>: <i>huset mitt, kartet mitt</i>.', '«Моя карта» (et kart):|kartet mitt|kartet min|kartet mi # et → mitt.'],
