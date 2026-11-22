@@ -908,6 +908,14 @@ async function loadRules(env) {
   for (const [d, n] of Object.entries(RULES.levels)) BTN.levels[d] = ix(n);
   for (const [b, n] of Object.entries(RULES.badges)) BTN.badges[b] = ix(n);
   BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null;  // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
+  // разово (22.11.2026, Алина): награды карточки дня ×3 (заход, рисунок, комментарий, дождь, зелье + его лимит, блины, Титос, бонус дня), «Позвать друга» — 299. Метка в meta 'rules_x3' — второй раз не сработает
+  if (rulesRaw != null || birdsN != null) try {
+    if (!(await getMeta(env, 'rules_x3'))) {
+      await setMeta(env, 'rules_x3', String(Date.now()));
+      const x3 = ['daily', 'upload', 'comment', 'gameLevelPct', 'potion1Pct', 'potionDayMaxPct', 'panLevelPct', 'titosLevelPct', 'dayBonusPct'];
+      await setRules(env, { ...Object.fromEntries(x3.map(k => [k, RULES[k] * 3])), friend: 299 });
+    }
+  } catch (e) { healthErr(env, 'rules_x3', e); }
   return RULES;
 }
 // цвета темы дня: {"2026-10-11": "yp"} — для бейджей за цвета. До 1.11.2026 — site/assets/day-colors.json (tools/daycolors.js), дальше — план в D1 (challenge_days, раз в 5 мин)
