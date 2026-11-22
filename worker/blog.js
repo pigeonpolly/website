@@ -230,7 +230,8 @@ export async function cleanHtml(html) {
       }
       if (tag === 'img') e.setAttribute('loading', 'lazy');
     },
-  }).transform(new Response(`<body>${html}</body>`, { headers: { 'content-type': 'text/html' } })).text();
+  }).onDocument({ comments(c) { c.remove(); } }) // <!--StartFragment--> и прочие комментарии из Google Docs
+    .transform(new Response(`<body>${html}</body>`, { headers: { 'content-type': 'text/html' } })).text();
   return out.replace(/^<body>|<\/body>$/g, '').replace(/<p>(\s|<br>|&nbsp;)*<\/p>/g, '').replace(/<figcaption>(\s|<br>|&nbsp;)*<\/figcaption>/g, '').trim();
 }
 

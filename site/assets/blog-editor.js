@@ -10,7 +10,24 @@
   // ---------- сноски: в базе это [[текст]] (так их понимает сайт), а в редакторе — циферка-«фишка» в тексте и поле в списке под текстом ----------
   const FN_RE = /\[\[((?:(?!\]\]|<\/?(?:p|h2|h3|li|ul|ol|blockquote|figure)\b)[\s\S]){0,3000}?)\]\]/g;
   const fnChip = inner => `<sup class="be-fn" contenteditable="false" data-fn="${esc(inner.trim())}" title="Сноска — текст правится в списке под статьёй"></sup>`;
-  const fnToChips = html => String(html || '').replace(FN_RE, (m, inner) => fnChip(inner));
+  // текст, вставленный прямо в блок картинки (из Google Docs, с комментариями <!--StartFragment-->), — в обычный абзац рядом с картинкой, иначе он не переводится
+  const fixFigures = html => {
+    const box = document.createElement('div'); box.innerHTML = String(html || '');
+    const w = document.createTreeWalker(box, NodeFilter.SHOW_COMMENT); const cm = []; while (w.nextNode()) cm.push(w.currentNode); cm.forEach(c => c.remove());
+    box.querySelectorAll('figure').forEach(f => {
+      let before = true; const pre = [], post = [];
+      [...f.childNodes].forEach(n => {
+        const t = n.nodeType === 1 ? n.tagName : '';
+        if (t === 'IMG' || t === 'FIGCAPTION' || t === 'IFRAME' || t === 'A' && n.querySelector('img')) { before = false; return; }
+        (before ? pre : post).push(n);
+      });
+      const wrap = list => { if (!list.some(n => n.textContent.trim())) { list.forEach(n => n.textContent.trim() || n.remove()); return null; } const p = document.createElement('p'); list.forEach(n => p.append(n)); return p; };
+      const a = wrap(pre), b = wrap(post);
+      if (a) f.before(a); if (b) f.after(b);
+    });
+    return box.innerHTML;
+  };
+  const fnToChips = html => fixFigures(String(html || '')).replace(FN_RE, (m, inner) => fnChip(inner));
   // клон тела статьи → фишки обратно в [[…]] (пустые сноски выбрасываем)
   const chipsToFn = c => { const notes = []; c.querySelectorAll('sup.be-fn').forEach(s => { const v = (s.dataset.fn || '').trim(); if (!v) { s.remove(); return; } notes.push(v); s.replaceWith(document.createTextNode('⟦FN' + (notes.length - 1) + '⟧')); });
     return c.innerHTML.replace(/⟦FN(\d+)⟧/g, (m, i) => '[[' + notes[+i].replace(/\]\]/g, '] ]') + ']]'); };
@@ -1195,7 +1212,7 @@
     // сноски [[…]] переводчик ломает (путает скобки с цифрами) — в тексте заменяем их метками «не переводить», а сами сноски переводим отдельно
     const notes = [];
     const box = document.createElement('div');
-    box.innerHTML = String(ru['b_' + from] || '').replace(FN_RE, (m, inner) => { notes.push(inner.trim()); return ` <span class="notranslate" translate="no" data-fnp="${notes.length - 1}">#${notes.length}</span>`; }); // пробел перед меткой — чтобы переводчик не «приклеил» её к слову
+    box.innerHTML = fixFigures(ru['b_' + from]).replace(FN_RE, (m, inner) => { notes.push(inner.trim()); return ` <span class="notranslate" translate="no" data-fnp="${notes.length - 1}">#${notes.length}</span>`; }); // пробел перед меткой — чтобы переводчик не «приклеил» её к слову
     const slots = [];
     const walk = el => {
       for (const ch of el.children) {
