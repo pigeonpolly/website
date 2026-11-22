@@ -70,7 +70,7 @@
   // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске видео на странице /learn/v/<id>/) + «Смотреть все» → /learn/
   const FREE_YT = ['eRa1uB_7s9U', 'VVvLZcIqUbM']; // как в src/pages/preview-learn.html, новое первым
   const INK = { t: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'], s: ['Fifteen lessons from Alina’s ink book, stamps from Polly and a diploma', 'Пятнадцать уроков по книге Алины о туши, печати от Полли и диплом', 'Piecpadsmit nodarbības pēc Alīnas tušas grāmatas, Pollija zīmogi un diploms'] }; // курс туши в «📜 Дипломах»
-  const BOOK = { study: ['#2F5F6A', '💻', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'], nederlands: ['#C8601E', '🇳🇱', '/nederlands/'] };
+  const BOOK = { study: ['#2F5F6A', '/study/', '/images/books/textbook-programming.webp'], english: ['#22405F', '/english/', '/images/books/textbook-english.webp'], norsk: ['#8E2F3C', '/norsk/', '/images/books/textbook-norsk.webp'], nederlands: ['#C8601E', '/nederlands/', '/images/books/textbook-nederlands.webp'] };
   const sec = (k, h, more) => `<section class="cab-sec cab-${k}"${k === 'books' ? ' hidden' : ''}><div class="cab-sh"><h2>${h}</h2>${more || ''}</div><div class="cab-body"></div></section>`;
   function learnPane(el) {
     el.innerHTML = sec('books', t('books'))
@@ -133,7 +133,7 @@
       const ks = Object.keys(BOOK).filter(k => u[k]);
       if (!ks.length) return;
       const b = el.querySelector('.cab-books'); b.hidden = false;
-      b.querySelector('.cab-body').innerHTML = '<div class="cab-shelf">' + ks.map(k => `<a class="cab-book" href="${BOOK[k][2]}" style="--bk:${BOOK[k][0]}"><span class="cab-bk-c"><i>${BOOK[k][1]}</i><b>${t(k)}</b></span><em>${t('openBook')}</em></a>`).join('') + '</div>';
+      b.querySelector('.cab-body').innerHTML = '<div class="cab-shelf">' + ks.map(k => `<a class="cab-book" href="${BOOK[k][1]}" style="--bk:${BOOK[k][0]}"><span class="cab-bk-c"><img src="${BOOK[k][2]}" width="300" height="400" alt="${esc(t(k))}" loading="lazy" decoding="async"></span><em>${t('openBook')}</em></a>`).join('') + '</div>';
     });
   }
 
