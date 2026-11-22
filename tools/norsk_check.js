@@ -28,6 +28,7 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
     if (ids.has(u.id)) bad.push(`${u.id}: id повторяется`); ids.add(u.id);
     for (const f of ['id', 'lvl', 't', 'th']) if (!u[f]) bad.push(`${u.id}: нет поля ${f}`);
     for (const [i, e] of (u.ex || []).entries()) fmtCheck(`${u.id}-e${i}`, e);
+    for (const [i, e] of (u.bonus || []).entries()) fmtCheck(`${u.id}-x${i}`, e);
     for (const g of (u.read || {}).q || []) fmtCheck(`${u.id}-r`, g);
     for (const sr of u.series || []) { if (!sr.qz) bad.push(`${u.id}: цитата без вопроса: ${sr.q}`); else fmtCheck(`${u.id}-s`, { t: 'choice', q: [sr.qz] }); if (!SHOWS.includes(sr.show)) bad.push(`${u.id}: сериал ${sr.show}`); }
     if (u.write && !u.write.min) bad.push(`${u.id}: письмо без min`);

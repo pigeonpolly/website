@@ -396,7 +396,7 @@
     const nu = UNITS[reach()]; if (reach() > was && nu) toast('🔓', nu.lvl + ' · ' + nu.t, `Урок пройден на ${PASS} % — открыт следующий`, 'Открыто: ');
   }
   // ---------- ошибки: где ошибаюсь — там новые задания ----------
-  const refUnit = ref => byId(ref.replace(/-(e\d+|m|t|r|b|s|v)#\d+$/, ''));
+  const refUnit = ref => byId(ref.replace(/-(e\d+|x\d+|m|t|r|b|s|v)#\d+$/, '')); // x — «🎯 Бонус» (вне процента урока и замков)
   function mark(it, ok) {
     const u = refUnit(it.ref), bump = k => { const a = S.m[k] || [0, 0]; S.m[k] = [a[0] + (ok ? 0 : 1), a[1] + 1]; };
     if (u) bump(u.id); bump('t:' + it.t);
@@ -405,6 +405,7 @@
   }
   function groupsOf(u, tag) { // задания блока в том же порядке, что на странице (без авто-заданий «Своими словами»)
     if (/^e\d+$/.test(tag)) { const e = (u.ex || [])[+tag.slice(1)]; return e ? [e] : []; }
+    if (/^x\d+$/.test(tag)) { const e = (u.bonus || [])[+tag.slice(1)]; return e ? [e] : []; }
     if (tag === 'r') return (u.read || {}).q || [];
     if (tag === 's') return [{ t: 'choice', q: (u.series || []).map(s => s.qz).filter(Boolean) }];
     if (tag === 'm') return [{ t: 'mk', q: (NOTES[u.id] || {}).mk || [] }];
@@ -765,6 +766,7 @@
     if (TOPICS[u.id]) h += topicHTML(u);
     if (N.etym) h += `<div class="box etym"><h4>🔎 Откуда слово</h4>${N.etym.map(([w, t]) => `<p><b class="en">${esc(w)}</b> — ${fmt(t)}</p>`).join('')}</div>`;
     if (u.ex) h += `<section class="sec" id="practice"><h3><span class="ic">✏️</span>Упражнения</h3>${u.ex.map((e, k) => { const id = `${u.id}-e${k}`, title = `Упражнение ${k + 1}. ${e.h || NAMES_T[e.t]}`; return late(id, title, () => blockHTML(id, title, [{ t: e.t, q: e.q, hint: e.hint, how: e.how }], { track: true })); }).join('')}</section>`;
+    if (u.bonus) h += `<section class="sec" id="bonus"><h3><span class="ic">🎯</span>Бонус</h3><p class="note-s">Задания по желанию — на процент урока и замки не влияют, ошибки попадут в «Работу над ошибками».</p>${u.bonus.map((e, k) => blockHTML(`${u.id}-x${k}`, `Бонус ${k + 1}. ${e.h || NAMES_T[e.t]}`, [{ t: e.t, q: e.q, hint: e.hint, how: e.how || (e.t === 'tf' ? 'Верно или неверно?' : undefined) }], { track: true })).join('')}</section>`;
     if (hasMk(u)) h += `<section class="sec" id="mk"><h3><span class="ic">💬</span>Своими словами</h3>${crow(crowPick('mk'), 'small')}${late(u.id + '-m', 'Своими словами', () => blockHTML(u.id + '-m', 'Своими словами: пишем сами', mkGroups(u), { track: true }))}</section>`;
     if (hasLs(u)) h += `<section class="sec" id="listen"><h3><span class="ic">🎧</span>Слушание и говорение</h3>${crow(crowPick('ls'), 'small')}${canSay ? '' : '<p class="note-s">В этом браузере нет озвучки — откройте страницу в Chrome или Safari.</p>'}${late(u.id + '-l', 'Слушание и говорение', () => blockHTML(u.id + '-l', 'Послушайте, ответьте и скажите сами', grouped(listenItems(u))))}</section>`;
     if (hasSt(u)) h += smallTalkHTML(u);
