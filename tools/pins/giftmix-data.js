@@ -140,7 +140,7 @@ const gifts = [
   { type: 'art', key: '2023-mr-chew-australian-postal-snail-introduction', th: 'kraft', kick: 'meet the postman', h: 'Your postcard is delivered by <em>Mr. Chew</em>', cap: 'don’t worry, email is faster than he is', season: Y, ih: 680,
     title: 'Meet the Postal Snail: Funny Illustration + Free Animated Postcards to Send',
     desc: 'Mr. Chew, the postal snail, takes his job very seriously. Luckily the postcards on pigeonpolly.com travel by email: pick an animated card, write a few words, and it arrives in a minute. Free.',
-    alt: 'Illustration by Pigeon Polly of Mr. Chew the snail as a postman with a mail bag.' },
+    alt: 'Ink and watercolor illustration by Pigeon Polly of Mr. Chew the snail in round glasses holding a stamp, a letter tied to his shell, next to a sign “Australian postal snail”.' },
   { type: 'art', key: '2023-mr-chew-delivery', th: 'sky', kick: 'special delivery', h: 'Some gifts arrive <em>by balloon</em>', cap: 'yours arrives by email — free', season: Y, ih: 680, pos: '50% 40%',
     title: 'Special Delivery by Balloon: Whimsical Snail Painting and Free Ecards to Send',
     desc: 'My painting of Mr. Chew floating to a delivery under a bunch of purple balloons. This exact picture is also an animated thank-you postcard on pigeonpolly.com — free to send by email, with your words.',
@@ -172,7 +172,7 @@ const mix = [
   { type: 'pigment', id: 'pgreen', key: 'sketchbook-16', th: 'sage', season: 'Лето', h: 'Phthalo green is <em>never</em> used alone' },
   { type: 'pigment', id: 'black', key: 'studio-cat_lights', th: 'studio', season: Y, h: 'Why painters <em>avoid black</em>' },
   { type: 'chart', m: 'watercolor', rows: ['lemon', 'hansa', 'ochre'], cols: ['ultra', 'phthalo', 'cerul'], th: 'sage', season: 'Весна', h: '3 yellows × 3 blues = <em>9 greens</em>', cap: 'cool yellow + green-blue = the brightest green' },
-  { type: 'chart', m: 'watercolor', rows: ['scarlet', 'qrose', 'qmag'], cols: ['ultra', 'phthalo', 'cerul'], th: 'rose', season: Y, h: 'Why your <em>purple</em> turns brown', cap: 'scarlet + blue = mud. rose + blue = violet' },
+  { type: 'chart', m: 'watercolor', rows: ['scarlet', 'qrose', 'qmag'], cols: ['ultra', 'phthalo', 'cerul'], th: 'rose', season: Y, h: 'Why your <em>purple</em> turns brown', cap: 'scarlet + blue = mud, rose + blue = violet' },
   { type: 'chart', m: 'gouache', rows: ['ochre', 'scarlet', 'bsienna', 'qrose'], cols: ['ochre', 'hansa', 'bumber'], th: 'paper', season: Y, h: 'Warm <em>earth mixes</em> in gouache', cap: 'with white 1 : 1 : 1 — skin, wood, autumn' },
   { type: 'ladder', m: 'watercolor', pair: ['ultra', 'bsienna'], key: 'sketchbook-7', th: 'paper', season: Y, h: 'Five <em>greys</em> from two paints', cap: 'more blue — cool grey, more sienna — warm brown' },
   { type: 'ladder', m: 'gouache', pair: ['scarlet', 'phthalo'], key: '2024-halloween-edition', white: 2, th: 'studio', season: 'Осень', h: 'Opposites make <em>soft neutrals</em>', cap: 'orange-red + blue: from rust to slate' },
@@ -192,8 +192,8 @@ function text(p, n, c) {
     const R = p._r, C = p._c, m = p.m, a = c.art(p.key);
     return { season: p.season,
       title: `How to Mix ${C.en} ${C.hex} in ${m[0].toUpperCase() + m.slice(1)} — Real Pigment Recipe`.slice(0, 100),
-      desc: `${C.en} (${C.hex}) from my painting “${a}”, mixed in ${m}: ${R.short}. Ready recipe in pea-sized parts${m === 'watercolor' ? ' and brushfuls' : ''}, with a “you want / you get” comparison. ${where}`,
-      alt: `${m} mixing recipe for ${C.en} ${C.hex}: paint swatches with amounts under a painting by Pigeon Polly, “${a}”.`,
+      desc: `${C.en} (${C.hex}) from my painting “${a}”, mixed in ${m}: ${R.short}. Ready recipe in ${m === 'watercolor' ? 'brushfuls' : 'pea-sized parts'}, with a “you want / you get” comparison. ${where}`,
+      alt: `${m[0].toUpperCase() + m.slice(1)} mixing recipe for ${C.en} ${C.hex}: paint swatches with amounts under a painting by Pigeon Polly, “${a}”.`,
       topics: `${MT}, How to mix ${C.en.toLowerCase()}, ${m[0].toUpperCase() + m.slice(1)} mixing` };
   }
   if (p.type === 'pigment') {
@@ -208,8 +208,8 @@ function text(p, n, c) {
     const names = a => a.map(x => c.PN[x].toLowerCase()).join(', ');
     return { season: p.season,
       title: { 0: '9 Greens From 3 Yellows and 3 Blues — Watercolor Mixing Chart', 1: 'Why Your Purple Turns Brown: Red × Blue Watercolor Mixing Chart', 2: 'Warm Earth Tones Mixing Chart for Gouache: Skin, Wood, Autumn' }[mix.filter(x => x.type === 'chart').indexOf(p)],
-      desc: `A ${p.m} mixing chart: ${names(p.rows)} mixed 1 : 1 with ${names(p.cols)}. ${p.cap[0].toUpperCase() + p.cap.slice(1)}. Save it, then paint your own chart — or ${where[0].toLowerCase() + where.slice(1)}`,
-      alt: `${p.m} mixing chart grid: ${names(p.rows)} in rows, ${names(p.cols)} in columns, each square showing the mix.`,
+      desc: `A ${p.m} mixing chart: ${names(p.rows)} mixed 1 : 1 with ${names(p.cols)}. ${p.cap[0].toUpperCase() + p.cap.slice(1)}. Save it and paint your own chart. ${where}`,
+      alt: `${p.m[0].toUpperCase() + p.m.slice(1)} mixing chart grid: ${names(p.rows)} in rows, ${names(p.cols)} in columns, each square showing the mix.`,
       topics: `${MT}, Color mixing chart, ${p.m[0].toUpperCase() + p.m.slice(1)} mixing chart` };
   }
   if (p.type === 'ladder') {
