@@ -203,3 +203,103 @@ FT('b2-6', { title: 'Æ e glad',
   gl: { 'fetteren': 'двоюродный брат', 'fort': 'быстро', 'hvisket': 'прошептал', 'like norsk som': 'такой же норвежец, как', 'melodien': 'мелодия', 'bølger': 'волны', 'stolt': 'гордый' },
   q: [{ t: 'tf', q: ['Tor-Arne kommer fra Tromsø.|T', 'Ahmed trodde at Tor-Arne var svensk.|F # Han trodde at han var dansk.', '«Æ» betyr «jeg».|T'] },
     { t: 'choice', q: ['Hvordan er melodien i nordnorsk, ifølge Nora?|opp og ned som bølger|helt flat|som en engelsk sang', 'Hva kunne Ahmed etter en uke?|si «Æ e glad»|snakke dansk|synge på samisk'] }] });
+
+// ---------- C1 ----------
+NOTE('c1-1', { sm: 'Høsten kom til Røst. Et tungt, byråkratisk brev fra Polarinstituttet ba bestefar om hjelp med de gamle kartene. Han viste Pelle et kart over Svalbard med en øy uten navn.' });
+NOTE('c1-2', { sm: 'Bestefar fortalte om forliset i 1998. En ukjent øy full av lundefugler reddet ham, men ingen trodde ham. Pelle bestemte seg for å finne øya.' });
+NOTE('c1-3', { sm: 'Bestefar var for gammel til å reise. Vennene fikk bli med på forskningsskipet Polarlys, og bestefar ga Pelle den røde lua si.' });
+NOTE('c1-4', { sm: 'Polarlys la ut fra Tromsø. Pelle lovet å ta vare på kartet og fant ut at bestefar hadde skrevet posisjonen langs kanten — men det siste tallet manglet.' });
+NOTE('c1-5', { sm: 'Mannskapet diskuterte om øya burde bli kjent. Forskning sto mot fuglenes fred, og de ble enige om et kompromiss: publisere funnet, men holde posisjonen hemmelig.' });
+NOTE('c1-6', { sm: 'En storm ved iskanten truet skipet. Mari fløy ut i mørket og fant en åpning i isen. Hun reddet skipet og ble kalt «Admiral Mari».' });
+
+FT('c1-1', { title: 'Brevet fra NAV',
+  txt: ['En dag lå det et brev fra NAV i postkassa til Ahmed. Han leste det tre ganger og forsto stadig mindre.', '«Det vises til Deres søknad av 3. mars. Etter en helhetlig vurdering er det fattet vedtak om innvilgelse av stønad til norskopplæring. Vedkommende anmodes om å foreta registrering innen fjorten dager.»', 'Han gikk til Sofie, som nettopp hadde fått toppkarakter i norsk. Hun leste, rynket pannen og oversatte: «Vi har sagt ja til søknaden din. Du får penger til norskkurs. Registrer deg innen to uker.»', 'Ahmed stirret på henne. «Står det virkelig så lite?» «Ja,» sa Sofie. «Resten er bare innpakning.» Samme kveld meldte han seg på kurset — og skrev et kort, høflig takkebrev. På klarspråk.'],
+  sm: 'Ahmed fikk et tungt brev fra NAV. Sofie oversatte det til klarspråk: søknaden om penger til norskkurs var innvilget.',
+  gl: { 'stadig mindre': 'всё меньше', 'helhetlig vurdering': 'всесторонняя оценка', 'fattet vedtak': 'принято решение', 'innvilgelse': 'удовлетворение (заявления)', 'stønad': 'пособие', 'anmodes': 'просят', 'toppkarakter': 'высшая оценка', 'rynket pannen': 'нахмурилась', 'innpakning': 'обёртка', 'meldte han seg på': 'он записался' },
+  q: [{ t: 'tf', q: ['Ahmed forsto brevet med en gang.|F # Han forsto stadig mindre.', 'Søknaden ble innvilget.|T', 'Ahmed må registrere seg innen fjorten dager.|T'] },
+    { t: 'choice', q: ['Hva er «resten» av brevet, ifølge Sofie?|bare innpakning|viktige regler|en feil', 'Hvordan skrev Ahmed takkebrevet?|kort, høflig og på klarspråk|langt og formelt|på engelsk'] }] });
+
+FT('c1-2', { title: 'Det fargerike gjerdet',
+  txt: ['En morgen var det gamle, grå gjerdet i Solgata malt i alle regnbuens farger. Ingen hadde sett noe.', '«Det var ikke jeg som gjorde det,» sa Jonas med en gang. «Og det var i hvert fall ikke Pus,» la Kari til. «Han har ikke tomler.»', 'Det var Sofie som fant det første sporet: en liten, gul flekk på dørhåndtaket til bakeriet. Og det var Ahmed som fant det andre: en tom malingsboks bak søppelkassen — med «Nora» skrevet på lokket.', 'Nora innrømmet alt. «Det var gråheten jeg ikke orket mer,» sa hun. «Aldri har jeg malt noe så stort. Og aldri har jeg sovet så godt etterpå.» Kommunen lot gjerdet være. Nå er det gatas mest fotograferte attraksjon.'],
+  sm: 'En natt ble gjerdet i Solgata malt i alle farger. Sofie og Ahmed fant sporene, og det viste seg at det var Nora som hadde gjort det.',
+  gl: { 'gjerdet': 'забор', 'regnbuens farger': 'цвета радуги', 'i hvert fall': 'во всяком случае', 'tomler': 'большие пальцы', 'sporet': 'улика', 'flekk': 'пятно', 'dørhåndtaket': 'дверная ручка', 'lokket': 'крышка', 'innrømmet': 'призналась', 'gråheten': 'серость', 'orket': 'могла выносить' },
+  q: [{ t: 'tf', q: ['Jonas malte gjerdet.|F # Det var Nora.', 'Det var Sofie som fant det første sporet.|T', 'Kommunen malte gjerdet grått igjen.|F # Kommunen lot det være.'] },
+    { t: 'choice', q: ['Hva sto det på lokket?|Nora|Kari|Solgata', 'Hvorfor malte Nora gjerdet?|Hun orket ikke gråheten mer.|Kommunen ba henne om det.|For å selge maling.'] }] });
+
+FT('c1-3', { title: 'Lottotallene',
+  txt: ['Hver lørdag i førti år hadde Kari spilt Lotto med de samme tallene: bursdagene til barna og nummeret på det første huset hennes.', 'En lørdag glemte hun det. Hun satt hos Leif og drakk kaffe, og hun tenkte ikke på Lotto i det hele tatt.', 'Om kvelden kom tallene på TV. Det var hennes tall. Alle sju. «Hadde jeg bare husket det!» ropte hun. «Om jeg bare hadde levert kupongen!» Hun regnet: hadde hun spilt, ville hun vært millionær.', 'Leif tok hånden hennes. «Hvis du hadde spilt, hadde du sittet hjemme i kveld og ventet på tallene,» sa han. «Og ikke her.» Kari tenkte seg om lenge. Så skrudde hun av TV-en. «Jeg skulle ønske jeg kunne si at det ikke betyr noe,» sa hun. «Men det betyr litt mindre enn jeg trodde.»'],
+  sm: 'En lørdag glemte Kari å spille Lotto for første gang på førti år — og tallene hennes kom opp. Leif minnet henne om at hun da var sammen med ham.',
+  gl: { 'spilt Lotto': 'играла в лото', 'i det hele tatt': 'вообще', 'levert kupongen': 'сдала купон', 'regnet': 'посчитала', 'millionær': 'миллионерша', 'tenkte seg om': 'задумалась', 'skrudde hun av': 'выключила' },
+  q: [{ t: 'tf', q: ['Kari brukte de samme tallene i førti år.|T', 'Kari vant en million.|F # Hun glemte å spille.', 'Kari var hos Leif den lørdagen.|T'] },
+    { t: 'choice', q: ['Hvilket uttrykk viser at Kari angrer?|Hadde jeg bare husket det!|Jeg er glad.|Det var flaks.', 'Hva gjorde Kari til slutt?|skrudde av TV-en|ringte Norsk Tipping|gråt hele natten'] }] });
+
+FT('c1-4', { title: 'Taxisjåfør-metoden',
+  txt: ['Ahmed hadde strøket på oppkjøringen to ganger. Første gang glemte han å slå på blinklyset. Andre gang kjørte han inn i rundkjøringen uten å se seg for.', 'Jonas fant ut at nok var nok. «Jeg setter i gang med deg i morgen,» sa han. «Taxisjåfør-metoden. Den går ut på én ting: ro.»', 'I tre uker kjørte de rundt i Ålesund hver kveld. Jonas pekte ut farer, la merke til alt og holdt ut med alle spørsmålene. «Slå av radioen,» sa han. «Og se deg for. Igjen.»', 'Tredje gang besto Ahmed. Sensoren sa at han kjørte «rolig som en taxisjåfør». Ahmed så fram til å fortelle det til Jonas. Jonas tok det med ro — men han tutet med hornet hele veien hjem.'],
+  sm: 'Ahmed strøk på oppkjøringen to ganger. Jonas øvde med ham hver kveld i tre uker, og tredje gang besto Ahmed.',
+  gl: { 'strøket på': 'провалил', 'oppkjøringen': 'экзамен по вождению', 'blinklyset': 'поворотник', 'rundkjøringen': 'круговое движение', 'se seg for': 'смотреть по сторонам', 'nok var nok': 'хватит', 'farer': 'опасности', 'holdt ut med': 'терпел', 'besto': 'сдал', 'Sensoren': 'экзаменатор', 'hornet': 'гудок' },
+  q: [{ t: 'tf', q: ['Ahmed besto første gang.|F # Han strøk to ganger.', 'Taxisjåfør-metoden går ut på ro.|T', 'Jonas tutet hele veien hjem.|T'] },
+    { t: 'choice', q: ['Hva glemte Ahmed første gang?|å slå på blinklyset|å ta med førerkortet|å stoppe på rødt', 'Hva betyr «holdt ut med» her?|терпел|выключил|выяснил'] }] });
+
+FT('c1-5', { title: 'Bilfri gate?',
+  txt: ['Kommunen foreslo å gjøre Solgata bilfri. Det ble et allmøte i bakeriet, og stemningen var høy.', 'Jonas var imot. «For det første lever jeg av å kjøre. For det andre: hvordan skal Kari komme seg til legen?» Sofie var for. «Riktignok blir det tungvint i starten. Men på den annen side blir det tryggere for barna, og luften blir renere.»', 'Kari overrasket alle. «Jeg er sytti år, og jeg går tur hver dag nå. Følgelig trenger jeg ikke bil til legen. Derimot trenger jeg benker å hvile på.»', 'Til slutt foreslo Nora et kompromiss: bilfritt om dagen, taxi og varelevering tillatt om morgenen, og benker langs hele gata. Alt i alt var alle fornøyde. Bortsett fra Pus, som hadde likt å sove på de varme panserne.'],
+  sm: 'Naboene diskuterte om Solgata skulle bli bilfri. Alle hadde gode argumenter, og Nora foreslo et kompromiss som alle var fornøyde med.',
+  gl: { 'bilfri': 'без машин', 'allmøte': 'общее собрание', 'stemningen var høy': 'страсти кипели', 'imot': 'против', 'tungvint': 'неудобно', 'tryggere': 'безопаснее', 'Følgelig': 'следовательно', 'Derimot': 'зато', 'varelevering': 'доставка товаров', 'Bortsett fra': 'кроме', 'panserne': 'капоты' },
+  q: [{ t: 'tf', q: ['Jonas var imot forslaget.|T', 'Kari trenger bil til legen.|F # Hun går tur hver dag nå.', 'Pus var fornøyd med kompromisset.|F # Han likte å sove på varme pansere.'] },
+    { t: 'choice', q: ['Hva var et argument for, ifølge Sofie?|tryggere for barna|billigere taxi|flere parkeringsplasser', 'Hva ønsket Kari seg?|benker å hvile på|en ny bil|mer taxi'] }] });
+
+FT('c1-6', { title: 'Kakekrisen',
+  txt: ['Nora hadde tatt seg vann over hodet. Hun hadde lovet å bake tre bryllupskaker, to hundre boller til et konfirmasjonsselskap og kransekake til ordføreren — samme lørdag.', 'Fredag kveld snakket hun rett fra levra: «Jeg henger ikke med i svingene lenger. Det står om livet — om bakeriets liv!»', 'Da viste Solgata at de hadde bein i nesa. Kari pisket krem, Ahmed rullet boller, Sofie pyntet kaker, og Jonas kjørte alt ut. De slo to fluer i én smekk: kundene fikk kakene sine, og naboene fikk en uforglemmelig natt.', 'Ordføreren sa at kransekaka var midt i blinken. Nora var i den sjuende himmel. Men neste gang, sa hun, skal hun ikke skjære alle bestillinger over én kam. Hun skal si nei. Ingen i gata tror på det.'],
+  sm: 'Nora hadde lovet å bake altfor mye til én lørdag. Naboene hjalp henne hele natten, og alt ble levert i tide.',
+  gl: { 'tatt seg vann over hodet': 'взялась за непосильное', 'konfirmasjonsselskap': 'праздник конфирмации', 'kransekake': 'торт-башня из колец', 'ordføreren': 'мэр', 'rett fra levra': 'начистоту', 'henger ikke med i svingene': 'не успеваю', 'bein i nesa': 'характер', 'pisket krem': 'взбивала сливки', 'to fluer i én smekk': 'двух зайцев одним выстрелом', 'midt i blinken': 'в яблочко', 'over én kam': 'под одну гребёнку' },
+  q: [{ t: 'tf', q: ['Nora hadde lovet å bake for mye.|T', 'Naboene sa nei til å hjelpe.|F # De hjalp hele natten.', 'Ordføreren likte kransekaka.|T'] },
+    { t: 'choice', q: ['Hva gjorde Kari?|pisket krem|kjørte kaker|pyntet kaker', 'Hva tror naboene om løftet til Nora?|De tror ikke på det.|De er sikre.|De bryr seg ikke.'] }] });
+
+// ---------- C2 ----------
+NOTE('c2-1', { sm: 'I Longyearbyen ble Pelle overveldet av lyset og stillheten. Kunstneren tegnet nesten ingenting, mens Mari skrek for å bryte stillheten.' });
+NOTE('c2-2', { sm: 'Fangstmannen Odd, som underdriver alt, ga dem ei gammel loggbok som bestefar hadde glemt hos ham.' });
+NOTE('c2-3', { sm: 'Loggboka fra 1924 var skrevet med gammel rettskrivning. Den beskrev Lundeøen, og bestefar hadde lagt til en gåte: «Der tre møtes, og tanken står stille».' });
+NOTE('c2-4', { sm: 'Mari løste gåten: ikke «tanke», men «tank». Ved en gammel oljetank under tre isbreer fant de det siste tallet i posisjonen.' });
+NOTE('c2-5', { sm: 'De fant Lundeøen. Pelle holdt en tale for å la øya være i fred, og øya ble vernet.' });
+NOTE('c2-6', { sm: 'En utstilling i Oslo fortalte om reisen. Øya ble vernet uten navn på noe kart. På operataket tenkte Pelle at det finnes flere kart.' });
+
+FT('c2-1', { title: 'Å se, eller å glo',
+  txt: ['Ahmed var stolt av ordforrådet sitt. Men en dag sa han til Nora: «Jeg har glodd på kakene dine hele dagen. De er så vakre!» Nora løftet et øyenbryn.', '«Glo?» sa hun. «Det er det fulle folk gjør på bussen. Du mener vel at du beundret dem. Eller at du tittet på dem gjennom vinduet. Eller at du skuet dem, hvis du vil være poetisk.»', 'Ahmed skrev en ny side i notatboka: se — titte — kikke — glo — stirre — skue. Han øvde hele uka. Han tittet på Pus, stirret på regnskyene, skuet utover fjorden og passet seg vel for å glo på noen.', 'Fredag sa han til Nora: «Jeg skimtet deg i tåka i morges.» Nora smilte. «Nå,» sa hun, «snakker du bedre norsk enn halve Ålesund.»'],
+  sm: 'Ahmed brukte ordet «glo» feil om kakene til Nora. Hun forklarte forskjellen på mange ord for å se, og etter en uke brukte han dem perfekt.',
+  gl: { 'ordforrådet': 'словарный запас', 'glodd': 'пялился', 'øyenbryn': 'бровь', 'beundret': 'любовался', 'skuet': 'созерцал', 'passet seg vel for': 'остерегался', 'skimtet': 'едва различил', 'tåka': 'туман', 'i morges': 'сегодня утром' },
+  q: [{ t: 'tf', q: ['«Glo» er et nøytralt ord.|F # Det er det fulle folk gjør på bussen.', 'Ahmed øvde på synonymene hele uka.|T', 'Til slutt brukte Ahmed «skimte» riktig.|T'] },
+    { t: 'choice', q: ['Hva mente Ahmed egentlig om kakene?|at han beundret dem|at han var sint på dem|at han var sulten', 'Hva skuet Ahmed utover?|fjorden|Pus|regnskyene'] }] });
+
+FT('c2-2', { title: 'Litt friskt',
+  txt: ['Jonas hadde trukket en turist opp av havnen en kald januarkveld. Lokalavisa ville intervjue ham.', '«Hvordan var det å hoppe i iskaldt vann?» spurte journalisten. Jonas tenkte seg om. «Litt friskt,» sa han. «Var du redd?» «Ikke akkurat avslappet.»', '«Folk kaller deg en helt,» fortsatte journalisten. Jonas ristet på hodet. «Jeg er ikke akkurat noen svømmer. Det gikk greit, det var det.» Kari, som sto bak ham, himlet med øynene.', 'Artikkelen fikk tittelen «Ikke verst, Jonas!». Han hengte den opp i taxien, rett ved siden av en lapp fra turisten: «Takk for turen. Det kunne vært verre.»'],
+  sm: 'Jonas reddet en turist fra iskaldt vann. I intervjuet med avisa underdrev han alt, slik norske helter gjør.',
+  gl: { 'trukket': 'вытащил', 'havnen': 'гавань', 'Litt friskt': 'свежо (бодрит)', 'avslappet': 'расслаблен', 'en helt': 'герой', 'himlet med øynene': 'закатила глаза', 'tittelen': 'заголовок' },
+  q: [{ t: 'tf', q: ['Jonas reddet en turist.|T', 'Jonas sa at han var veldig redd.|F # «Ikke akkurat avslappet».', 'Artikkelen het «Ikke verst, Jonas!».|T'] },
+    { t: 'choice', q: ['Что на самом деле значит «Litt friskt» здесь?|ужасно холодно|немного прохладно|очень весело # Преуменьшение.', 'Hvor hengte Jonas artikkelen?|i taxien|i bakeriet|på kjøleskapet'] }] });
+
+FT('c2-3', { title: 'Brevet fra 1893',
+  txt: ['Leif fant en eske med brev etter bestefaren sin. Det eldste var fra 1893, skrevet med sirlig, skrå håndskrift.', '«Kjære Marie! Idag gik jeg langs Havnen og tænkte paa Dig. Vi har faaet godt Veir, og Baadene er komne hjem med megen Fisk.»', 'Kari hjalp ham å tyde det. «Gik er gikk, tænkte er tenkte, Baadene er båtene,» forklarte hun. «Og alle substantiver hadde stor forbokstav — akkurat som på tysk.» Sofie fant ut at Ibsen og Hamsun skrev på nesten samme måte.', 'Brevet sluttet slik: «Jeg venter paa Dig, om det saa skal tage hele mit Liv.» Leif ble stille. Så så han på Kari. «Familien vår er visst god på å vente,» sa han.'],
+  sm: 'Leif fant et brev fra 1893 skrevet med gammel rettskrivning. Kari og Sofie hjalp ham å tyde det. Brevet handlet om å vente på den man elsker.',
+  gl: { 'sirlig': 'аккуратный (о почерке)', 'skrå': 'наклонный', 'tyde': 'расшифровать', 'forbokstav': 'первая буква', 'om det saa skal tage hele mit Liv': 'даже если это займёт всю мою жизнь', 'visst': 'похоже' },
+  q: [{ t: 'tf', q: ['Det eldste brevet var fra 1893.|T', 'I gammel rettskrivning hadde substantiver liten forbokstav.|F # Stor, som på tysk.', '«Baadene» er «båtene» i dag.|T'] },
+    { t: 'choice', q: ['Hva betyr «gik»?|gikk|gikt|gi', 'Hva sa Leif til slutt?|Familien vår er visst god på å vente.|Jeg forstår ingenting.|Brevet er falskt.'] }] });
+
+FT('c2-4', { title: 'De beste brødrene',
+  txt: ['Nora skulle ha en ny plakat i vinduet. Hun ville ha noe morsomt, noe som fikk folk til å stoppe.', 'Sofie skrev: «Hos oss får du de beste brødene i byen!» Men hun skrev fort, og det ble én r for mye: «de beste brødrene i byen».', 'Dagen etter kom tre damer inn og spurte høflig hvor brødrene var. Jonas og fetteren hans, som tilfeldigvis var på besøk, stilte seg straks opp ved disken. «Vi er brødrene,» sa Jonas. «Eller i hvert fall fettere.»', 'Nora lot feilen stå. Salget doblet seg. Ahmed skrev i notatboka: brød — brødet — brødene; bror — broren — brødrene. Én bokstav, og et bakeri blir et sjekkested.'],
+  sm: 'Sofie skrev «brødrene» i stedet for «brødene» på plakaten til bakeriet. Feilen ble en suksess, og Jonas og fetteren spilte «brødrene».',
+  gl: { 'plakat': 'плакат', 'én r for mye': 'на одну «r» больше', 'tilfeldigvis': 'случайно', 'disken': 'прилавок', 'i hvert fall': 'во всяком случае', 'Salget doblet seg': 'продажи удвоились', 'sjekkested': 'место для знакомств' },
+  q: [{ t: 'tf', q: ['Sofie skrev feil på plakaten.|T', '«Brødrene» betyr «хлеба».|F # brødrene — братья; brødene — хлеба.', 'Salget ble dårligere.|F # Det doblet seg.'] },
+    { t: 'choice', q: ['Hvem sa «Vi er brødrene»?|Jonas|Ahmed|Kari', 'Как по-норвежски «те самые хлеба»?|brødene|brødrene|brødet'] }] });
+
+FT('c2-5', { title: 'Talen for biblioteket',
+  txt: ['Kommunen ville legge ned det lille biblioteket i bydelen. Sofie, nå seksten år, ble valgt til å holde tale på folkemøtet.', 'Hun begynte stille: «Kjære alle sammen. Her lærte jeg å lese. Her fant Ahmed sine første norske ord. Her har Kari lånt krim hver fredag i femti år.»', '«Vi er ikke her for bøkene. Vi er her for menneskene. Ikke for det som var, men for det som kommer. Hvem skal gi barna et sted å drømme, hvis ikke biblioteket? Hyllene tier. Men i dag taler vi for dem.»', 'Det ble helt stille. Så reiste Kari seg og klappet. Hele salen fulgte. Tre uker senere kom vedtaket: biblioteket fikk fortsette. Sofie sa bare: «Takk for meg.» Men hun smilte hele veien hjem.'],
+  sm: 'Kommunen ville legge ned biblioteket. Sofie holdt en rørende tale med anafor, antitese og retoriske spørsmål, og biblioteket fikk fortsette.',
+  gl: { 'legge ned': 'закрыть', 'bydelen': 'район', 'folkemøtet': 'собрание жителей', 'krim': 'детективы', 'Hyllene tier': 'полки молчат', 'taler vi for dem': 'мы говорим за них', 'salen': 'зал', 'vedtaket': 'решение' },
+  q: [{ t: 'tf', q: ['Sofie var seksten år.|T', 'Kari lånte krim hver fredag.|T', 'Biblioteket ble lagt ned.|F # Det fikk fortsette.'] },
+    { t: 'choice', q: ['Hvilken antitese brukte Sofie?|Ikke for det som var, men for det som kommer.|Kjære alle sammen.|Takk for meg.', 'Hvem reiste seg først og klappet?|Kari|Jonas|Nora'] }] });
+
+FT('c2-6', { title: 'Gruppechatten',
+  txt: ['Sofie lagde en gruppechat for Solgata. Det var en dårlig idé.', 'Sofie: «Dugnad lørdag! Ta med snacks, det blir chill 😎» Jonas: «Jalla, jeg booker henger til søpla.» Tor-Arne fra Tromsø: «Æ kjem òg!» Kari: «Undertegnede vil med dette bekrefte deltakelse. Med vennlig hilsen, Kari Vik.»', 'Ahmed leste alt tre ganger. Det var engelsk, slang, nordnorsk, nynorsk og kanselli — i fire meldinger. «Er dette norsk?» skrev han. Sofie svarte: «Wolla, dette ER norsk 😂»', 'På lørdag kom alle. Ingen hadde forstått hverandre helt, men alle hadde forstått det viktigste: vafler klokka tolv. Ahmed skrev i notatboka: «Norsk er ikke ett språk. Det er en gate full av folk.»'],
+  sm: 'Sofie lagde en gruppechat for gata. Meldingene var fulle av anglisismer, slang, dialekt og kanselli, men alle forsto det viktigste og kom på dugnaden.',
+  gl: { 'gruppechat': 'групповой чат', 'henger': 'прицеп', 'søpla': 'мусор', 'Undertegnede': 'нижеподписавшаяся', 'bekrefte deltakelse': 'подтвердить участие', 'kanselli': 'канцелярит', 'det viktigste': 'самое главное' },
+  q: [{ t: 'tf', q: ['Gruppechatten var en dårlig idé.|T', 'Kari skrev veldig uformelt.|F # Hun skrev kanselli.', 'Alle kom på dugnaden.|T'] },
+    { t: 'choice', q: ['Hva skrev Ahmed i notatboka?|Norsk er en gate full av folk.|Norsk er umulig.|Norsk er engelsk.', 'Hva var det viktigste alle forsto?|vafler klokka tolv|at Kari er sint|at det regner'] }] });

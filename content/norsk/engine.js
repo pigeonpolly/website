@@ -820,7 +820,7 @@
   const olHTML = gl => { const w = Object.entries(gl || {}); return w.length ? `<details class="ordliste"><summary>📒 Ordliste — слова (${w.length})</summary><ul>${w.map(([a, b]) => `<li><b class="en">${esc(a)}</b> — ${esc(b)}</li>`).join('')}</ul></details>` : ''; };
   function storyHTML(u) {
     const F = (window.NO_STORIES || {})[u.id]; if (!F) return '';
-    return `<section class="sec" id="story"><h3><span class="ic">📚</span>Fortelling: короткий рассказ</h3><p class="note-s">Отдельная история к уроку, по желанию: на процент урока и замки не влияет.</p>${READSTEPS}
+    return `<section class="sec" id="story"><h3><span class="ic">📚</span>Короткий рассказ</h3><p class="note-s">Отдельная история к уроку, по желанию: на процент урока и замки не влияет.</p>${READSTEPS}
       <article class="reading"><h4>${esc(F.title)} ${sayBtn(F.title + '. ' + F.txt.join(' '))}</h4><div class="txt">${F.txt.map(p => `<p>${glossText(p, F.gl)}</p>`).join('')}</div>
       <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь». Подчёркнутые — с готовой подсказкой.</p></article>
       ${smHTML(F.sm, F.smru)}${olHTML(F.gl)}${F.q && F.q.length ? blockHTML(u.id + '-f', 'Forståelsesspørsmål — вопросы', F.q, { track: true }) : ''}</section>`;
