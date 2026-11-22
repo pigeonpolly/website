@@ -190,7 +190,8 @@
     clear: { en: '☐ Clear all', ru: '☐ Убрать все', lv: '☐ Noņemt visas' },
     brand: { en: 'Paints:', ru: 'Краски:', lv: 'Krāsas:' },
     baseSet: { en: 'Basic pigments (any brand)', ru: 'Базовые пигменты (любой бренд)', lv: 'Pamata pigmenti (jebkurš zīmols)' },
-    brandSrc: { en: 'Pigments of each paint are taken from {src}. Tick the tubes you have. ≈ means the pigment colour is approximate.', ru: 'Пигменты каждой краски взяты с {src}. Отметьте тюбики, которые у вас есть. ≈ — цвет пигмента приблизительный.', lv: 'Katras krāsas pigmenti ņemti no {src}. Atzīmē tūbiņas, kas tev ir. ≈ — pigmenta krāsa ir aptuvena.' },
+    brandSrc: { en: 'Where the pigments come from: {src}. Tick the tubes you have. ≈ means the pigment colour is approximate.', ru: 'Откуда составы: {src}. Отметьте тюбики, которые у вас есть. ≈ — цвет пигмента приблизительный.', lv: 'No kurienes sastāvi: {src}. Atzīmē tūbiņas, kas tev ir. ≈ — pigmenta krāsa ir aptuvena.' },
+    brandsNote: { en: 'This site is not affiliated with paint makers. Brand and paint names belong to their owners; pigment lists are taken from the makers’ own websites and colour charts.', ru: 'Сайт не связан с производителями красок. Названия брендов и красок принадлежат их владельцам; составы взяты с сайтов и выкрасок самих производителей.', lv: 'Vietne nav saistīta ar krāsu ražotājiem. Zīmolu un krāsu nosaukumi pieder to īpašniekiem; sastāvi ņemti no pašu ražotāju vietnēm un krāsu kartēm.' },
     find: { en: 'Find a paint', ru: 'Найти краску', lv: 'Atrast krāsu' },
     reset: { en: '↺ Basic set', ru: '↺ Базовый набор', lv: '↺ Pamata komplekts' },
     m3: { en: '3. How to mix it', ru: '3. Как смешать', lv: '3. Kā sajaukt' },
@@ -289,7 +290,7 @@
       <div class="mx-photo" hidden><p class="mx-hint">${t('photoTip')}</p><canvas></canvas></div>
       <div class="mx-pal"><p class="mx-hint">${t('fromPal')}</p><div class="mx-chips"></div><button type="button" class="mx-lnk mx-more">${t('another')}</button></div></div>
     </div><div class="mx-step mx-right"><h2>${t('m3')}</h2><p class="mx-unit"></p><div class="mx-out"></div>
-      <p class="mx-note">⚠️ ${t('note')}</p></div></div>
+      <p class="mx-note">⚠️ ${t('note')}</p><p class="mx-hint mx-legal">${t('brandsNote')}</p></div></div>
     <div class="mx-pane" data-pane="play" hidden></div><div class="mx-pane" data-pane="pigs" hidden></div>`;
   const $ = s => app.querySelector(s);
 

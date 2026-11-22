@@ -146,6 +146,7 @@
 .mx-psaved > div { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .mx-sv { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #D8D0C8; cursor: pointer; }
 /* бренды красок */
+.mx-legal { font-size: 12px; margin-top: 8px; }
 .mx-brw { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 4px; font-weight: 700; }
 .mx-left, .mx-find > *, .mx-play > *, .mx-pud > * { min-width: 0; }
 .mx-brand { font: inherit; font-weight: 400; flex: 1 1 220px; min-width: 0; width: 100%; max-width: 100%; padding: 8px 10px; border: 2px solid #D8D0C8; border-radius: 12px; background: #fff; color: #2A2230; }
