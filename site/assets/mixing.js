@@ -151,8 +151,27 @@
     best.hex = water ? mixHex(best.items, 0, best.d, true) : mixHex(best.items, best.white, 1, false);
     return best;
   }
+  // отбор до 16 красок: лучшие по одной (с белилами/водой) и те, что входят в лучшие пары (грубая сетка)
+  function shortlist(pig, tLab, water) {
+    const seen = new Set(); pig = pig.filter(p => { const k = p.m + p.t; if (seen.has(k)) return false; seen.add(k); return true; }); // одинаковые по цвету краски — один раз
+    if (pig.length <= 16) return pig;
+    const lv = water ? [1, 0.4, 0.15, 0.05] : [0, 1, 4, 16], fr = [0.15, 0.5, 0.85];
+    const best = (items) => { let e = 1e9; for (const x of lv) { const v = dE(water ? mixLab(items, 0, x, true) : mixLab(items, x, 1, false), tLab); if (v < e) e = v; } return e; };
+    const single = pig.map(p => ({ p, e: best([[p, 1]]) })).sort((a, b) => a.e - b.e);
+    const pairs = [];
+    for (let i = 0; i < pig.length; i++) for (let j = i + 1; j < pig.length; j++) {
+      let e = 1e9; for (const f of fr) { const v = best([[pig[i], f], [pig[j], 1 - f]]); if (v < e) e = v; }
+      pairs.push({ a: pig[i], b: pig[j], e });
+    }
+    pairs.sort((a, b) => a.e - b.e);
+    const out = new Set(single.slice(0, 6).map(x => x.p));
+    for (const q of pairs) { if (out.size >= 16) break; out.add(q.a); if (out.size < 16) out.add(q.b); }
+    return [...out];
+  }
   function solve(hex, ids, water) {
-    const tLab = labOfHex(hex), pig = ids.map(id => P[id]).filter(Boolean);
+    const tLab = labOfHex(hex);
+    let pig = ids.map(id => P[id]).filter(Boolean);
+    if (pig.length > 16) pig = shortlist(pig, tLab, water); // большой набор (вся серия бренда): перебор троек завис бы — сначала отбираем подходящие краски
     if (!pig.length) return { tLab, recipes: [] };
     const cand = coarse(tLab, pig, water).sort((a, b) => (a.e + penalty(a)) - (b.e + penalty(b))).slice(0, 14);
     const ref = cand.map(c => { const r = refine(c, tLab, water); return toUnits(r, tLab, water); });
