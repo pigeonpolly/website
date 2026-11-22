@@ -316,7 +316,7 @@ file	tools/norsk_page.py	tools/norsk_page.py	0	32 строк, 4 КБ
 file	tools/og_cards.js	tools/og_cards.js	0	263 строк, 28 КБ
 file	tools/ornaments/make.py	tools/ornaments/make.py	0	294 строк, 24 КБ
 file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
-file	tools/paint_brands.js	tools/paint_brands.js	0	141 строк, 14 КБ
+file	tools/paint_brands.js	tools/paint_brands.js	0	143 строк, 15 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
 file	tools/palette_overrides.py	tools/palette_overrides.py	0	15 строк, 6 КБ
 file	tools/palette_titles.py	tools/palette_titles.py	0	128 строк, 12 КБ
@@ -4915,10 +4915,10 @@ sym	base	tools/paint_brands.js	43	const
 sym	DS	tools/paint_brands.js	44	const
 sym	dsLab	tools/paint_brands.js	45	const
 sym	LIB	tools/paint_brands.js	46	const
-sym	EST	tools/paint_brands.js	86	const
-sym	resolve	tools/paint_brands.js	89	fn
-sym	skipped	tools/paint_brands.js	105	const
-sym	out	tools/paint_brands.js	106	const
+sym	EST	tools/paint_brands.js	88	const
+sym	resolve	tools/paint_brands.js	91	fn
+sym	skipped	tools/paint_brands.js	107	const
+sym	out	tools/paint_brands.js	108	const
 sym	NAMES	tools/palette_names.py	2	const
 sym	HERE	tools/palettes.py	8	const
 sym	to_lab	tools/palettes.py	16	fn

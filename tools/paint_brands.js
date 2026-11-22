@@ -79,11 +79,13 @@ const LIB = {
   PB1: fromHex('#4A6AB8'), PB66: fromHex('#4A5A8A'), PB74: fromHex('#3F6AB8'),
   PG8: fromHex('#5A8A5A'), PG23: fromHex('#8E9C80'),
   PBk7: dsLab('Lamp Black'), PBk8: fromHex('#4E4E52'), PBk1: fromHex('#4A4A4E'), PBk19: fromHex('#7A7A80'), PBk26: fromHex('#5A5450'),
-  PBr8: fromHex('#8A7466'), PBr33: fromHex('#8E6A58'), PBr41: fromHex('#A07A5E'),
+  PBr8: fromHex('#8A7466'),
+  PBk27: fromHex('#4A4A54'), PBr29: fromHex('#6A4E44'), PBr23: fromHex('#A2654A'), PR146: fromHex('#D05A6E'), PB72: fromHex('#4A64B4'), PY93: fromHex('#F4DA5A'),
+  PV102: fromHex('#BE86C8'), 'PR81:1': fromHex('#EA74AE'), PR4: fromHex('#E4685A'), PR2: fromHex('#DC5E58'), 'PR48:3': fromHex('#CC4E5E'), 'PR170:1': dsLab('Permanent Red'), 'PV3:2': fromHex('#8A5AA8'), PBr33: fromHex('#8E6A58'), PBr41: fromHex('#A07A5E'),
   PW6: { m: '#F6F6F2', t: '#F6F6F2', white: 1 }, PW4: { m: '#F7F7F5', t: '#F7F7F5', white: 1 }, PW5: { m: '#F5F5F2', t: '#F5F5F2', white: 1 }, PW7: { m: '#F4F4F2', t: '#F4F4F2', white: 1 },
 };
 delete LIB.PR144x;
-const EST = new Set(['PY35', 'PY37', 'PY83', 'PY159', 'PY1', 'PY6', 'PY14', 'PY119', 'PY128', 'PY153', 'PY155', 'PY216', 'PO20', 'PO13', 'PO34', 'PO36', 'PO64', 'PO67', 'PO72', 'PR9', 'PR12', 'PR23', 'PR112', 'PR144', 'PR169', 'PR173', 'PR187', 'PR207', 'PR242', 'PR48:4', 'PR88', 'PV1', 'PV2', 'PV3', 'PV37', 'PV47', 'PV62', 'PB1', 'PB66', 'PB74', 'PG8', 'PG23', 'PBk8', 'PBk1', 'PBk19', 'PBk26', 'PBr8', 'PBr33', 'PBr41']);
+const EST = new Set(['PBk27', 'PBr29', 'PBr23', 'PR146', 'PB72', 'PY93', 'PV102', 'PR81', 'PR4', 'PR2', 'PR48', 'PV3', 'PY35', 'PY37', 'PY83', 'PY159', 'PY1', 'PY6', 'PY14', 'PY119', 'PY128', 'PY153', 'PY155', 'PY216', 'PO20', 'PO13', 'PO34', 'PO36', 'PO64', 'PO67', 'PO72', 'PR9', 'PR12', 'PR23', 'PR112', 'PR144', 'PR169', 'PR173', 'PR187', 'PR207', 'PR242', 'PR48:4', 'PR88', 'PV1', 'PV2', 'PV3', 'PV37', 'PV47', 'PV62', 'PB1', 'PB66', 'PB74', 'PG8', 'PG23', 'PBk8', 'PBk1', 'PBk19', 'PBk26', 'PBr8', 'PBr33', 'PBr41']);
 
 // у некоторых кодов несколько разных пигментов (сиена/умбра, розовый/фиолетовый хинакридон) — уточняем по названию краски
 function resolve(code, name) {
