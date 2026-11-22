@@ -193,6 +193,9 @@
     brandSrc: { en: 'Where the pigments come from: {src}. Tick the tubes you have. ≈ means the pigment colour is approximate.', ru: 'Откуда составы: {src}. Отметьте тюбики, которые у вас есть. ≈ — цвет пигмента приблизительный.', lv: 'No kurienes sastāvi: {src}. Atzīmē tūbiņas, kas tev ir. ≈ — pigmenta krāsa ir aptuvena.' },
     brandsNote: { en: 'This site is not affiliated with paint makers. Brand and paint names belong to their owners; pigment lists are taken from the makers’ own websites and colour charts.', ru: 'Сайт не связан с производителями красок. Названия брендов и красок принадлежат их владельцам; составы взяты с сайтов и выкрасок самих производителей.', lv: 'Vietne nav saistīta ar krāsu ražotājiem. Zīmolu un krāsu nosaukumi pieder to īpašniekiem; sastāvi ņemti no pašu ražotāju vietnēm un krāsu kartēm.' },
     find: { en: 'Find a paint', ru: 'Найти краску', lv: 'Atrast krāsu' },
+    cloudIn: { en: '💾 Saved in your profile: the same paints on any device.', ru: '💾 Сохраняется в вашем профиле: те же краски на любом устройстве.', lv: '💾 Saglabājas tavā profilā: tās pašas krāsas jebkurā ierīcē.' },
+    cloudOut: { en: '💾 Sign in and your paints will be saved in your profile, on any device.', ru: '💾 Войдите — и отмеченные краски сохранятся в профиле, на любом устройстве.', lv: '💾 Ienāc — un atzīmētās krāsas saglabāsies tavā profilā jebkurā ierīcē.' },
+    signIn: { en: 'Sign in', ru: 'Войти', lv: 'Ienākt' },
     reset: { en: '↺ Basic set', ru: '↺ Базовый набор', lv: '↺ Pamata komplekts' },
     m3: { en: '3. How to mix it', ru: '3. Как смешать', lv: '3. Kā sajaukt' },
     wait: { en: 'Mixing paints…', ru: 'Смешиваю краски…', lv: 'Jaucu krāsas…' },
@@ -249,7 +252,10 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const nm = id => P[id].n[gi];
   const ink = h => { const n = parseInt(h.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#1B1820' : '#FFFFFF'; };
-  const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* приватный режим */ } } };
+  // «Мои краски», бренд и «Мои цвета» (ключи SYNC) у вошедших живут в профиле (syncPrefs, /api/mixing); в браузере — копия
+  const SYNC = /^pp-mix-(p-|b-|saved$)/;
+  let applying = false;
+  const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* приватный режим */ } if (SYNC.test(k) && !applying) { try { localStorage.setItem('pp-mix-t', String(Date.now())); } catch (e) { /* */ } syncSoon(); } } };
   const plural = (n, forms) => {
     if (L === 'ru') { const i = Math.floor(n); if (n !== i) return forms[1]; const a = i % 10, b = i % 100; return a === 1 && b !== 11 ? forms[0] : a >= 2 && a <= 4 && (b < 12 || b > 14) ? forms[1] : forms[2]; }
     if (L === 'lv') { return n % 10 === 1 && n % 100 !== 11 ? forms[0] : forms[1]; }
@@ -282,7 +288,7 @@
   app.innerHTML = `<nav class="mx-tabs" role="tablist"><button type="button" role="tab" data-tab="find"></button><button type="button" role="tab" data-tab="play"></button><button type="button" role="tab" data-tab="pigs"></button></nav>
     <div class="mx-pane mx-find" data-pane="find"><div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
       <label class="mx-brw">🎨 ${t('brand')} <select class="mx-brand"></select></label><p class="mx-hint mx-bsrc" hidden></p>
-      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><input class="mx-pfind" type="search" placeholder="🔍 ${t('find')}" hidden><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
+      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><p class="mx-hint mx-cloud"></p><input class="mx-pfind" type="search" placeholder="🔍 ${t('find')}" hidden><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
     <div class="mx-step"><h2>${t('m2')}</h2>
       <div class="mx-pickrow"><label class="mx-color"><input type="color" value="${target}" aria-label="${t('pick')}"><span class="mx-tsw"></span></label>
         <input class="mx-hex" type="text" maxlength="7" spellcheck="false" aria-label="HEX" value="${target}">
@@ -680,6 +686,56 @@
     if (e.target.closest('.mx-pl-find')) { const h = plHex(); if (!h) return; setTab('find'); setTarget(h); app.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
   app.addEventListener('input', e => { if (e.target.matches('.mx-wat input')) { play.d = Math.max(0.03, 1 - e.target.value / 100); setWater(); renderPuddle(false); } });
+
+  // ── синхронизация с профилем ──
+  function who() { return window.PPWho && window.PPWho.user; }
+  var syncT = 0, pulled = false; // var: ls.set может позвать syncSoon раньше этой строки
+  function collect() {
+    const d = { b: {}, p: {}, s: savedGet() };
+    for (const m of Object.keys(MEDIA)) d.b[m] = ls.get('pp-mix-b-' + m) || '';
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^pp-mix-p-/.test(k)) d.p[k.slice(9)] = localStorage.getItem(k) || ''; } } catch (e) { /* */ }
+    return d;
+  }
+  function push(beacon) {
+    if (!who() || !pulled) return;
+    clearTimeout(syncT); syncT = 0;
+    const body = JSON.stringify({ data: collect(), t: +ls.get('pp-mix-t') || Date.now() });
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon('/api/mixing', body);
+    else fetch('/api/mixing', { method: 'POST', credentials: 'same-origin', body }).catch(() => {});
+  }
+  function syncSoon() { if (who() && pulled) { clearTimeout(syncT); syncT = setTimeout(push, 800); } }
+  function applyPrefs(d, t) {
+    applying = true;
+    try {
+      const drop = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^pp-mix-p-/.test(k)) drop.push(k); }
+      drop.forEach(k => localStorage.removeItem(k));
+    } catch (e) { /* */ }
+    for (const m of Object.keys(MEDIA)) ls.set('pp-mix-b-' + m, (d.b && d.b[m]) || '');
+    for (const [k, v] of Object.entries(d.p || {})) ls.set('pp-mix-p-' + k, v);
+    ls.set('pp-mix-saved', JSON.stringify(d.s || []));
+    ls.set('pp-mix-t', String(t));
+    applying = false;
+    loadBrands().then(() => { renderMedia(); run(); if (app.querySelector('.mx-tubes')) { renderShelf(); renderPuddle(false); } });
+  }
+  function cloudNote() {
+    const el = app.querySelector('.mx-cloud'); if (!el) return;
+    el.innerHTML = who() ? esc(t('cloudIn')) : esc(t('cloudOut')) + (window.PPAccount && window.PPAccount.openSignIn ? ` <button type="button" class="mx-lnk mx-signin">${t('signIn')}</button>` : '');
+  }
+  function pull() {
+    cloudNote();
+    if (!who() || pulled) return;
+    fetch('/api/mixing', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(x => {
+      if (!x) return;
+      pulled = true;
+      const localT = +ls.get('pp-mix-t') || 0;
+      if (x.data && x.t >= localT) applyPrefs(x.data, x.t); // в профиле новее — берём его
+      else if (localT > (x.t || 0)) push(); // отмечено до входа или на этом устройстве позже — переносим в профиль
+    }).catch(() => {});
+  }
+  if (window.PPWho) pull(); else cloudNote();
+  document.addEventListener('pp:whoami', pull);
+  window.addEventListener('pagehide', () => { if (syncT) push(true); });
+  app.addEventListener('click', e => { if (e.target.closest('.mx-signin') && window.PPAccount) window.PPAccount.openSignIn(); });
 
   app.querySelector('[data-pane="pigs"]').innerHTML = pigmentsHTML();
   app.querySelector('[data-pane="play"]').innerHTML = playHTML();

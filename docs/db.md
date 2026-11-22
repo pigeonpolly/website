@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (78)
+## Таблицы (80)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -38,7 +38,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **room_guests** (worker/flock.js): `owner_id` int nn, `guest_id` int nn, `first_at` int, `last_at` int; PRIMARY KEY (owner_id, guest_id)
 - **feathers** (worker/flock.js): `owner_id` int nn, `from_id` int nn, `day` text nn, `created_at` int, `seen` int =0; PRIMARY KEY (owner_id, from_id, day)
 - **garden** (worker/garden.js): `user_id` int PK, `beds` text ='[]', `seeds` text ='{}', `crop` text ='{}', `bug_day` text ='', `bug_got` text ='[]', `harvests` int =0, `bugs` int =0, `created_at` int; + `found` text ='[]', `drop_day` text ='', `drop_n` int =0, `rare_day` text ='', `magic_day` text ='', `water_days` text ='[]', `hide` text ='[]'
-- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `pw` text, `pw_temp` int =0, `email_ok` int =0, `privacy_at` int, `advent_mail` text ='', `advent_sent` int =0'], `news_off` int =0'], `feathers` int =0, `feather_day` text ='', `yt_seen` text ='', `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `pot_days` int =0, `pot_last` text, `cats_alive` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0, `office_task` int =0, `atags` text ='', `mail_games` int =0, `mail_feat` int =0, `mail_news` int =0, `mail_asked` int =0, `mail_later` int =0, `mail_lang` text ='', `mail_day` text ='', `mail_g_at` int =0, `mail_g_garden` int =0, `mail_g_titos` int =0, `mail_g_streak` text ='', `pan_best` int =0, `pan_best_at` int, `pan_washes` int =0, `pan_up` text ='', `shift_min` int =0'], `train_best` int =0, `train_best_at` int, `train_lv` text ='', `train_up` text ='', `train_words` int =0'], `lang` text ='', `wl_mail_off` int =0, `wl_sent` text ='', `ink_ok` int =0, `ink_until` int =0
+- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `pw` text, `pw_temp` int =0, `email_ok` int =0, `privacy_at` int, `advent_mail` text ='', `advent_sent` int =0'], `news_off` int =0'], `feathers` int =0, `feather_day` text ='', `yt_seen` text ='', `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `pot_days` int =0, `pot_last` text, `cats_alive` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0, `office_task` int =0, `atags` text ='', `mail_games` int =0, `mail_feat` int =0, `mail_news` int =0, `mail_asked` int =0, `mail_later` int =0, `mail_lang` text ='', `mail_day` text ='', `mail_g_at` int =0, `mail_g_garden` int =0, `mail_g_titos` int =0, `mail_g_streak` text ='', `pan_best` int =0, `pan_best_at` int, `pan_washes` int =0, `pan_up` text ='', `ink_ok` int =0, `ink_until` int =0'], `shift_min` int =0'], `train_best` int =0, `train_best_at` int, `train_lv` text ='', `train_up` text ='', `train_words` int =0'], `lang` text ='', `wl_mail_off` int =0, `wl_sent` text =''
 - **sessions** (worker/index.js): `token` text PK, `user_id` int nn, `expires` int nn; + `pin_ok` int =0
 - **posts** (worker/index.js): `id` text PK, `user_id` int nn, `day` text nn, `theme` text, `bw` int =0, `created_at` int, `hidden` int =0; + `tod` int, `picked` int =0, `bytes` int, `store` text, `ai` int =0, `kv` int =1; UNIQUE(user_id, day)
 - **meta** (worker/index.js): `key` text PK, `value` text
@@ -63,6 +63,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **kitchen** (worker/kitchen.js): `user_id` int PK, `cook` text ='', `dish` text ='', `book` text ='{}', `cooked` int =0, `created_at` int
 - **mail_out** (worker/mail.js): `id` int PK auto, `cat` text nn, `L` text nn, `status` text nn, `total` int =0, `sent` int =0, `created_at` int; + `aud_from` int =0, `aud_to` int =0, `aud_ids` text
 - **mail_sent** (worker/mail.js): `out_id` int nn, `user_id` int nn, `at` int; PRIMARY KEY (out_id, user_id)
+- **mix_prefs** (worker/mixing.js): `user_id` int PK, `data` text, `t` int nn
 - **nederlands_progress** (worker/nederlands.js): `user_id` int PK, `state` text, `updated_at` int
 - **nederlands_access** (worker/nederlands.js): `user_id` int PK, `added_at` int
 - **norsk_progress** (worker/norsk.js): `user_id` int PK, `state` text, `updated_at` int
@@ -74,6 +75,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **polls** (worker/polls.js): `id` text PK, `q` text, `opts` text, `status` text =\'draft\', `ideas` int =1, `created` int, `opened` int, `closed` int, `ends` int
 - **poll_votes** (worker/polls.js): `poll` text nn, `ip` text nn, `opt` text, `uid` int, `lang` text, `at` int; + `ipk` text; PRIMARY KEY (poll, ip)
 - **poll_ideas** (worker/polls.js): `id` int PK auto, `poll` text, `ip` text, `uid` int, `text` text, `lang` text, `at` int
+- **postcards** (worker/postcards.js): `id` int PK auto, `token` text UNIQUE nn, `design` text nn, `greet` text, `msg` text, `from_uid` int nn, `from_name` text, `to_name` text, `to_email` text nn, `to_uid` int, `lang` text, `mail` text, `seen` int =0, `created_at` int nn
+- **postcard_block** (worker/postcards.js): `hash` text PK, `at` int
 - **school_works** (worker/school.js): `id` int PK auto, `user_id` int nn, `lesson` int nn, `img` text nn, `note` text, `status` text ='wait', `comment` text, `created_at` int, `checked_at` int, `seen` int =1; + `comment_tr` text, `course` text ='water'
 - **shift_runs** (worker/shift.js): `id` text PK, `user_id` int nn, `started` int nn, `min` int nn, `done` int =0
 - **study_progress** (worker/study.js): `user_id` int PK, `state` text, `updated_at` int
@@ -81,15 +84,17 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
 - **train_runs** (worker/train.js): `id` text PK, `user_id` int nn, `started` int nn, `lang` text nn, `level` int =0, `base` int =0, `words` int =0
+- **room_visits** (worker/visits.js): `owner_id` int nn, `user_id` int nn, `home` text =\'living\', `at` int, `act` text =\'\', `act_n` int =0; PRIMARY KEY (owner_id, user_id)
 - **out_clicks** (worker/week.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `target` text, `path` text, `href` text
 
-## Ключи meta (68)
+## Ключи meta (73)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
 - `admin_email_off` — worker/index.js
 - `admin_ids` — worker/index.js
 - `admin_pin` — worker/blog.js, worker/index.js
+- `advent_adv_v1` — worker/index.js
 - `advent_mail_n:` — worker/auth.js, worker/mail.js, worker/wl-holidays.js
 - `anon_names_v1` — worker/index.js
 - `atag_colors` — worker/index.js
@@ -120,9 +125,12 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `index_base` — worker/index.js
 - `mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `mail_salt` — worker/wl-holidays.js
-- `mail_secret` — worker/mail.js
+- `mail_secret` — worker/mail.js, worker/postcards.js
 - `media_backup` — worker/blog.js, worker/index.js
 - `new_seen` — worker/flock-news.js, worker/index.js
+- `pc_mail_n:` — worker/mail.js, worker/postcards.js, worker/wl-holidays.js
+- `pc_mail_n:*` — worker/postcards.js
+- `pc_rule_89` — worker/postcards.js
 - `pick_post` — worker/index.js
 - `pick_price_11` — worker/index.js
 - `pick_user` — worker/index.js
@@ -138,14 +146,15 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `req_closed` — worker/index.js
 - `restock_day` — worker/index.js
 - `restock_last` — worker/index.js, worker/week.js
-- `rules` — worker/index.js
+- `rules` — worker/index.js, worker/postcards.js
 - `schema_ver` — worker/index.js
 - `sections_news` — worker/blog.js
 - `sections_v2` — worker/blog.js
 - `site_pause` — worker/pause.js, worker/week.js
-- `site_pause_at` — worker/pause.js, worker/week.js
+- `site_pause_at` — worker/analytics.js, worker/pause.js, worker/week.js
 - `sketchbook` — worker/index.js
 - `starter_box_v1` — worker/index.js
+- `stock_new_sig` — worker/index.js
 - `t:` — worker/english-page.js, worker/nederlands-page.js, worker/norsk-page.js
 - `titos_pot_n` — worker/titos.js
 - `unit` — worker/index.js
@@ -155,6 +164,3 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
-- `room_visits` (worker/visits.js, 21.11.2026): owner_id, user_id (PK вместе), home, at (мс последней отметки), act, act_n — кто сейчас в гостях в комнате и его последнее действие; старше 1 ч удаляются, при удалении аккаунта — тоже.
-- `postcards` (worker/postcards.js, 21.11.2026): id PK auto, token (уник., p+24 hex — ссылка из письма), design, greet (своя надпись), msg, from_uid nn, from_name ('' — аноним), to_name, to_email nn (нижний регистр), to_uid (забрал по ссылке), lang, mail (sent/queue/off/fail/block), seen =0, created_at nn. Индексы по from_uid, to_email, to_uid.
-- `postcard_block` (worker/postcards.js): hash PK (sha256 почты — отказ от открыток), at. Meta `pc_mail_n:<день>` — писем с открытками за сутки (входит в общий лимит usedToday).

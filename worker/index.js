@@ -27,6 +27,7 @@ import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный у
 import { avisApi, avisCron, AVIS_TABLES, AVIS_RULES, AVIS_RANGE, AVIS_INT, AVIS_CRON, LOCKED } from './avis.js'; // «Morgenavis» — утренняя газета на норвежском для Алины /norsk/avis/ (docs/site.md «Morgenavis»)
 import { nederlandsApi, nederlandsOk, NEDERLANDS_TABLES } from './nederlands.js'; // личный учебник нидерландского /nederlands/ (docs/site.md «Учебник нидерландского»)
 import { postcardsApi, postcardCron, postcardNews, POSTCARD_TABLES, POSTCARD_RULES, POSTCARD_RANGE, POSTCARD_INT } from './postcards.js'; // 💌 открытки /postcards/ (docs/postcards.md)
+import { mixingApi, MIXING_TABLES } from './mixing.js'; // «Смешивание цветов»: мои краски в профиле (docs/palettes.md)
 import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT, inkOn, INK_YEAR } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
@@ -706,6 +707,7 @@ async function ensureSchemaRun(env) {
     ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
     ...ENGLISH_TABLES.map(sql => prep(sql)), // учебник английского: english_progress (worker/english.js)
     ...POSTCARD_TABLES.map(sql => prep(sql)), // открытки: postcards, postcard_block (worker/postcards.js)
+    ...MIXING_TABLES.map(sql => prep(sql)), // смешивание цветов: mix_prefs (worker/mixing.js)
     ...NOTEBOOK_TABLES.map(sql => prep(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
     ...AVIS_TABLES.map(sql => prep(sql)), // «Morgenavis»: avis_src, avis (worker/avis.js)
     ...NORSK_TABLES.map(sql => prep(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
@@ -1810,6 +1812,7 @@ async function route(req, env, url) {
   if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/postcards/')) { const r = await postcardsApi(req, env, url, mailHelpers(env)); if (r) return r; }
+  if (p === '/api/mixing') { const r = await mixingApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/notebook') { const r = await notebookApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/avis' || p.startsWith('/api/avis/')) { const r = await avisApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/norsk' || p === '/api/norsk/access' || p === '/api/norsk/tts') { const r = await norskApi(req, env, url, studyHelpers(env)); if (r) return r; }
