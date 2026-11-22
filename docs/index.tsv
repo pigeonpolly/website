@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 435, страниц 58, маршрутов 220, таблиц 76, ключей meta 68, имён 5914, разделов доков 253
+# файлов 440, страниц 58, маршрутов 220, таблиц 76, ключей meta 68, имён 5986, разделов доков 253
 file	build.py	build.py	0	897 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -66,14 +66,14 @@ file	docs/db.md	docs/db.md	0	160 строк, 17 КБ
 file	docs/flock.md	docs/flock.md	0	35 строк, 16 КБ
 file	docs/freebies.md	docs/freebies.md	0	10 строк, 5 КБ
 file	docs/games.md	docs/games.md	0	92 строк, 38 КБ
-file	docs/growth.md	docs/growth.md	0	95 строк, 17 КБ
+file	docs/growth.md	docs/growth.md	0	96 строк, 17 КБ
 file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
 file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	373 строк, 74 КБ
-file	docs/palettes.md	docs/palettes.md	0	74 строк, 36 КБ
+file	docs/palettes.md	docs/palettes.md	0	76 строк, 40 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	203 строк, 52 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	206 строк, 53 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/postcards.md	docs/postcards.md	0	25 строк, 6 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
@@ -137,8 +137,8 @@ file	site/assets/ideas-admin.js	site/assets/ideas-admin.js	0	79 строк, 9 К
 file	site/assets/ink-course.css	site/assets/ink-course.css	0	113 строк, 7 КБ
 file	site/assets/ink-course.js	site/assets/ink-course.js	0	254 строк, 27 КБ
 file	site/assets/mail-admin.js	site/assets/mail-admin.js	0	73 строк, 9 КБ
-file	site/assets/mixing.css	site/assets/mixing.css	0	148 строк, 15 КБ
-file	site/assets/mixing.js	site/assets/mixing.js	0	650 строк, 79 КБ
+file	site/assets/mixing.css	site/assets/mixing.css	0	156 строк, 16 КБ
+file	site/assets/mixing.js	site/assets/mixing.js	0	691 строк, 84 КБ
 file	site/assets/news.js	site/assets/news.js	0	451 строк, 47 КБ
 file	site/assets/norway.css	site/assets/norway.css	0	16 строк, 1 КБ
 file	site/assets/palettes.js	site/assets/palettes.js	0	439 строк, 40 КБ
@@ -300,6 +300,7 @@ file	tools/docs/split_claude_old.py	tools/docs/split_claude_old.py	0	461 стр�
 file	tools/english_book.py	tools/english_book.py	0	42 строк, 3 КБ
 file	tools/english_check.js	tools/english_check.js	0	103 строк, 10 КБ
 file	tools/english_page.py	tools/english_page.py	0	23 строк, 2 КБ
+file	tools/fb/fb_giftmix.js	tools/fb/fb_giftmix.js	0	194 строк, 59 КБ
 file	tools/fb/fb_no.js	tools/fb/fb_no.js	0	65 строк, 5 КБ
 file	tools/fb/fb_pal.js	tools/fb/fb_pal.js	0	74 строк, 5 КБ
 file	tools/game_covers.py	tools/game_covers.py	0	564 строк, 21 КБ
@@ -315,6 +316,7 @@ file	tools/norsk_page.py	tools/norsk_page.py	0	32 строк, 4 КБ
 file	tools/og_cards.js	tools/og_cards.js	0	263 строк, 28 КБ
 file	tools/ornaments/make.py	tools/ornaments/make.py	0	294 строк, 24 КБ
 file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
+file	tools/paint_brands.js	tools/paint_brands.js	0	141 строк, 14 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
 file	tools/palette_overrides.py	tools/palette_overrides.py	0	15 строк, 6 КБ
 file	tools/palette_titles.py	tools/palette_titles.py	0	128 строк, 12 КБ
@@ -323,6 +325,9 @@ file	tools/pins/cal-data.js	tools/pins/cal-data.js	0	67 строк, 8 КБ
 file	tools/pins/cal.js	tools/pins/cal.js	0	230 строк, 22 КБ
 file	tools/pins/cover.js	tools/pins/cover.js	0	54 строк, 5 КБ
 file	tools/pins/dec2026.py	tools/pins/dec2026.py	0	154 строк, 7 КБ
+file	tools/pins/giftmix-data.js	tools/pins/giftmix-data.js	0	259 строк, 35 КБ
+file	tools/pins/giftmix.js	tools/pins/giftmix.js	0	282 строк, 27 КБ
+file	tools/pins/giftmix_shots.js	tools/pins/giftmix_shots.js	0	22 строк, 2 КБ
 file	tools/pins/holidays27-data.js	tools/pins/holidays27-data.js	0	429 строк, 65 КБ
 file	tools/pins/holidays27.js	tools/pins/holidays27.js	0	168 строк, 17 КБ
 file	tools/pins/life_pal.py	tools/pins/life_pal.py	0	22 строк, 1 КБ
@@ -2883,72 +2888,83 @@ sym	labOfHex	site/assets/mixing.js	51	const
 sym	dE	site/assets/mixing.js	52	const
 sym	lch	site/assets/mixing.js	53	const
 sym	Wc	site/assets/mixing.js	55	const
-sym	R_	site/assets/mixing.js	74	const
-sym	mixR	site/assets/mixing.js	75	const
-sym	mixLab	site/assets/mixing.js	83	const
-sym	mixHex	site/assets/mixing.js	84	const
-sym	F2	site/assets/mixing.js	87	const
-sym	T3	site/assets/mixing.js	88	const
-sym	WL	site/assets/mixing.js	89	const
-sym	DL	site/assets/mixing.js	90	const
-sym	UNITS	site/assets/mixing.js	91	const
-sym	snapU	site/assets/mixing.js	92	const
-sym	penalty	site/assets/mixing.js	93	const
-sym	coarse	site/assets/mixing.js	95	fn
-sym	refine	site/assets/mixing.js	110	fn
-sym	toUnits	site/assets/mixing.js	131	fn
-sym	solve	site/assets/mixing.js	152	fn
-sym	app	site/assets/mixing.js	171	const
-sym	gi	site/assets/mixing.js	173	const
-sym	esc	site/assets/mixing.js	242	const
-sym	nm	site/assets/mixing.js	243	const
-sym	ink	site/assets/mixing.js	244	const
-sym	ls	site/assets/mixing.js	245	const
-sym	plural	site/assets/mixing.js	246	const
-sym	frac	site/assets/mixing.js	251	const
-sym	qs	site/assets/mixing.js	254	const
-sym	medium	site/assets/mixing.js	255	const
-sym	target	site/assets/mixing.js	256	const
-sym	myPaints	site/assets/mixing.js	257	const
-sym	renderMedia	site/assets/mixing.js	273	fn
-sym	amt	site/assets/mixing.js	282	const
-sym	sw	site/assets/mixing.js	287	const
-sym	describe	site/assets/mixing.js	289	fn
-sym	tune	site/assets/mixing.js	308	fn
-sym	recipeHTML	site/assets/mixing.js	330	fn
-sym	WHEEL	site/assets/mixing.js	357	const
-sym	WN	site/assets/mixing.js	358	const
-sym	WH	site/assets/mixing.js	359	const
-sym	wheelPos	site/assets/mixing.js	361	const
-sym	wheelSVG	site/assets/mixing.js	368	fn
-sym	RULES	site/assets/mixing.js	381	const
-sym	PINFO	site/assets/mixing.js	391	const
-sym	PT	site/assets/mixing.js	410	const
-sym	pigmentsHTML	site/assets/mixing.js	419	fn
-sym	job	site/assets/mixing.js	427	const
-sym	run	site/assets/mixing.js	428	fn
-sym	setTarget	site/assets/mixing.js	456	fn
-sym	pickT	site/assets/mixing.js	482	const
-sym	photo	site/assets/mixing.js	487	fn
-sym	pals	site/assets/mixing.js	506	const
-sym	palChips	site/assets/mixing.js	507	fn
-sym	PL	site/assets/mixing.js	517	const
-sym	pl	site/assets/mixing.js	535	const
-sym	play	site/assets/mixing.js	536	const
-sym	NAMES	site/assets/mixing.js	537	const
-sym	plItems	site/assets/mixing.js	539	const
-sym	plHex	site/assets/mixing.js	540	const
-sym	portions	site/assets/mixing.js	545	const
-sym	playHTML	site/assets/mixing.js	546	fn
-sym	renderShelf	site/assets/mixing.js	559	fn
-sym	setWater	site/assets/mixing.js	568	fn
-sym	renderPuddle	site/assets/mixing.js	573	fn
-sym	savedGet	site/assets/mixing.js	602	const
-sym	renderSaved	site/assets/mixing.js	603	fn
-sym	addPaint	site/assets/mixing.js	608	fn
-sym	plReset	site/assets/mixing.js	615	fn
-sym	plRandom	site/assets/mixing.js	616	fn
-sym	setTab	site/assets/mixing.js	623	fn
+sym	prep	site/assets/mixing.js	58	fn
+sym	R_	site/assets/mixing.js	76	const
+sym	mixR	site/assets/mixing.js	77	const
+sym	mixLab	site/assets/mixing.js	85	const
+sym	mixHex	site/assets/mixing.js	86	const
+sym	F2	site/assets/mixing.js	89	const
+sym	T3	site/assets/mixing.js	90	const
+sym	WL	site/assets/mixing.js	91	const
+sym	DL	site/assets/mixing.js	92	const
+sym	UNITS	site/assets/mixing.js	93	const
+sym	snapU	site/assets/mixing.js	94	const
+sym	penalty	site/assets/mixing.js	95	const
+sym	coarse	site/assets/mixing.js	97	fn
+sym	refine	site/assets/mixing.js	112	fn
+sym	toUnits	site/assets/mixing.js	133	fn
+sym	solve	site/assets/mixing.js	154	fn
+sym	app	site/assets/mixing.js	173	const
+sym	gi	site/assets/mixing.js	175	const
+sym	esc	site/assets/mixing.js	248	const
+sym	nm	site/assets/mixing.js	249	const
+sym	ink	site/assets/mixing.js	250	const
+sym	ls	site/assets/mixing.js	251	const
+sym	plural	site/assets/mixing.js	252	const
+sym	frac	site/assets/mixing.js	257	const
+sym	qs	site/assets/mixing.js	260	const
+sym	medium	site/assets/mixing.js	261	const
+sym	target	site/assets/mixing.js	262	const
+sym	BR	site/assets/mixing.js	264	const
+sym	STRONG	site/assets/mixing.js	265	const
+sym	loadBrands	site/assets/mixing.js	266	const
+sym	brandOf	site/assets/mixing.js	267	const
+sym	lineOf	site/assets/mixing.js	268	const
+sym	prepLine	site/assets/mixing.js	269	fn
+sym	pkey	site/assets/mixing.js	276	const
+sym	allIds	site/assets/mixing.js	277	const
+sym	defaultOn	site/assets/mixing.js	278	const
+sym	myPaints	site/assets/mixing.js	279	const
+sym	brandOptions	site/assets/mixing.js	296	fn
+sym	renderMedia	site/assets/mixing.js	300	fn
+sym	amt	site/assets/mixing.js	312	const
+sym	sw	site/assets/mixing.js	317	const
+sym	describe	site/assets/mixing.js	319	fn
+sym	tune	site/assets/mixing.js	338	fn
+sym	recipeHTML	site/assets/mixing.js	360	fn
+sym	WHEEL	site/assets/mixing.js	387	const
+sym	WN	site/assets/mixing.js	388	const
+sym	WH	site/assets/mixing.js	389	const
+sym	wheelPos	site/assets/mixing.js	391	const
+sym	wheelSVG	site/assets/mixing.js	398	fn
+sym	RULES	site/assets/mixing.js	411	const
+sym	PINFO	site/assets/mixing.js	421	const
+sym	PT	site/assets/mixing.js	440	const
+sym	pigmentsHTML	site/assets/mixing.js	449	fn
+sym	job	site/assets/mixing.js	457	const
+sym	run	site/assets/mixing.js	458	fn
+sym	setTarget	site/assets/mixing.js	486	fn
+sym	pickT	site/assets/mixing.js	519	const
+sym	photo	site/assets/mixing.js	524	fn
+sym	pals	site/assets/mixing.js	543	const
+sym	palChips	site/assets/mixing.js	544	fn
+sym	PL	site/assets/mixing.js	554	const
+sym	pl	site/assets/mixing.js	572	const
+sym	play	site/assets/mixing.js	573	const
+sym	NAMES	site/assets/mixing.js	574	const
+sym	plItems	site/assets/mixing.js	576	const
+sym	plHex	site/assets/mixing.js	577	const
+sym	portions	site/assets/mixing.js	582	const
+sym	playHTML	site/assets/mixing.js	583	fn
+sym	renderShelf	site/assets/mixing.js	597	fn
+sym	setWater	site/assets/mixing.js	607	fn
+sym	renderPuddle	site/assets/mixing.js	612	fn
+sym	savedGet	site/assets/mixing.js	641	const
+sym	renderSaved	site/assets/mixing.js	642	fn
+sym	addPaint	site/assets/mixing.js	647	fn
+sym	plReset	site/assets/mixing.js	654	fn
+sym	plRandom	site/assets/mixing.js	655	fn
+sym	setTab	site/assets/mixing.js	662	fn
 sym	esc	site/assets/news.js	8	const
 sym	pl	site/assets/news.js	11	const
 sym	KINDS	site/assets/news.js	32	const
@@ -4737,6 +4753,7 @@ sym	file	tools/english_check.js	7	const
 sym	TYPES	tools/english_check.js	8	const
 sym	ROOT	tools/english_page.py	5	const
 sym	notebook	tools/english_page.py	14	fn
+sym	bad	tools/fb/fb_giftmix.js	191	const
 sym	fs	tools/fb/fb_no.js	4	const
 sym	ROOT	tools/fb/fb_no.js	6	const
 sym	PAL	tools/fb/fb_no.js	7	const
@@ -4884,6 +4901,24 @@ sym	FILES	tools/ornaments/make.py	251	const
 sym	html_for	tools/ornaments/make.py	281	fn
 sym	main	tools/ornaments/make.py	288	fn
 sym	out	tools/ornaments/render.js	4	const
+sym	fs	tools/paint_brands.js	5	const
+sym	ROOT	tools/paint_brands.js	7	const
+sym	raw	tools/paint_brands.js	8	const
+sym	lin	tools/paint_brands.js	11	const
+sym	oklabToRgb	tools/paint_brands.js	12	fn
+sym	oklchHex	tools/paint_brands.js	16	fn
+sym	labD50toOklch	tools/paint_brands.js	23	fn
+sym	fromSwatch	tools/paint_brands.js	33	fn
+sym	fromLab	tools/paint_brands.js	37	const
+sym	fromHex	tools/paint_brands.js	38	const
+sym	base	tools/paint_brands.js	43	const
+sym	DS	tools/paint_brands.js	44	const
+sym	dsLab	tools/paint_brands.js	45	const
+sym	LIB	tools/paint_brands.js	46	const
+sym	EST	tools/paint_brands.js	86	const
+sym	resolve	tools/paint_brands.js	89	fn
+sym	skipped	tools/paint_brands.js	105	const
+sym	out	tools/paint_brands.js	106	const
 sym	NAMES	tools/palette_names.py	2	const
 sym	HERE	tools/palettes.py	8	const
 sym	to_lab	tools/palettes.py	16	fn
@@ -4961,6 +4996,48 @@ sym	gift	tools/pins/dec2026.py	70	fn
 sym	pin_list	tools/pins/dec2026.py	80	fn
 sym	pin_one	tools/pins/dec2026.py	115	fn
 sym	pin_challenge	tools/pins/dec2026.py	135	fn
+sym	TH	tools/pins/giftmix-data.js	5	const
+sym	GT	tools/pins/giftmix-data.js	18	const
+sym	gifts	tools/pins/giftmix-data.js	21	const
+sym	MT	tools/pins/giftmix-data.js	151	const
+sym	mix	tools/pins/giftmix-data.js	152	const
+sym	text	tools/pins/giftmix-data.js	188	fn
+sym	plain	tools/pins/giftmix-data.js	239	const
+sym	fbImages	tools/pins/giftmix-data.js	242	const
+sym	fs	tools/pins/giftmix.js	7	const
+sym	ROOT	tools/pins/giftmix.js	9	const
+sym	SITE	tools/pins/giftmix.js	10	const
+sym	PALS	tools/pins/giftmix.js	12	const
+sym	SRC	tools/pins/giftmix.js	13	const
+sym	PINFO	tools/pins/giftmix.js	14	const
+sym	esc	tools/pins/giftmix.js	16	const
+sym	plain	tools/pins/giftmix.js	17	const
+sym	col	tools/pins/giftmix.js	19	const
+sym	art	tools/pins/giftmix.js	20	const
+sym	PN	tools/pins/giftmix.js	23	const
+sym	MED	tools/pins/giftmix.js	25	const
+sym	frac	tools/pins/giftmix.js	26	const
+sym	amt	tools/pins/giftmix.js	27	const
+sym	solved	tools/pins/giftmix.js	28	const
+sym	recipe	tools/pins/giftmix.js	29	fn
+sym	mixLink	tools/pins/giftmix.js	40	const
+sym	CSSf	tools/pins/giftmix.js	43	const
+sym	foot	tools/pins/giftmix.js	60	const
+sym	img	tools/pins/giftmix.js	61	const
+sym	head	tools/pins/giftmix.js	62	const
+sym	PC	tools/pins/giftmix.js	63	const
+sym	postcard	tools/pins/giftmix.js	64	const
+sym	envelope	tools/pins/giftmix.js	65	const
+sym	recipeRows	tools/pins/giftmix.js	127	const
+sym	compare	tools/pins/giftmix.js	130	const
+sym	swatch	tools/pins/giftmix.js	133	const
+sym	TR	tools/pins/giftmix.js	134	const
+sym	chips	tools/pins/giftmix.js	135	const
+sym	mixCell	tools/pins/giftmix.js	136	const
+sym	FB	tools/pins/giftmix.js	207	const
+sym	PINS	tools/pins/giftmix.js	243	const
+sym	dup	tools/pins/giftmix.js	254	const
+sym	path	tools/pins/giftmix_shots.js	4	const
 sym	pal	tools/pins/holidays27-data.js	4	const
 sym	list	tools/pins/holidays27-data.js	5	const
 sym	frames	tools/pins/holidays27-data.js	6	const
@@ -6935,7 +7012,7 @@ doc	Палитры из артов	docs/palettes.md	20	h2
 doc	Pinterest	docs/palettes.md	25	h2
 doc	Палитра из своего фото	docs/palettes.md	35	h2
 doc	Картины и палитры, добавленные с сайта	docs/palettes.md	40	h2
-doc	Смешивание цветов	docs/palettes.md	64	h2
+doc	Смешивание цветов	docs/palettes.md	65	h2
 doc	Пины на декабрь 2026: три штуки + тексты	docs/pinterest-dec2026.md	1	h1
 doc	Пин 1 — список тем (бумажная карточка, фото скетчбука на подоконнике)	docs/pinterest-dec2026.md	11	h2
 doc	Пин 2 — одна тема (акварель с чашками какао)	docs/pinterest-dec2026.md	22	h2

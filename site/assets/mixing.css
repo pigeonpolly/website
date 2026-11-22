@@ -145,4 +145,12 @@
 .mx-pbtn .mx-btn:disabled { opacity: .4; cursor: default; }
 .mx-psaved > div { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .mx-sv { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #D8D0C8; cursor: pointer; }
+/* бренды красок */
+.mx-brw { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 4px; font-weight: 700; }
+.mx-left, .mx-find > *, .mx-play > *, .mx-pud > * { min-width: 0; }
+.mx-brand { font: inherit; font-weight: 400; flex: 1 1 220px; min-width: 0; width: 100%; max-width: 100%; padding: 8px 10px; border: 2px solid #D8D0C8; border-radius: 12px; background: #fff; color: #2A2230; }
+.mx-pm + .mx-brw { margin-top: 0; margin-bottom: 10px; }
+.mx-pfind { font: inherit; width: 100%; box-sizing: border-box; margin: 4px 0 8px; padding: 8px 10px; border: 1px solid #D8D0C8; border-radius: 10px; }
+.mx-pg.mx-pgb { max-height: 420px; overflow: auto; padding-right: 4px; }
+.mx-pg .mx-p[hidden] { display: none; }
 @media (max-width: 600px) { .mx-tabs { padding: 6px 0 0; gap: 3px; } .mx-tabs button { flex: 1 1 0; min-width: 0; font-size: 13px; line-height: 1.15; padding: 9px 6px 8px; white-space: normal; } .mx-pane { padding: 10px; border-radius: 0 16px 16px 16px; } .mx-pud { display: contents; } .mx-pudt { order: -1; position: sticky; top: calc(var(--header-h, 68px) + 4px); z-index: 2; padding: 10px; border-radius: 16px; display: flex; align-items: center; gap: 12px; text-align: left; } .mx-pudt .mx-res { justify-content: flex-start; } .mx-bowl { width: 110px; flex: none; margin: 0; } .mx-pudt .mx-rdesc { display: none; } .mx-pudt .mx-res { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 15px; } .mx-pudr { border-radius: 16px; } .mx-tubes { grid-template-columns: repeat(4, 1fr); gap: 6px; } .mx-tube { padding: 8px 2px 6px; } .mx-tube i { width: 34px; height: 34px; } .mx-tube span { font-size: 11px; } .mx-step { padding: 16px; border-radius: 16px; } .mx-th { flex-direction: column; align-items: stretch; } .mx-thw { width: auto; } }

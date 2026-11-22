@@ -54,7 +54,8 @@
 
   const Wc = new SP.Color(WHITE_HEX), WK = Wc.R.map(KSf), RP = Wc.R; // белила: K/S, S = 1; бумага — тот же белый
   const P = {};
-  for (const p of PIG) {
+  // краска из цвета в тюбике (m) и разбела 1:3 белилами (t) → K, S (гуашь, акрил), A, ts (акварель)
+  function prep(p) {
     const m = new SP.Color(p.m), t = new SP.Color(p.t), Lm = labOfR(m.R)[0];
     const mk = m.R.map(KSf), tk = t.R.map(KSf);
     // рассеяние краски относительно белил: из разбела 1:3 (медиана по спектру — устойчивее)
@@ -67,8 +68,9 @@
     const A = Float64Array.from(tA, a => a * (lo + hi) / 2);
     // сила краски в акварельной смеси: насколько тёмный её разбел относительно чистой краски (фталоцианин — сильный, охра — слабая)
     const ts = 8 / ((lo + hi) / 2);
-    P[p.id] = Object.assign({}, p, { S, K, A, ts });
+    return Object.assign({}, p, { S, K, A, ts });
   }
+  for (const p of PIG) P[p.id] = prep(p);
 
   // items: [[pigment, parts]...], white — части белил (гуашь/акрил); d — насыщенность акварели (1 — из тюбика, 0.1 — светлый чай)
   const R_ = new Float64Array(N);
@@ -90,7 +92,7 @@
   const DL = [1, 0.7, 0.5, 0.35, 0.25, 0.18, 0.12, 0.08, 0.05, 0.03]; // акварель: сколько пигмента
   const UNITS = [0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40];
   const snapU = x => { let b = UNITS[0]; for (const u of UNITS) if (Math.abs(Math.log(u / x)) < Math.abs(Math.log(b / x))) b = u; return b; };
-  const penalty = r => 1.6 * (r.items.length - 1) + (r.items.some(it => it[0].id === 'black') ? 1 : 0);
+  const penalty = r => 1.6 * (r.items.length - 1) + (r.items.some(it => it[0].id === 'black' || it[0].blk) ? 1 : 0);
 
   function coarse(tLab, pig, water) {
     const best = new Map(), lv = water ? DL : WL;
@@ -165,7 +167,7 @@
     return { tLab, recipes: out };
   }
 
-  if (!HAS_DOM) { module.exports = { P, PIG, MEDIA, solve, mixHex, labOfHex, dE, lch }; return; }
+  if (!HAS_DOM) { module.exports = { P, PIG, MEDIA, solve, mixHex, labOfHex, dE, lch, prep, hexOfR, labOfR }; return; }
 
   // ═══════════════ страница ═══════════════
   const app = document.getElementById('mx-app');
@@ -186,6 +188,10 @@
     mineTip: { en: 'Tick the paints you have. The pigment code is printed on the tube or pan (like PB29): paints with the same code mix alike in any brand.', ru: 'Отметьте краски, которые у вас есть. Код пигмента написан на тюбике или кювете (например, PB29): краски с одним кодом смешиваются похоже у любого бренда.', lv: 'Atzīmē krāsas, kas tev ir. Pigmenta kods ir uz tūbiņas vai kivetes (piemēram, PB29): krāsas ar vienu kodu jaucas līdzīgi jebkuram zīmolam.' },
     all: { en: '☑ Select all', ru: '☑ Отметить все', lv: '☑ Atzīmēt visas' },
     clear: { en: '☐ Clear all', ru: '☐ Убрать все', lv: '☐ Noņemt visas' },
+    brand: { en: 'Paints:', ru: 'Краски:', lv: 'Krāsas:' },
+    baseSet: { en: 'Basic pigments (any brand)', ru: 'Базовые пигменты (любой бренд)', lv: 'Pamata pigmenti (jebkurš zīmols)' },
+    brandSrc: { en: 'Pigments of each paint are taken from {src}. Tick the tubes you have. ≈ means the pigment colour is approximate.', ru: 'Пигменты каждой краски взяты с {src}. Отметьте тюбики, которые у вас есть. ≈ — цвет пигмента приблизительный.', lv: 'Katras krāsas pigmenti ņemti no {src}. Atzīmē tūbiņas, kas tev ir. ≈ — pigmenta krāsa ir aptuvena.' },
+    find: { en: 'Find a paint', ru: 'Найти краску', lv: 'Atrast krāsu' },
     reset: { en: '↺ Basic set', ru: '↺ Базовый набор', lv: '↺ Pamata komplekts' },
     m3: { en: '3. How to mix it', ru: '3. Как смешать', lv: '3. Kā sajaukt' },
     wait: { en: 'Mixing paints…', ru: 'Смешиваю краски…', lv: 'Jaucu krāsas…' },
@@ -254,11 +260,28 @@
   const qs = new URLSearchParams(location.search);
   let medium = MEDIA[qs.get('m')] ? qs.get('m') : (MEDIA[ls.get('pp-mix-m')] ? ls.get('pp-mix-m') : 'watercolor');
   let target = /^#?[0-9a-f]{6}$/i.test(qs.get('c') || '') ? '#' + qs.get('c').replace('#', '').toUpperCase() : '#7A9E7E';
-  const myPaints = m => { const s = ls.get('pp-mix-p-' + m); if (s === '-') return []; const v = s ? s.split(',').filter(id => MEDIA[m].all.includes(id)) : null; return v && v.length ? v : MEDIA[m].on.slice(); };
+  // бренды (site/assets/paint-brands.json, tools/paint_brands.js): краски серии — id «b:серия:номер», пигменты смешаны заранее
+  let BR = null, BRP = null;
+  const STRONG = /\b(PB15(:\d)?|PG7|PG36|PV23|PB16|PB60|PBk6|PBk7)\b/;
+  const loadBrands = () => BRP || (BRP = fetch('/assets/paint-brands.json').then(r => r.ok ? r.json() : null).then(x => { BR = x; return x; }).catch(() => null));
+  const brandOf = m => ls.get('pp-mix-b-' + m) || '';
+  const lineOf = m => { const id = brandOf(m); const L = BR && id ? BR.lines.find(l => l.id === id && l.medium === m) : null; if (L && !L.ready) prepLine(L); return L; };
+  function prepLine(L) {
+    L.paints.forEach((x, i) => {
+      const id = 'b:' + L.id + ':' + i, n = x[0], ru = x[7] || n;
+      P[id] = prep({ id, m: x[3], t: x[4], n: [n, ru, n], ci: x[2].replace(/,/g, ', ') + (x[6] ? ' ≈' : ''), strong: STRONG.test(x[2]) ? 1 : 0, blk: /^PBk\d+$/.test(x[2]) ? 1 : 0 });
+    });
+    L.ready = 1;
+  }
+  const pkey = m => 'pp-mix-p-' + m + (lineOf(m) ? '-' + brandOf(m) : '');
+  const allIds = m => { const L = lineOf(m); return L ? L.paints.map((_, i) => 'b:' + L.id + ':' + i) : MEDIA[m].all; };
+  const defaultOn = m => { const L = lineOf(m); return L ? L.starter.map(i => 'b:' + L.id + ':' + i) : MEDIA[m].on.slice(); };
+  const myPaints = m => { const s = ls.get(pkey(m)); if (s === '-') return []; const all = allIds(m); const v = s ? s.split(',').filter(id => all.includes(id)) : null; return v && v.length ? v : defaultOn(m); };
 
   app.innerHTML = `<nav class="mx-tabs" role="tablist"><button type="button" role="tab" data-tab="find"></button><button type="button" role="tab" data-tab="play"></button><button type="button" role="tab" data-tab="pigs"></button></nav>
     <div class="mx-pane mx-find" data-pane="find"><div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
-      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
+      <label class="mx-brw">🎨 ${t('brand')} <select class="mx-brand"></select></label><p class="mx-hint mx-bsrc" hidden></p>
+      <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><input class="mx-pfind" type="search" placeholder="🔍 ${t('find')}" hidden><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
     <div class="mx-step"><h2>${t('m2')}</h2>
       <div class="mx-pickrow"><label class="mx-color"><input type="color" value="${target}" aria-label="${t('pick')}"><span class="mx-tsw"></span></label>
         <input class="mx-hex" type="text" maxlength="7" spellcheck="false" aria-label="HEX" value="${target}">
@@ -270,11 +293,18 @@
     <div class="mx-pane" data-pane="play" hidden></div><div class="mx-pane" data-pane="pigs" hidden></div>`;
   const $ = s => app.querySelector(s);
 
+  function brandOptions() {
+    const cur = lineOf(medium) ? brandOf(medium) : '';
+    return `<option value="">${t('baseSet')}</option>` + (BR ? BR.lines.filter(l => l.medium === medium).map(l => `<option value="${l.id}"${l.id === cur ? ' selected' : ''}>${esc(l.brand + ' — ' + l.name)} (${l.paints.length})</option>`).join('') : (brandOf(medium) ? `<option selected>…</option>` : ''));
+  }
   function renderMedia() {
     app.querySelectorAll('[data-m]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.m === medium)));
+    app.querySelectorAll('.mx-brand').forEach(sel => { sel.innerHTML = brandOptions(); });
+    const L = lineOf(medium), bs = $('.mx-bsrc'); bs.hidden = !L; if (L) bs.textContent = t('brandSrc').replace('{src}', L.src);
+    $('.mx-pg').classList.toggle('mx-pgb', !!L); $('.mx-pfind').hidden = !L; $('.mx-pfind').value = '';
     const on = myPaints(medium);
-    $('.mx-pg').innerHTML = MEDIA[medium].all.map(id => `<label class="mx-p"><input type="checkbox" value="${id}"${on.includes(id) ? ' checked' : ''}><i style="background:linear-gradient(90deg,${P[id].m} 50%,${P[id].t} 50%)"></i><span>${esc(nm(id))}<small>${P[id].ci}</small></span></label>`).join('') +
-      (MEDIA[medium].water ? '' : `<label class="mx-p"><input type="checkbox" checked disabled><i style="background:${WHITE_HEX}"></i><span>${t('white')}<small>PW6</small></span></label>`);
+    $('.mx-pg').innerHTML = allIds(medium).map(id => `<label class="mx-p"><input type="checkbox" value="${id}"${on.includes(id) ? ' checked' : ''}><i style="background:linear-gradient(90deg,${P[id].m} 50%,${P[id].t} 50%)"></i><span>${esc(nm(id))}<small>${P[id].ci}</small></span></label>`).join('') +
+      (MEDIA[medium].water || L ? '' : `<label class="mx-p"><input type="checkbox" checked disabled><i style="background:${WHITE_HEX}"></i><span>${t('white')}<small>PW6</small></span></label>`);
     $('.mx-cnt').textContent = '(' + on.length + ')';
     const w = MEDIA[medium].water;
     $('.mx-unit').innerHTML = `<b>${t('unitT')}:</b> ${w ? t('unitBrush') : t('unitPea')}<br>💡 ${w ? t('stWater') : t('stOpaque') + ' ' + (medium === 'gouache' ? t('stGouache') : t('stAcrylic'))}`;
@@ -312,7 +342,7 @@
     out.lighter = water ? { hex: mixHex(base, 0, r.d * 0.55, true), txt: t('moreWater') } : { hex: mixHex(base, r.white + Math.max(1, tot), 1, false), txt: t('addMore') + ': ' + t('white') };
     let bestD = null, bestM = null;
     for (const id of ids) {
-      if (id === 'black') continue;
+      if (id === 'black' || P[id].blk) continue;
       const p = P[id], items = base.map(it => [it[0], it[1]]); const ex = items.find(it => it[0] === p);
       if (ex) ex[1] += tot * 0.25; else items.push([p, tot * 0.25]);
       const lab = water ? mixLab(items, 0, r.d, true) : mixLab(items, r.white, 1, false), c = lch(lab);
@@ -439,7 +469,7 @@
       const best = res.recipes[0], d = describe(res.tLab);
       let gam = '';
       if (best.e > 5) {
-        const all = solve(target, MEDIA[medium].all, water).recipes[0];
+        const all = solve(target, allIds(medium), water).recipes[0];
         const extra = all && all.e < best.e - 2 && all.items.map(it => it[0].id).filter(id => !ids.includes(id));
         if (extra && extra.length) gam = `<p class="mx-gam">💡 ${t('gamut')} <b>${extra.map(id => esc(nm(id)) + ' (' + P[id].ci + ')').join(', ')}</b> ${sw(all.hex)}</p>`;
         else if (best.e > 8) gam = `<p class="mx-gam">💡 ${t('screen')}</p>`;
@@ -467,16 +497,23 @@
     if (m) { medium = m.dataset.m; ls.set('pp-mix-m', medium); renderMedia(); run(); if (app.querySelector('.mx-tubes')) { renderShelf(); renderPuddle(false); } return; }
     const c = e.target.closest('[data-c]');
     if (c) { setTarget(c.dataset.c); $('.mx-out').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-    if (e.target.closest('.mx-all')) { ls.set('pp-mix-p-' + medium, MEDIA[medium].all.join(',')); renderMedia(); run(); return; }
-    if (e.target.closest('.mx-nonebtn')) { ls.set('pp-mix-p-' + medium, '-'); renderMedia(); run(); return; }
-    if (e.target.closest('.mx-reset')) { ls.set('pp-mix-p-' + medium, ''); renderMedia(); run(); return; }
+    if (e.target.closest('.mx-all')) { ls.set(pkey(medium), allIds(medium).join(',')); renderMedia(); run(); return; }
+    if (e.target.closest('.mx-nonebtn')) { ls.set(pkey(medium), '-'); renderMedia(); run(); return; }
+    if (e.target.closest('.mx-reset')) { ls.set(pkey(medium), ''); renderMedia(); run(); return; }
     if (e.target.closest('.mx-more')) palChips();
   });
   app.addEventListener('change', e => {
-    if (e.target.matches('.mx-pg input')) { const v = [...app.querySelectorAll('.mx-pg input:checked:not(:disabled)')].map(x => x.value); ls.set('pp-mix-p-' + medium, v.join(',') || '-'); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
+    if (e.target.matches('.mx-brand')) {
+      ls.set('pp-mix-b-' + medium, e.target.value);
+      loadBrands().then(() => { renderMedia(); run(); if (app.querySelector('.mx-tubes')) { renderShelf(); renderPuddle(false); } });
+      return;
+    }
+    if (e.target.matches('.mx-pg input')) { const v = [...app.querySelectorAll('.mx-pg input:checked:not(:disabled)')].map(x => x.value); ls.set(pkey(medium), v.join(',') || '-'); $('.mx-cnt').textContent = '(' + v.length + ')'; run(); }
     if (e.target.matches('input[type=color]')) setTarget(e.target.value, 'pick');
     if (e.target.matches('.mx-ph input')) photo(e.target.files[0]);
   });
+  // поиск краски в длинной серии
+  app.addEventListener('input', e => { if (e.target.matches('.mx-pfind')) { const q = e.target.value.trim().toLowerCase(); app.querySelectorAll('.mx-pg .mx-p').forEach(l => { l.hidden = q && !l.textContent.toLowerCase().includes(q); }); } });
   // ползунок сравнения «нужен | получится»: тянем границу
   app.addEventListener('input', e => { if (e.target.matches('.mx-strip input')) e.target.parentNode.style.setProperty('--x', e.target.value + '%'); });
   let pickT = 0;
@@ -546,6 +583,7 @@
   function playHTML() {
     return `<div class="mx-play"><div class="mx-step mx-shelf"><h2>${pl('h')}</h2><p class="mx-hint">${pl('p')}</p>
       <div class="mx-media mx-pm">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
+      <label class="mx-brw">🎨 ${t('brand')} <select class="mx-brand"></select></label>
       <p class="mx-por">${pl('portion')} ${portions.map(v => `<button type="button" data-por="${v}">${v === 1 ? '1' : v === 0.5 ? '½' : '¼'}</button>`).join('')}<span class="mx-hint"></span></p>
       <div class="mx-tubes"></div>
       <label class="mx-wat" hidden><span>💧 ${pl('water')}: <b></b></span><input type="range" min="0" max="100" value="40"></label></div>
@@ -558,7 +596,8 @@
   }
   function renderShelf() {
     const water = !!MEDIA[medium].water, box = app.querySelector('.mx-tubes'); if (!box) return;
-    box.innerHTML = MEDIA[medium].all.map(id => `<button type="button" class="mx-tube" data-add="${id}" title="${esc(nm(id))} · ${P[id].ci}"><i style="--c:${P[id].m};--t:${P[id].t}"></i><span>${esc(nm(id).replace(/ \(.*\)$/, ''))}</span></button>`).join('') +
+    const mine = myPaints(medium), shelf = lineOf(medium) && mine.length ? mine : allIds(medium);
+    box.innerHTML = shelf.map(id => `<button type="button" class="mx-tube" data-add="${id}" title="${esc(nm(id))} · ${P[id].ci}"><i style="--c:${P[id].m};--t:${P[id].t}"></i><span>${esc(nm(id).replace(/ \(.*\)$/, ''))}</span></button>`).join('') +
       (water ? '' : `<button type="button" class="mx-tube" data-add="white" title="${t('white')} · PW6"><i style="--c:${WHITE_HEX};--t:#FFFFFF"></i><span>${t('white')}</span></button>`);
     app.querySelector('.mx-wat').hidden = !water;
     app.querySelectorAll('[data-por]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.por === portion)));
@@ -615,7 +654,7 @@
   function plReset() { play = { items: {}, white: 0, d: play.d }; plPath = []; plPrev = null; renderPuddle(false); }
   function plRandom() {
     plReset();
-    const ids = MEDIA[medium].all.filter(id => id !== 'black'), n = 2 + Math.floor(Math.random() * 2), pick = [];
+    const ids = allIds(medium).filter(id => id !== 'black' && !P[id].blk), n = 2 + Math.floor(Math.random() * 2), pick = [];
     while (pick.length < n) { const id = ids[Math.floor(Math.random() * ids.length)]; if (!pick.includes(id)) pick.push(id); }
     pick.forEach((id, i) => setTimeout(() => addPaint(id, [0.5, 1, 1, 2][Math.floor(Math.random() * 4)]), i * 450));
     if (!MEDIA[medium].water && Math.random() < 0.6) setTimeout(() => addPaint('white', 1 + Math.floor(Math.random() * 4)), n * 450);
@@ -646,5 +685,7 @@
   [['find', 'tab1'], ['play', 'tab2'], ['pigs', 'tab3']].forEach(([k, v]) => { app.querySelector(`[data-tab="${k}"]`).textContent = pl(v); });
   renderMedia();
   run();
+  // список брендов — в выпадающем списке; если выбран бренд, пересчитать уже с его красками
+  loadBrands().then(() => { const had = Object.keys(MEDIA).some(m => brandOf(m)); renderMedia(); if (had) { run(); if (app.querySelector('.mx-tubes') && !app.querySelector('[data-pane="play"]').hidden) { renderShelf(); renderPuddle(false); } } });
   setTab(['find', 'play', 'pigs'].includes(qs.get('tab')) ? qs.get('tab') : (['find', 'play', 'pigs'].includes(ls.get('pp-mix-tab')) ? ls.get('pp-mix-tab') : 'find'));
 })();
