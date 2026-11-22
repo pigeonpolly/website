@@ -311,7 +311,7 @@ const games = [
     cap: 'one window lights up every day', chips: ['🎄 1 Dec to 31 Dec', '🎁 a gift in every window'], cta: 'Open today’s window', tpl: 'Адвент',
     title: 'A Cozy Pixel Advent Calendar: a Street of 31 Windows, One Lights Up Every Day',
     desc: 'A street of 31 little houses on pigeonpolly.com: every day from December 1 one more window lights up, and there is a gift inside. Come back every day, or catch up later.',
-    alt: 'Pixel art night street of colourful little houses with dark windows under a moon, the advent calendar “A street of 31 windows” on pigeonpolly.com.',
+    alt: 'Close-up of colourful pixel houses with numbered windows on a night street, the advent calendar “A street of 31 windows” on pigeonpolly.com.',
     fb: ['A street of 31 windows', 'Про сайт', `Every December I want an advent calendar, and every December I eat it in three days. So I made one you can’t eat.\n\nOn my site there is a little pixel street of 31 houses. From December 1, one window lights up every day, and there is a gift inside. I won’t tell you what — that is the whole point. Do you open advent windows one by one, or all at once?`,
       `Каждый декабрь хочу адвент-календарь и каждый декабрь съедаю его за три дня. Поэтому сделала такой, который не съесть.\n\nНа сайте маленькая пиксельная улица из 31 домика. С 1 декабря каждый день загорается одно окошко, а внутри подарок. Какой — не скажу, в этом весь смысл. Вы открываете окошки по одному или все сразу?`, 'Рождество'] },
   { type: 'tiles', th: 'rose', kick: 'the cast', h: 'Meet the <em>Pigeon Polly universe</em>', cols: 2, top: 320, tileH: 370,
