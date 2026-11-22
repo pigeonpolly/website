@@ -146,7 +146,7 @@ const CARDS = {
     en: ['a focus timer', 'Shift with', 'Polly', 'Pick a time and a retro tune, and Polly works next to you.'],
     ru: ['таймер для работы', 'Смена', 'с Полли', 'Выбери время и ретро-мелодию — Полли работает рядом.'],
     lv: ['fokusa taimeris', 'Maiņa', 'ar Polliju', 'Izvēlies laiku un retro melodiju — Pollija strādā blakus.'] },
-  shop: { img: 'images/games/shop.jpg', bg: '#F9E3D6', pos: '30% 50%',
+  shop: { img: 'images/og/src/shop-hats.png', px: 1,
     en: ['paid in buttons', 'Pigeon Polly', 'shop', 'Hats, scarves, frames and treasures for your pixel bird.'],
     ru: ['за пуговки', 'Магазин', 'Pigeon Polly', 'Шляпы, шарфы, рамки и сокровища для пиксельной птички.'],
     lv: ['par pogām', 'Pigeon Polly', 'veikals', 'Cepures, šalles, rāmji un dārgumi tavam pikseļu putniņam.'] },
@@ -174,6 +174,22 @@ const CARDS = {
     en: ['new here · start here', 'What is', 'this place?', 'A guide to the Lab for the first five minutes: the bird, buttons and the bird market.'],
     ru: ['впервые здесь · начни отсюда', 'Что это за', 'место?', 'Гид по Лаборатории на первые пять минут: птичка, пуговки и птичий рынок.'],
     lv: ['pirmoreiz šeit · sāc šeit', 'Kas tā par', 'vietu?', 'Ceļvedis pa Laboratoriju pirmajām piecām minūtēm: putniņš, pogas un Putnu tirgus.'] },
+  ink: { img: 'images/ink/p01-0.jpg', bg: '#FFFFFF', fit: 'contain',
+    en: ['course · 15 lessons', 'Ink sketching', 'without fear', 'A course from Alina’s book Ink Sketching: theory, a test and a task on paper in every lesson.'],
+    ru: ['курс · 15 уроков', 'Тушь: скетчинг', 'без страха', 'Курс по книге Алины Ink Sketching: теория, тест и задание на бумаге в каждом уроке.'],
+    lv: ['kurss · 15 nodarbības', 'Tušas skices', 'bez bailēm', 'Kurss pēc Alīnas grāmatas Ink Sketching: teorija, tests un uzdevums uz papīra katrā nodarbībā.'] },
+  'color-mixing': { img: 'images/photos/chart.jpg', pos: '50% 50%',
+    en: ['watercolour · gouache · acrylic', 'How to mix', 'any colour', 'Pick a colour and see which real paints to mix, and how much of each.'],
+    ru: ['акварель · гуашь · акрил', 'Как смешать', 'любой цвет', 'Выбери цвет и узнай, какие настоящие краски смешать и сколько каждой.'],
+    lv: ['akvarelis · guaša · akrils', 'Kā sajaukt', 'jebkuru krāsu', 'Izvēlies krāsu un uzzini, kuras īstās krāsas sajaukt un cik daudz katras.'] },
+  prompts: { img: 'images/photos/journal.jpg', pos: '50% 60%',
+    en: ['30 prompts · 5–15 minutes', 'Monthly drawing', 'prompts', 'Thirty small drawing prompts for this month, three colours and a free printable list.'],
+    ru: ['30 тем · 5–15 минут', 'Темы для рисования', 'на месяц', 'Тридцать маленьких тем на этот месяц, три цвета и бесплатный список для печати.'],
+    lv: ['30 temati · 5–15 minūtes', 'Zīmēšanas temati', 'mēnesim', 'Trīsdesmit mazi zīmēšanas temati šim mēnesim, trīs krāsas un bezmaksas saraksts drukai.'] },
+  postcards: { img: 'images/postcards/coffee.gif', grid: ['images/postcards/coffee.gif', 'images/postcards/bday-cake.gif', 'images/postcards/sunshine.gif', 'images/postcards/xmas-room.gif'],
+    en: ['animated postcards · by email', 'Send a', 'postcard', 'A living postcard with the art of Alina Otkinska and Pigeon Polly, to anyone by email.'],
+    ru: ['живые открытки · на почту', 'Отправь', 'открытку', 'Живая открытка с артом Алины Откинской и Pigeon Polly кому угодно на почту.'],
+    lv: ['dzīvas kartītes · uz e-pastu', 'Nosūti', 'kartīti', 'Dzīva kartīte ar Alīnas Otkinskas un Pigeon Polly mākslu jebkuram uz e-pastu.'] },
   privacy: { img: 'images/logo/v3/pigeon-polly-color-autumn-1080.png', bg: '#FBF9F5', fit: 'contain',
     en: ['privacy', 'How we', 'care for data', 'How pigeonpolly.com handles your data.'],
     ru: ['конфиденциальность', 'Как мы', 'бережём данные', 'Как pigeonpolly.com обращается с твоими данными.'],
@@ -189,7 +205,7 @@ const ACC = '#22405F', INK = '#2A211C', MUT = '#6C6058', LINE = '#DED5CA';
 const NOTE = { en: 'come and play', ru: 'заходи в гости', lv: 'nāc ciemos' }, NOTE2 = { en: 'with love, Polly', ru: 'с любовью, Полли', lv: 'ar mīlestību, Pollija' };
 function html(c, t, lang) {
   const art = c.grid
-    ? `<div class="grid">${c.grid.map(g => `<img src="${fileUrl(g)}" class="px">`).join('')}</div>`
+    ? `<div class="grid">${c.grid.map(g => `<img src="${fileUrl(g)}"${c.px ? ' class="px"' : ''}>`).join('')}</div>`
     : `<img class="art${c.px ? ' px' : ''}" src="${fileUrl(c.img)}" style="object-position:${c.pos || '50% 50%'};object-fit:${c.fit || 'cover'}">`;
   return `<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Lora:ital,wght@0,400;1,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
