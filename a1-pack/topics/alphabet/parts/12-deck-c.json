@@ -1,0 +1,386 @@
+{
+ "deck": [
+  {
+   "type": "section",
+   "num": "03",
+   "title": "Spell your *name*",
+   "text": "vārds, uzvārds un pilsēta pa burtiem",
+   "notes": "Pāreja uz trešo daļu. Pastāsti: tagad burtus liksim lietā — savs vārds, uzvārds, pilsēta pa telefonu un reģistratūrā."
+  },
+  {
+   "type": "story",
+   "title": "On the *phone*",
+   "pose": "phone",
+   "tag": "Story",
+   "messages": [
+    {
+     "who": "note",
+     "text": "Hop & Hat Tours, 9:30. Līga zvana, lai rezervētu ekskursiju."
+    },
+    {
+     "who": "patel",
+     "name": "Mrs Patel",
+     "text": "Hop & Hat Tours, good morning! What's your surname, please?"
+    },
+    {
+     "who": "liga",
+     "name": "Līga",
+     "text": "It's Ozola."
+    },
+    {
+     "who": "patel",
+     "name": "Mrs Patel",
+     "text": "Sorry? **How do you spell it?**"
+    },
+    {
+     "who": "liga",
+     "name": "Līga",
+     "text": "O-Z-O-L-A."
+    },
+    {
+     "who": "patel",
+     "name": "Mrs Patel",
+     "text": "Thank you! O-Z-O-L-A. Your booking is OK."
+    }
+   ],
+   "lesson": "Uzvārdu pa telefonu jautā: **How do you spell it?** Atbildi pa burtiem: **O-Z-O-L-A.**",
+   "notes": "Ar → atklāj replikas pa vienai. Pievērs uzmanību: Z angliski ir zed, A — /eɪ/. Lai katrs students pats nosauc O-Z-O-L-A angliski."
+  },
+  {
+   "type": "vocab",
+   "title": "Phone *phrases*",
+   "cols": 4,
+   "items": [
+    {
+     "en": "first name",
+     "lv": "vārds",
+     "ipa": "/ˈfɜːst neɪm/"
+    },
+    {
+     "en": "surname",
+     "lv": "uzvārds",
+     "ipa": "/ˈsɜːneɪm/"
+    },
+    {
+     "en": "spell",
+     "lv": "nosaukt pa burtiem",
+     "ipa": "/spel/"
+    },
+    {
+     "en": "repeat",
+     "lv": "atkārtot",
+     "ipa": "/rɪˈpiːt/"
+    },
+    {
+     "en": "slowly",
+     "lv": "lēnām",
+     "ipa": "/ˈsləʊli/"
+    },
+    {
+     "en": "capital letter",
+     "lv": "lielais burts",
+     "ipa": "/ˈkæpɪtəl ˈletə/"
+    },
+    {
+     "en": "double",
+     "lv": "dubults",
+     "ipa": "/ˈdʌbəl/"
+    },
+    {
+     "en": "Sorry?",
+     "lv": "Atvainojiet? (lūdzu, atkārtojiet)",
+     "ipa": "/ˈsɒri/"
+    }
+   ],
+   "notes": "Klikšķis uz kartītes — tulkojums, skaļrunis — izruna. Sorry? ar jautājuma intonāciju nozīmē «lūdzu, atkārto». spell = pateikt vai uzrakstīt pa burtiem."
+  },
+  {
+   "type": "rule",
+   "title": "Ask & *answer*",
+   "pose": "teacher",
+   "head": [
+    "Jautā",
+    "Atbildi"
+   ],
+   "rows": [
+    [
+     "What's your surname?",
+     "It's Ozola."
+    ],
+    [
+     "How do you **spell** it?",
+     "O-Z-O-L-A."
+    ],
+    [
+     "Can you **repeat** that, please?",
+     "Sure. O-Z-O-L-A."
+    ],
+    [
+     "What's your first name?",
+     "It's Līga. L-I-G-A."
+    ]
+   ],
+   "note": "Nesaprati? Saki: **Sorry?** · **Slowly, please.**",
+   "notes": "Izlasi kreiso kolonnu, studenti katrs sev skaļi atbild par sevi. Atgādini: It's = It is — no iepriekšējās tēmas. Līga angliski parasti bez garumzīmes: L-I-G-A."
+  },
+  {
+   "type": "examples",
+   "title": "At *reception*",
+   "pose": "guide",
+   "items": [
+    {
+     "en": "What's your name, please?",
+     "lv": "Kā jūs sauc, lūdzu?"
+    },
+    {
+     "en": "How do you spell your surname?",
+     "lv": "Kā jūsu uzvārds ir pa burtiem?"
+    },
+    {
+     "en": "It's B-E-R-Z-I-N-S.",
+     "lv": "Tas ir B-E-R-Z-I-N-S."
+    },
+    {
+     "en": "Is that with a capital B?",
+     "lv": "Vai tas ir ar lielo B?"
+    },
+    {
+     "en": "Can you spell that, please?",
+     "lv": "Vai varat to pateikt pa burtiem, lūdzu?"
+    },
+    {
+     "en": "Slowly, please.",
+     "lv": "Lēnām, lūdzu."
+    }
+   ],
+   "notes": "Ar → atklāj tulkojumus, skaļrunis — izruna. Viesnīcas reģistratūra: Jānis Bērziņš reģistrējas. Lai studenti klausās, kā skan B-E-R-Z-I-N-S."
+  },
+  {
+   "type": "rule",
+   "title": "*Double* letters",
+   "head": [
+    "Vārds",
+    "Pa burtiem"
+   ],
+   "rows": [
+    [
+     "Russell",
+     "R-U-**double S**-E-**double L**"
+    ],
+    [
+     "Hill",
+     "H-I-**double L**"
+    ],
+    [
+     "Moore",
+     "M-**double O**-R-E"
+    ],
+    [
+     "coffee",
+     "C-O-**double F**-**double E**"
+    ]
+   ],
+   "note": "Divi vienādi burti pēc kārtas = **double**.",
+   "notes": "Briti divus vienādus burtus pēc kārtas parasti saka ar double. Teikt S-S arī saprot, bet double ir ierastāk. Lai katrs students nosauc coffee pa burtiem."
+  },
+  {
+   "type": "oscar",
+   "kind": "tip",
+   "pose": "idea",
+   "text": "Mans uzvārds? Nav! Bet mana iela ir **Hill Street**. Es saku: H-I-**double L**. Viens vārds — un neviens nesajauc!",
+   "en": "Hill. H-I-double L.",
+   "notes": "Oskara padoms: double ietaupa laiku un kļūdas pa telefonu. Skaļrunis — izruna. Pajautā: kurā tavā vārdā vai ielā ir divi vienādi burti?"
+  },
+  {
+   "type": "quiz",
+   "question": "Russell: R-U-___-E-double L",
+   "options": [
+    "S-S-S",
+    "double S",
+    "two S"
+   ],
+   "answer": 1,
+   "why": "Divi vienādi burti = **double**: double S.",
+   "notes": "Katrs students izvēlas pats, tad klikšķini vai A."
+  },
+  {
+   "type": "build",
+   "title": "Build the *question*",
+   "words": "spell / do / it / How / you",
+   "answer": "How do you spell it?",
+   "lv": "Kā to raksta pa burtiem? — saliec angliski.",
+   "notes": "Students saliek pats pie ekrāna vai pierakstos. Pārbaudīt — vai A rāda atbildi. Uzsver: spell, nevis write."
+  },
+  {
+   "type": "text",
+   "title": "*Capital* letters",
+   "body": "Ar lielo burtu (**capital letter**) angliski raksta:",
+   "bullets": [
+    "**I** (es)",
+    "vārdus un uzvārdus: Līga, Ozola",
+    "pilsētas un valstis: Riga, Latvia",
+    "tautības: Latvian, British",
+    "dienas un mēnešus: Monday, May"
+   ],
+   "note": "Pārējais — mazie burti (**small letters / lower case**).",
+   "notes": "Salīdzini ar latviešu valodu: latviski tautības, dienas un mēneši ir ar mazo burtu (latvietis, pirmdiena, maijs), angliski — ar lielo. Tas ir biežs klupšanas akmens."
+  },
+  {
+   "type": "quiz",
+   "question": "My name is Jānis. I'm ___.",
+   "options": [
+    "latvian",
+    "Latvian",
+    "LATVIAN"
+   ],
+   "answer": 1,
+   "why": "Tautības angliski — ar lielo burtu: **Latvian**.",
+   "notes": "Katrs izvēlas pats. Atgādini: latviski «latvietis» ar mazo burtu, angliski Latvian — ar lielo."
+  },
+  {
+   "type": "quiz",
+   "question": "See you on ___!",
+   "options": [
+    "monday",
+    "Monday",
+    "MONDAY"
+   ],
+   "answer": 1,
+   "why": "Dienas angliski — ar lielo burtu: **Monday**.",
+   "notes": "Tas pats likums dienām un mēnešiem: Monday, May."
+  },
+  {
+   "type": "oscar",
+   "kind": "tip",
+   "pose": "map",
+   "text": "Jānis saka: «Bērziņš». Es meklēju sarakstā... nav! Angliski to bieži raksta **Berzins**. Saki burtus bez garumzīmēm — B-E-R-Z-I-N-S.",
+   "en": "It's B-E-R-Z-I-N-S.",
+   "notes": "Uzmanīgi: pasē un dokumentos rakstība var atšķirties — vienkārši saki burtus tā, kā tie rakstīti tavā rezervācijā vai pasē. Nekādu jaunu likumu, tikai praktisks padoms."
+  },
+  {
+   "type": "mistakes",
+   "title": "Typical *mistakes*",
+   "pose": "oops",
+   "items": [
+    {
+     "wrong": "E — kā latviešu «e»",
+     "right": "E = /iː/ (kā *tea*)",
+     "why": "Angliski E nosaukums ir /iː/."
+    },
+    {
+     "wrong": "I — kā latviešu «i»",
+     "right": "I = /aɪ/ (kā *my*)",
+     "why": "Angliski I nosaukums ir /aɪ/."
+    },
+    {
+     "wrong": "G = /dʒeɪ/, J = /dʒiː/",
+     "right": "G = /dʒiː/, J = /dʒeɪ/",
+     "why": "G skan kā *gee*, J — kā *jay*."
+    },
+    {
+     "wrong": "A — kā «a», R — kā «er»",
+     "right": "A = /eɪ/, R = /ɑː/",
+     "why": "A skan kā *day*, R — kā *car*."
+    },
+    {
+     "wrong": "How do you write your name?",
+     "right": "How do you spell your name?",
+     "why": "Pa burtiem — **spell**, nevis write."
+    },
+    {
+     "wrong": "«suns», «punkts» e-pastā",
+     "right": "@ = at, . = dot",
+     "why": "liga dot ozola at mail dot lv"
+    }
+   ],
+   "notes": "Vispirms katrs students pats mēģina izlabot kļūdu, tad klikšķini kartīti. A — apgriež visas. E-pasts vēl būs ceturtajā daļā."
+  },
+  {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Dzīve",
+   "title": "Letters in *Britain*",
+   "pose": "guide",
+   "items": [
+    {
+     "tag": "Dzīve",
+     "big": "A–Z",
+     "title": "Londonas atlants",
+     "text": "*A–Z* — slavens Londonas ielu atlants, izdod kopš 1936. gada. Briti to sauc «A to Zed».",
+     "en": "It's an A to Zed — a map of London."
+    },
+    {
+     "tag": "Dzīve",
+     "big": "SW1A 1AA",
+     "title": "Pasta indekss",
+     "text": "Britu postcode ir burti un cipari. SW1A 1AA — Bekingemas pils.",
+     "en": "What's your postcode?"
+    },
+    {
+     "tag": "Dzīve",
+     "big": "Bravo",
+     "title": "B for Bravo",
+     "text": "NATO alfabētu (Alfa, Bravo, Charlie…) lieto lidostās, policijā un pa telefonu, lai burtus nesajauktu.",
+     "en": "B for Bravo."
+    },
+    {
+     "tag": "Dzīve",
+     "big": "Sorry?",
+     "title": "Lūdzu, atkārto",
+     "text": "Ja brits nesadzirdēja, viņš bieži pieklājīgi jautā: *Sorry?* Tas nozīmē «atkārto, lūdzu».",
+     "en": "Sorry? Can you repeat that, please?"
+    }
+   ],
+   "notes": "Klikšķis — kartīte apgriežas. Fakti: A–Z atlants (Phyllis Pearsall, 1936); SW1A 1AA — Bekingemas pils pasta indekss; NATO fonētiskais alfabēts. Nemāci visu NATO alfabētu — tikai idejas līmenī."
+  },
+  {
+   "type": "picker",
+   "title": "Your *turn*",
+   "hint": "Nospied «Griezt»",
+   "lv": "Atbildi par sevi skaļi: vispirms vārdu, tad pa burtiem.",
+   "pose": "peek",
+   "items": [
+    "What's your first name?",
+    "How do you spell it?",
+    "What's your surname?",
+    "What's your city?",
+    "Spell your street.",
+    "Spell your favourite food."
+   ],
+   "notes": "Griez — katrs students pats atbild par sevi skaļi vai pierakstos. Ja kāds nevēlas teikt īsto adresi — drīkst izdomātu ielu."
+  },
+  {
+   "type": "oscar",
+   "kind": "joke",
+   "pose": "umbrella",
+   "text": "Lietus, telefons, lietussargs... Es nosaucu klientam savu vārdu: O-S-K... Nē! Angliski **O-S-C-A-R**. Pat gids reizēm jāpārbauda!",
+   "en": "My name is Oscar. O-S-C-A-R.",
+   "notes": "Maigs joks: latviski Oskars ar K, angliski Oscar ar C. Pajautā: vai tavs vārds angliski raksta citādi?"
+  },
+  {
+   "type": "task",
+   "title": "Your *card*",
+   "minutes": 10,
+   "mode": "Individuāli",
+   "steps": [
+    "Uzraksti savu vizītkarti: vārds, uzvārds, pilsēta.",
+    "Pasaki katru pa burtiem skaļi sev.",
+    "Ieraksti sevi telefonā.",
+    "Noklausies: vai E, I, G, J, A, R skan pareizi?"
+   ],
+   "box": "My name is … . It's …-…-… . · My surname is … . · I'm from … .",
+   "notes": "Individuāls darbs ar taimeri. Pēc tam vari palūgt 2–3 brīvprātīgos nosaukt savu uzvārdu pa burtiem."
+  },
+  {
+   "type": "quiz",
+   "question": "Sorry? Can you ___ that, please?",
+   "options": [
+    "write",
+    "repeat",
+    "spell me"
+   ],
+   "answer": 1,
+   "why": "Lai palūgtu vēlreiz: **Can you repeat that, please?**",
+   "notes": "Daļas C noslēgums. Katrs izvēlas pats, tad klikšķini vai A."
+  }
+ ]
+}
