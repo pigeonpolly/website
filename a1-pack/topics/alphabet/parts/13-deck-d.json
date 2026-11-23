@@ -1,45 +1,275 @@
-{"deck": [
-{"type": "section", "num": "04", "title": "Emails & *review*", "text": "e-pasts pa burtiem un atkārtojums", "notes": "Pāreja uz pēdējo daļu: e-pasta adrese, at un dot, kopsavilkums."},
-{"type": "story", "title": "The *email*", "pose": "laptop", "tag": "Story", "messages": [
- {"who": "note", "text": "Viesnīcas vestibils. Oskars sūta biļetes uz ekskursiju pa e-pastu."},
- {"who": "oscar", "name": "Oscar", "text": "What's your email address, Jānis?"},
- {"who": "janis", "name": "Jānis", "text": "It's janis dot berzins **suns** example dot com."},
- {"who": "oscar", "name": "Oscar", "text": "Suns? Ah! In English, @ is *at*: janis dot berzins **at** example dot com."},
- {"who": "janis", "name": "Jānis", "text": "Yes! All one word, small letters."}
-], "lesson": "@ = **at**, . = **dot**. E-pastu saki pa daļām.", "notes": "Ar → atklāj replikas. Pajautā: kā latviski saka @? (suns, kaķītis, et). Angliski — tikai at. Adrese izdomāta (example.com)."},
-{"type": "vocab", "title": "Email *words*", "cols": 4, "items": [
- {"en": "at", "ipa": "/æt/", "lv": "@ (e-pastā)"},
- {"en": "dot", "ipa": "/dɒt/", "lv": ". (punkts e-pastā)"},
- {"en": "dash", "ipa": "/dæʃ/", "lv": "- (domuzīme, defise)"},
- {"en": "underscore", "ipa": "/ˈʌndəskɔː/", "lv": "_ (apakšsvītra)"},
- {"en": "all one word", "lv": "viss kopā, bez atstarpēm"},
- {"en": "lower case", "ipa": "/ˌləʊə ˈkeɪs/", "lv": "mazie burti"},
- {"en": "capital letter", "lv": "lielais burts"},
- {"en": "number", "ipa": "/ˈnʌmbə/", "lv": "cipars, skaitlis"}
-], "notes": "Klikšķis — tulkojums, skaļrunis — izruna. Domuzīmei var teikt arī hyphen. Lai katrs atkārto skaļi."},
-{"type": "examples", "title": "Say the *email*", "pose": "laptop", "items": [
- {"en": "liga dot ozola at mail dot lv", "lv": "liga.ozola@mail.lv"},
- {"en": "janis dot berzins at example dot com", "lv": "janis.berzins@example.com"},
- {"en": "oscar underscore guide at example dot com", "lv": "oscar_guide@example.com"},
- {"en": "hop dash hat at example dot com", "lv": "hop-hat@example.com"},
- {"en": "info at example dot com", "lv": "info@example.com"},
- {"en": "berzins dot j at mail dot lv", "lv": "berzins.j@mail.lv"}
-], "notes": "Ar → atklāj, kā adrese izskatās rakstot. Visas adreses izdomātas. Lai katrs nolasa skaļi vismaz vienu."},
-{"type": "quiz", "question": "liga.ozola@mail.lv → liga ___ ozola at mail dot lv", "options": ["dot", "point", "punkts"], "answer": 0, "why": "E-pastā punktu saka **dot**.", "notes": "Lai katrs parāda atbildi ar pirkstiem (1/2/3), tad klikšķini vai A. Point lieto skaitļos (2.5 — two point five), ne e-pastā."},
-{"type": "build", "title": "Build the *question*", "words": "one / that / all / Is / word", "answer": "Is that all one word?", "lv": "Vai tas viss kopā (vienā vārdā)? — saliec angliski.", "notes": "Noderīgs jautājums, kad kāds saka e-pastu. Pārbaudīt — vai A rāda atbildi."},
-{"type": "oscar", "kind": "fact", "pose": "laptop", "text": "E-pasta adreses parasti raksta ar mazajiem burtiem. Ja nav īpaši pateikts, pieraksti visu ar mazajiem — tā drošāk.", "en": "It's all lower case.", "notes": "Nospied skaļruni. Lower case = mazie burti. Ja kāds saka capital J — tad jautā: Is that with a capital J?"},
-{"type": "facts", "kicker": "Oscar's Britain · Valoda", "title": "Funny *letters*", "pose": "teacher", "items": [
- {"tag": "Valoda", "big": "W", "title": "Double u", "text": "Burtu W sauc *double u* — «divi U», lai gan izskatās pēc divām V.", "en": "W is double u."},
- {"tag": "Valoda", "big": "QU", "title": "Q un U", "text": "Angļu vārdos aiz Q gandrīz vienmēr ir U: *queue*, *question*.", "en": "Queue: Q-U-E-U-E."},
- {"tag": "Valoda", "big": "know", "title": "Klusie burti", "text": "Dažus burtus neizrunā: *know* (k), *write* (w), *hour* (h).", "en": "Know, write, hour."},
- {"tag": "Valoda", "big": "I", "title": "Lielais I", "text": "Vārdu *I* (es) vienmēr raksta ar lielo burtu — arī teikuma vidū.", "en": "Yes, I am."}
-], "notes": "Klikšķis apgriež kartīti. Pajautā: kā izrunā queue? Tikai Q-ju skaņa, pārējie burti klusi."},
-{"type": "quiz", "question": "W in English is ___.", "options": ["double v", "double u", "ve"], "answer": 1, "why": "W = **double u** /ˈdʌbəl juː/.", "notes": "Biežā kļūda — teikt «ve» kā latviski. Lai katrs pasaka skaļi: double u."},
-{"type": "picker", "title": "Spell it!", "hint": "Nospied «Griezt»", "lv": "Pasaki skaļi pa burtiem. E-pastu drīkst izdomāt.", "pose": "idea", "items": ["Spell your email.", "Spell your city.", "Spell your job.", "Spell your favourite colour.", "Spell your first name.", "Spell your surname.", "Spell your street.", "Spell the word queue."], "notes": "Griez — katrs students pats atbild par sevi skaļi. Atgādini: at, dot, double L."},
-{"type": "task", "title": "Booking *form*", "minutes": 10, "mode": "Individuāli", "steps": ["Uzraksti formu: First name, Surname, City, Email.", "Aizpildi to par sevi. E-pastu drīkst izdomāt.", "Nolasi katru rindu skaļi pa burtiem.", "E-pastā saki **at** un **dot**."], "box": "First name: … · Surname: … · City: … · Email: …@example.com", "notes": "Individuāls darbs ar taimeri. Garumzīmes formā var nerakstīt (Berzins). Beigās vari palūgt 2–3 brīvprātīgos nolasīt e-pastu."},
-{"type": "quiz", "question": "jan_b@example.com → jan ___ b at example dot com", "options": ["dash", "underscore", "dot"], "answer": 1, "why": "_ = **underscore**, - = **dash**.", "notes": "Atkārtojums. Lai katrs parāda atbildi ar pirkstiem, tad A."},
-{"type": "oscar", "kind": "story", "pose": "suitcase", "text": "Pēdējā diena. Oskars drukā lidmašīnas biļetes Jānim un Līgai. Šoreiz bez «Jīga» un «Genis» — viņš pajautāja: Can you spell that, please?", "en": "Can you spell that, please? Thank you!", "notes": "Atsauce uz iepriekšējām kļūdām. Nospied skaļruni un lai katrs atkārto frāzi."},
-{"type": "oscar", "kind": "lesson", "pose": "celebrate", "text": "Šodien tu iemācījies: 26 burtus, savu vārdu pa burtiem, double, How do you spell it? un e-pastu ar at un dot.", "en": "Well done! You can spell your name!", "notes": "Kopsavilkums. Pajautā katram: kas šodien bija visgrūtākais burts?"},
-{"type": "big", "kicker": "Your turn", "text": "My name is … . It's *…-…-…* .", "lv": "Pasaki skaļi savu vārdu un uzvārdu pa burtiem.", "pose": "hello", "notes": "Personalizācija: katrs pats pasaka savu vārdu un uzvārdu pa burtiem. Piemērs: My name is Līga. It's L-I-G-A."},
-{"type": "thanks", "title": "Thank *you!*", "text": "Mājās: pasaki skaļi pa burtiem 5 vārdus — vārdu, uzvārdu, pilsētu, ielu un e-pastu.", "pose": "celebrate", "notes": "Paldies! Atgādini praktizēt mājās skaļi."}
-]}
+{
+ "deck": [
+  {
+   "type": "section",
+   "num": "04",
+   "title": "Emails & *review*",
+   "text": "e-pasts pa burtiem un atkārtojums",
+   "notes": "Pāreja uz pēdējo daļu: e-pasta adrese, at un dot, kopsavilkums."
+  },
+  {
+   "type": "story",
+   "title": "The *email*",
+   "pose": "laptop",
+   "tag": "Story",
+   "messages": [
+    {
+     "who": "note",
+     "text": "Viesnīcas vestibils. Oskars sūta biļetes uz ekskursiju pa e-pastu."
+    },
+    {
+     "who": "oscar",
+     "name": "Oscar",
+     "text": "What's your email address, Jānis?"
+    },
+    {
+     "who": "janis",
+     "name": "Jānis",
+     "text": "It's janis dot berzins **suns** example dot com."
+    },
+    {
+     "who": "oscar",
+     "name": "Oscar",
+     "text": "Suns? Ah! In English, @ is *at*: janis dot berzins **at** example dot com."
+    },
+    {
+     "who": "janis",
+     "name": "Jānis",
+     "text": "Yes! All one word, small letters."
+    }
+   ],
+   "lesson": "@ = **at**, . = **dot**. E-pastu saki pa daļām.",
+   "notes": "Ar → atklāj replikas. Pajautā: kā latviski saka @? (suns, kaķītis, et). Angliski — tikai at. Adrese izdomāta (example.com)."
+  },
+  {
+   "type": "vocab",
+   "title": "Email *words*",
+   "cols": 4,
+   "items": [
+    {
+     "en": "at",
+     "ipa": "/æt/",
+     "lv": "@ (e-pastā)"
+    },
+    {
+     "en": "dot",
+     "ipa": "/dɒt/",
+     "lv": ". (punkts e-pastā)"
+    },
+    {
+     "en": "dash",
+     "ipa": "/dæʃ/",
+     "lv": "- (domuzīme, defise)"
+    },
+    {
+     "en": "underscore",
+     "ipa": "/ˈʌndəskɔː/",
+     "lv": "_ (apakšsvītra)"
+    },
+    {
+     "en": "all one word",
+     "lv": "viss kopā, bez atstarpēm"
+    },
+    {
+     "en": "lower case",
+     "ipa": "/ˌləʊə ˈkeɪs/",
+     "lv": "mazie burti"
+    },
+    {
+     "en": "capital letter",
+     "lv": "lielais burts"
+    },
+    {
+     "en": "number",
+     "ipa": "/ˈnʌmbə/",
+     "lv": "cipars, skaitlis"
+    }
+   ],
+   "notes": "Klikšķis — tulkojums, skaļrunis — izruna. Domuzīmei var teikt arī hyphen. Lai katrs atkārto skaļi."
+  },
+  {
+   "type": "examples",
+   "title": "Say the *email*",
+   "pose": "laptop",
+   "items": [
+    {
+     "en": "liga dot ozola at mail dot lv",
+     "lv": "liga.ozola@mail.lv"
+    },
+    {
+     "en": "janis dot berzins at example dot com",
+     "lv": "janis.berzins@example.com"
+    },
+    {
+     "en": "oscar underscore guide at example dot com",
+     "lv": "oscar_guide@example.com"
+    },
+    {
+     "en": "hop dash hat at example dot com",
+     "lv": "hop-hat@example.com"
+    },
+    {
+     "en": "info at example dot com",
+     "lv": "info@example.com"
+    },
+    {
+     "en": "berzins dot j at mail dot lv",
+     "lv": "berzins.j@mail.lv"
+    }
+   ],
+   "notes": "Ar → atklāj, kā adrese izskatās rakstot. Visas adreses izdomātas. Lai katrs nolasa skaļi vismaz vienu."
+  },
+  {
+   "type": "quiz",
+   "question": "liga.ozola@mail.lv → liga ___ ozola at mail dot lv",
+   "options": [
+    "dot",
+    "point",
+    "punkts"
+   ],
+   "answer": 0,
+   "why": "E-pastā punktu saka **dot**.",
+   "notes": "Lai katrs parāda atbildi ar pirkstiem (1/2/3), tad klikšķini vai A. Point lieto skaitļos (2.5 — two point five), ne e-pastā."
+  },
+  {
+   "type": "build",
+   "title": "Build the *question*",
+   "words": "one / that / all / Is / word",
+   "answer": "Is that all one word?",
+   "lv": "Vai tas viss kopā (vienā vārdā)? — saliec angliski.",
+   "notes": "Noderīgs jautājums, kad kāds saka e-pastu. Pārbaudīt — vai A rāda atbildi."
+  },
+  {
+   "type": "oscar",
+   "kind": "fact",
+   "pose": "laptop",
+   "text": "E-pasta adreses parasti raksta ar mazajiem burtiem. Ja nav īpaši pateikts, pieraksti visu ar mazajiem — tā drošāk.",
+   "en": "It's all lower case.",
+   "notes": "Nospied skaļruni. Lower case = mazie burti. Ja kāds saka capital J — tad jautā: Is that with a capital J?"
+  },
+  {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Valoda",
+   "title": "Funny *letters*",
+   "pose": "teacher",
+   "items": [
+    {
+     "tag": "Valoda",
+     "big": "W",
+     "title": "Double u",
+     "text": "Burtu W sauc *double u* — «divi U», lai gan izskatās pēc divām V.",
+     "en": "W is double u."
+    },
+    {
+     "tag": "Valoda",
+     "big": "QU",
+     "title": "Q un U",
+     "text": "Angļu vārdos aiz Q gandrīz vienmēr ir U: *queue*, *question*.",
+     "en": "Queue: Q-U-E-U-E."
+    },
+    {
+     "tag": "Valoda",
+     "big": "know",
+     "title": "Klusie burti",
+     "text": "Dažus burtus neizrunā: *know* (k), *write* (w), *hour* (h).",
+     "en": "Know, write, hour."
+    },
+    {
+     "tag": "Valoda",
+     "big": "I",
+     "title": "Lielais I",
+     "text": "Vārdu *I* (es) vienmēr raksta ar lielo burtu — arī teikuma vidū.",
+     "en": "Yes, I am."
+    }
+   ],
+   "notes": "Klikšķis apgriež kartīti. Pajautā: kā izrunā queue? Tikai Q-ju skaņa, pārējie burti klusi."
+  },
+  {
+   "type": "quiz",
+   "question": "W in English is ___.",
+   "options": [
+    "double v",
+    "double u",
+    "ve"
+   ],
+   "answer": 1,
+   "why": "W = **double u** /ˈdʌbəl juː/.",
+   "notes": "Biežā kļūda — teikt «ve» kā latviski. Lai katrs pasaka skaļi: double u."
+  },
+  {
+   "type": "picker",
+   "title": "Spell it!",
+   "hint": "Nospied «Griezt»",
+   "lv": "Pasaki skaļi pa burtiem. E-pastu drīkst izdomāt.",
+   "pose": "idea",
+   "items": [
+    "Spell your email.",
+    "Spell your city.",
+    "Spell your job.",
+    "Spell your favourite colour.",
+    "Spell your first name.",
+    "Spell your surname.",
+    "Spell your street.",
+    "Spell the word queue."
+   ],
+   "notes": "Griez — katrs students pats atbild par sevi skaļi. Atgādini: at, dot, double L."
+  },
+  {
+   "type": "task",
+   "title": "Booking *form*",
+   "minutes": 10,
+   "mode": "Individuāli",
+   "steps": [
+    "Uzraksti formu: First name, Surname, City, Email.",
+    "Aizpildi to par sevi. E-pastu drīkst izdomāt.",
+    "Nolasi katru rindu skaļi pa burtiem.",
+    "E-pastā saki **at** un **dot**."
+   ],
+   "box": "First name: … · Surname: … · City: … · Email: …@example.com",
+   "notes": "Individuāls darbs ar taimeri. Garumzīmes formā var nerakstīt (Berzins). Beigās vari palūgt 2–3 brīvprātīgos nolasīt e-pastu."
+  },
+  {
+   "type": "quiz",
+   "question": "jan_b@example.com → jan ___ b at example dot com",
+   "options": [
+    "dash",
+    "underscore",
+    "dot"
+   ],
+   "answer": 1,
+   "why": "_ = **underscore**, - = **dash**.",
+   "notes": "Atkārtojums. Lai katrs parāda atbildi ar pirkstiem, tad A."
+  },
+  {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "suitcase",
+   "text": "Pēdējā diena. Drukāju lidmašīnas biļetes Jānim un Līgai. Šoreiz bez «Lija» un «Genis» — es pajautāju: Can you spell that, please?",
+   "en": "Can you spell that, please? Thank you!",
+   "notes": "Atsauce uz iepriekšējām kļūdām. Nospied skaļruni un lai katrs atkārto frāzi."
+  },
+  {
+   "type": "oscar",
+   "kind": "lesson",
+   "pose": "celebrate",
+   "text": "Šodien tu iemācījies: 26 burtus, savu vārdu pa burtiem, double, How do you spell it? un e-pastu ar at un dot.",
+   "en": "Well done! You can spell your name!",
+   "notes": "Kopsavilkums. Pajautā katram: kas šodien bija visgrūtākais burts?"
+  },
+  {
+   "type": "big",
+   "kicker": "Your turn",
+   "text": "My name is … . It's *…-…-…* .",
+   "lv": "Pasaki skaļi savu vārdu un uzvārdu pa burtiem.",
+   "pose": "hello",
+   "notes": "Personalizācija: katrs pats pasaka savu vārdu un uzvārdu pa burtiem. Piemērs: My name is Līga. It's L-I-G-A."
+  },
+  {
+   "type": "thanks",
+   "title": "Thank *you!*",
+   "text": "Mājās: tavs vārds pa burtiem!",
+   "pose": "celebrate",
+   "notes": "Paldies! Atgādini praktizēt mājās skaļi."
+  }
+ ]
+}

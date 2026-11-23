@@ -187,7 +187,7 @@
    "type": "oscar",
    "kind": "tip",
    "pose": "idea",
-   "text": "Mans uzvārds? Nav! Bet mana iela ir **Hill Street**. Es saku: H-I-**double L**. Viens vārds — un neviens nesajauc!",
+   "text": "Es dzīvoju **Hill Street**. Pa telefonu saku: H-I-**double L**. Viens vārds — *double* — un neviens nesajauc!",
    "en": "Hill. H-I-double L.",
    "notes": "Oskara padoms: double ietaupa laiku un kļūdas pa telefonu. Skaļrunis — izruna. Pajautā: kurā tavā vārdā vai ielā ir divi vienādi burti?"
   },
@@ -372,7 +372,7 @@
   },
   {
    "type": "quiz",
-   "question": "Sorry? Can you ___ that, please?",
+   "question": "Can you ___ that, please?",
    "options": [
     "write",
     "repeat",
