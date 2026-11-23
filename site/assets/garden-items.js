@@ -1,6 +1,6 @@
 // Вещи для огорода (этап 23, docs/bird.md «Огород»): вид подарка garden — в магазине, сумке, адвенте, кабинете, как вещи комнаты.
 // Купленная вещь сама стоит в огороде на своём месте (row: back — вдоль забора, side — под домиком); хозяин может спрятать её в огороде («🪴 Вещи огорода»).
-// PPGardenItems.draw(g, v, x, y, t, o) — рисует вещь в пикселях сцены огорода (192×120, x/y — левый верх), o = { night, season }; зимой — снег по `snow` ([dx, dy, w]).
+// PPGardenItems.draw(g, v, x, y, t, o) — рисует вещь в пикселях сцены огорода (240×150, x/y — левый верх), o = { night, season }; зимой — снег по `snow` ([dx, dy, w]).
 // layout(list, pos) — где какая стоит: pos['i:вещь'] = [x, y] — куда переставил хозяин (garden.js «✋ Переставить»); не влезло — { over: true } (видно только при перестановке).
 // Новая вещь = строка в ITEMS (n — название, w×h, row, p — ценность для tools/catalog.js, d — рисунок); легендарная — ещё в LEG и в site/assets/can-do.js LEGEND.
 (() => {
@@ -124,19 +124,19 @@
   const ORDER = Object.keys(ITEMS);
   const name = (v, l = L) => ITEMS[v] ? ITEMS[v].n[l] : v;
 
-  // где стоят вещи в огороде: back — вдоль забора (низ на y 56, слева направо от x 37), side — под домиком (4 ряда шириной 30, слева направо);
+  // где стоят вещи в огороде: back — вдоль забора (низ на y 56, слева направо от x 37), side — под домиком (6 рядов шириной 30, слева направо);
   // люксовые ставятся первыми; не влезло — не рисуется (хозяин может спрятать другую вещь)
   function layout(list, pos) {
-    const out = [], over = [], rows = [72, 88, 104, 119].map(y => ({ y, x: 1 })); let bx = 37;
+    const out = [], over = [], rows = [72, 88, 104, 120, 135, 149].map(y => ({ y, x: 1 })); let bx = 37;
     const order = [...ORDER.filter(v => LEG.includes('garden|' + v)), ...ORDER.filter(v => !LEG.includes('garden|' + v))];
     for (const v of order.filter(k => list.includes(k))) {
       const d = ITEMS[v], q = pos && pos['i:' + v];
       if (q) { out.push({ v, x: q[0], y: q[1] }); continue; } // хозяин поставил сам
-      if (d.row === 'back') { if (bx + d.w > 192) { over.push(v); continue; } out.push({ v, x: bx, y: 56 - d.h }); bx += d.w + 2; }
+      if (d.row === 'back') { if (bx + d.w > 240) { over.push(v); continue; } out.push({ v, x: bx, y: 56 - d.h }); bx += d.w + 2; }
       else { const r = rows.find(r => r.x + d.w <= 31); if (!r) { over.push(v); continue; } out.push({ v, x: r.x, y: r.y - d.h }); r.x += d.w + 2; }
     }
-    let tx = 36, ty = 62; // не влезло — ждёт над грядками (видно только при перестановке)
-    for (const v of over) { const d = ITEMS[v]; if (tx + d.w > 190) { tx = 36; ty += 12; } out.push({ v, x: tx, y: Math.min(120, ty) - d.h, over: true }); tx += d.w + 2; }
+    let tx = 38, ty = 63; // не влезло — ждёт над грядками (видно только при перестановке)
+    for (const v of over) { const d = ITEMS[v]; if (tx + d.w > 238) { tx = 38; ty += 14; } out.push({ v, x: tx, y: Math.min(150, ty) - d.h, over: true }); tx += d.w + 2; }
     return out;
   }
   const draw = (g, v, x, y, t, o) => {

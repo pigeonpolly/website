@@ -3313,6 +3313,14 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .bp-line { margin: 0 0 12px; color: var(--muted); }
 .bp-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .bp-room { border-radius: 22px; overflow: hidden; }
+/* 24.11.2026: комната шире (240×120) и крупнее — на компьютере выходит за колонку профиля, на телефоне листается вбок (при «Переставить» — во всю ширину) */
+@media (min-width: 1100px) { .bp-room { width: min(1240px, calc(100vw - 64px)); margin-left: calc((100% - min(1240px, calc(100vw - 64px))) / 2); } }
+@media (max-width: 700px) {
+  .bp-room .room-scroll, .garden .gd-scroll { overflow-x: auto; overscroll-behavior-x: contain; border-radius: 18px; scrollbar-width: thin; }
+  .bp-room:not(.editing) .room-stage { width: 600px; }
+  .bp-room:not(.editing) .room-cv { touch-action: pan-x pan-y; }
+  .garden:not(.gd-editing) .gd-stage { width: 600px; }
+}
 .bp-room[hidden] { display: none; }
 .bp-tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
 .bp-tabs button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: inherit; font: 600 15px 'Karla', sans-serif; cursor: pointer; }
@@ -3329,7 +3337,7 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 /* комната птички (room.js) */
 .room { display: grid; gap: 10px; }
 .room-stage { border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #504A46, 0 14px 30px rgba(0, 0, 0, .3); background: var(--pp-ink,#2B1A51); }
-.room-cv { display: block; width: 100%; height: auto; aspect-ratio: 192 / 120; image-rendering: pixelated; touch-action: pan-y; }
+.room-cv { display: block; width: 100%; height: auto; aspect-ratio: 240 / 120; image-rendering: pixelated; touch-action: pan-y; }
 .room.editing .room-cv { touch-action: none; cursor: grab; box-shadow: inset 0 0 0 2px var(--pp-acc,#F0A987); }
 .room-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
 .room-cap { font: 600 16px 'Fraunces', serif; opacity: .9; }
@@ -3616,6 +3624,7 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .bag-more-pic { display: grid; place-items: center; margin: 8px 0; }
 .bag-more-kind { margin: 0; color: #9F9690; font: 600 13px var(--sans); }
 .room-stage { position: relative; }
+.room-wrap { position: relative; min-width: 0; } .room-wrap > .room-plan { border-radius: 18px; } /* дверь и план дома — поверх прокрутки комнаты (24.11.2026) */
 .room-tip { position: absolute; z-index: 5; transform: translate(-50%, -100%); padding: 4px 10px; border-radius: 8px; background: rgba(28, 26, 24, .88); color: #fff; font: 600 13px var(--sans); white-space: nowrap; pointer-events: none; }
 .room-tip[hidden] { display: none; }
 .bp-tab-shop { padding: 8px 14px; border-radius: 999px; border: 1px solid #E9A93B; color: inherit; font: 600 15px 'Karla', sans-serif; text-decoration: none; }
@@ -5048,13 +5057,14 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .room-plan-grid a.room-plan-out:hover { background: #CDEBB8; }
 @media (max-width: 430px) { .room-plan-grid a.room-plan-out { padding: 4px 2px; font-size: 12px; } .room-plan-grid a.room-plan-out span { font-size: 18px; } }
 /* Огород (этап 22, garden.js) */
-.garden { display: grid; gap: 12px; max-width: 900px; margin: 0 auto 40px; }
+.garden { display: grid; gap: 12px; max-width: 1240px; margin: 0 auto 40px; } /* 24.11.2026: сцена 240×150 и крупнее на экране */
+.garden .gd-panel { width: 100%; max-width: 900px; margin: 0 auto; }
 .gd-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; }
 .gd-cap { font: 600 18px var(--serif); }
 .gd-wx { font: 14px var(--sans); opacity: .8; flex: 1; }
 .gd-home { padding: 8px 14px; font-size: 14px; }
 .gd-stage { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #504A46, 0 14px 30px rgba(0, 0, 0, .3); background: var(--pp-ink,#2B1A51); }
-.gd-cv { display: block; width: 100%; height: auto; aspect-ratio: 192 / 120; image-rendering: pixelated; touch-action: manipulation; }
+.gd-cv { display: block; width: 100%; height: auto; aspect-ratio: 240 / 150; image-rendering: pixelated; touch-action: manipulation; }
 .gd-float { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(28, 26, 24, .88); color: #fff; font: 600 15px var(--sans); opacity: 0; pointer-events: none; white-space: nowrap; }
 .gd-float.on { animation: gd-float 1.8s ease; }
 @keyframes gd-float { 0% { opacity: 0; transform: translate(-50%, 8px); } 15%, 70% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -6px); } }
@@ -5067,6 +5077,9 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .gd-note { font: 14px/1.45 var(--sans); opacity: .78; margin: 0; }
 .gd-cv.gd-edit { outline: 3px dashed var(--peach); outline-offset: -3px; } /* ✋ перестановка грядок и вещей */
 .gd-sub { margin: 14px 0 2px; font: 600 16px var(--sans); }
+.gd-forms { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; } /* форма клумбы */
+.gd-form { padding: 5px 12px; font-size: 14px; }
+.gd-form.on { background: var(--peach); border-color: var(--peach); color: var(--pp-ink,#2B1A51); }
 .gd-over { opacity: 1; font-weight: 600; }
 .gd-sel, .gd-box { padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
 .gd-sel { border-color: var(--peach); }

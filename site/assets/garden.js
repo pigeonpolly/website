@@ -1,4 +1,4 @@
-// Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 192×120 (canvas ×4), грядки, птичка, жуки, погода по сезону.
+// Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 240×150 (canvas ×4; до 24.11.2026 была 192×120), грядки, птичка, жуки, погода по сезону.
 // Нажал грядку → панель под сценой: посадить (свои семена), полить (раз в сутки), собрать. Корзинка — продать урожай за пуговки; «🛒 Семена» — купить.
 // Всё считает сервер (worker/garden.js): GET /api/garden?nick=, POST /api/garden/{plant,water,harvest,sell,buy,bug,hide,dig,move} (dig — выкопать, move — ✋ перестановка). Гость только смотрит.
 // Рисунки и названия растений — и для рынка (window.PPGardenPlants: icon, name — блок «🌱 Семена» в src/pages/shop.html); без #garden на странице — только это.
@@ -88,6 +88,14 @@
     moveReset: ['↩ As it was at first', '↩ Как было сначала', '↩ Kā bija sākumā'],
     moveOver: [n => `Things that did not fit: ${n} — they wait above the beds, drag them to a free spot.`, n => `Не влезло вещей: ${n} — они ждут над грядками, перетащи на свободное место.`, n => `Neiederējās lietas: ${n} — tās gaida virs dobēm, pārvelc uz brīvu vietu.`],
     moveSaved: ['✋ Saved', '✋ Сохранено', '✋ Saglabāts'],
+    form: ['Shape:', 'Форма:', 'Forma:'],
+    forms: { rect: ['▭ Usual', '▭ Обычная', '▭ Parasta'], round: ['● Round', '● Круглая', '● Apaļa'], square: ['■ Square', '■ Квадратная', '■ Kvadrātveida'], long: ['━ Long', '━ Длинная', '━ Gara'], heart: ['♥ Heart', '♥ Сердце', '♥ Sirds'] },
+    bedsHead: ['🟫 Beds', '🟫 Клумбы', '🟫 Dobes'],
+    bedsN: [(n, m) => `In the garden: ${n} of ${m}.`, (n, m) => `На участке: ${n} из ${m}.`, (n, m) => `Dārzā: ${n} no ${m}.`],
+    bedsFull: ['That is the most there can be.', 'Больше уже нельзя.', 'Vairāk vairs nevar.'],
+    bedAdd: [n => `➕ Buy a bed for ${n} 🔘`, n => `➕ Докупить клумбу за ${n} 🔘`, n => `➕ Nopirkt dobi par ${n} 🔘`],
+    bedAdded: ['🟫 New bed!', '🟫 Новая клумба!', '🟫 Jauna dobe!'],
+    bedsNote: ['Tap a bed to change its shape. Move beds with “✋ Move things”.', 'Нажми на клумбу — можно сменить форму. Передвинуть — «✋ Переставить».', 'Pieskaries dobei — var mainīt formu. Pārvietot — «✋ Pārkārtot».'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
   // растения: названия (порядок — как в лавке), цвета для разных грядок
@@ -123,7 +131,7 @@
   const TIER_OF = { rainbowcarrot: 'rare', bluerose: 'rare', goldpumpkin: 'rare', starberry: 'magic', moonflower: 'magic', mandrake: 'magic' }; // то же в worker/garden.js TIER
   Object.keys(HARV).forEach(k => { TIER_OF[k] = 'tree'; });
   const isTree = p => TIER_OF[p] === 'tree';
-  const W = 192, H = 120, K = 4;
+  const W = 240, H = 150, K = 4;
   const R = (g, x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
   const SKY = { autumn: ['#F6C89A', '#F3B489', '#E9A07F'], winter: ['#CFE1F2', '#BCD3EA', '#AAC4E2'], spring: ['#BFE6F6', '#D4EEF6', '#E8F6F2'], summer: ['#7FC8F0', '#9CD6F4', '#BDE4F6'] };
   const NIGHT = ['#2B1A51', '#3A2670', '#4B3488'];
@@ -137,13 +145,13 @@
     for (let i = 0; i < 3; i++) R(g, 0, i * 14, W, 14, sky[i]);
     R(g, 0, 42, W, 4, sky[2]);
     if (night) for (let i = 0; i < 22; i++) { const h = fnv('star' + i); R(g, h % W, (h >>> 8) % 36, 1, 1, i % 4 ? '#F2E9FF' : '#F0A987'); }
-    else if (season === 'summer' || wx === 'sun' || wx === 'frost') { R(g, 156, 6, 12, 12, '#FFE27A'); R(g, 154, 8, 16, 8, '#FFE27A'); R(g, 158, 4, 8, 16, '#FFE27A'); R(g, 158, 8, 8, 8, '#FFF2B0'); }
-    if (night) { R(g, 158, 7, 10, 8, '#F7F1D0'); R(g, 159, 6, 8, 10, '#F7F1D0'); R(g, 160, 9, 2, 2, '#E0D6A8'); R(g, 164, 12, 2, 1, '#E0D6A8'); } // луна
+    else if (season === 'summer' || wx === 'sun' || wx === 'frost') { R(g, W - 36, 6, 12, 12, '#FFE27A'); R(g, W - 38, 8, 16, 8, '#FFE27A'); R(g, W - 34, 4, 8, 16, '#FFE27A'); R(g, W - 34, 8, 8, 8, '#FFF2B0'); }
+    if (night) { R(g, W - 34, 7, 10, 8, '#F7F1D0'); R(g, W - 33, 6, 8, 10, '#F7F1D0'); R(g, W - 32, 9, 2, 2, '#E0D6A8'); R(g, W - 28, 12, 2, 1, '#E0D6A8'); } // луна
     // облака
     if (!night && wx !== 'sun') for (const [x, y] of [[20, 10], [92, 6], [128, 16]]) { const cc = wx === 'rain' || wx === 'snow' ? '#D9D4E6' : '#FFFFFF'; R(g, x, y, 22, 4, cc); R(g, x + 4, y - 3, 12, 3, cc); }
     // деревья за забором
     const tc = TREE[season];
-    for (const [x, s] of [[40, 1], [70, .8], [118, 1.1], [150, .9], [178, 1]]) {
+    for (const [x, s] of [[40, 1], [70, .8], [118, 1.1], [150, .9], [178, 1], [206, .85], [232, 1.05]]) {
       const w = 22 * s, h = 18 * s, top = 44 - h - 4;
       R(g, x - 1, top + h - 2, 3, 10, '#6B4A2E');
       if (season === 'winter') { R(g, x - 6 * s, top + 4, 1, 6, '#6B4A2E'); R(g, x + 6 * s, top + 3, 1, 6, '#6B4A2E'); R(g, x - 6 * s, top + 3, 3, 1, '#FFFFFF'); R(g, x + 5 * s, top + 2, 3, 1, '#FFFFFF'); continue; }
@@ -153,9 +161,9 @@
     // земля
     const gr = GROUND[season];
     R(g, 0, 46, W, H - 46, gr[0]);
-    for (let i = 0; i < 160; i++) { const h = fnv('grass' + i); R(g, h % W, 50 + (h >>> 8) % 70, 1 + (h >>> 3) % 2, 1, gr[1 + (h >>> 5) % 2]); }
-    if (season === 'autumn') for (let i = 0; i < 40; i++) { const h = fnv('leaf' + i); R(g, h % W, 52 + (h >>> 8) % 66, 2, 1, ['#E8771C', '#D2502A', '#F2A93B', '#B5652A'][h % 4]); }
-    if (season === 'spring') for (let i = 0; i < 26; i++) { const h = fnv('fl' + i); const x = h % W, y = 52 + (h >>> 8) % 66; R(g, x, y, 1, 1, ['#FFFFFF', '#F6E36A', '#F29BBA'][h % 3]); }
+    for (let i = 0; i < 260; i++) { const h = fnv('grass' + i); R(g, h % W, 50 + (h >>> 8) % (H - 50), 1 + (h >>> 3) % 2, 1, gr[1 + (h >>> 5) % 2]); }
+    if (season === 'autumn') for (let i = 0; i < 64; i++) { const h = fnv('leaf' + i); R(g, h % W, 52 + (h >>> 8) % (H - 54), 2, 1, ['#E8771C', '#D2502A', '#F2A93B', '#B5652A'][h % 4]); }
+    if (season === 'spring') for (let i = 0; i < 42; i++) { const h = fnv('fl' + i); const x = h % W, y = 52 + (h >>> 8) % (H - 54); R(g, x, y, 1, 1, ['#FFFFFF', '#F6E36A', '#F29BBA'][h % 3]); }
     // забор
     const fc = season === 'winter' ? '#B89A78' : '#D9B98E', fd = '#9C7650';
     R(g, 0, 37, W, 2, fd); R(g, 0, 43, W, 2, fd);
@@ -177,20 +185,39 @@
   function pumpkinAt(g, x, y, s = 1) { const w = 7 * s, h = 5 * s; R(g, x, y - h, w, h, '#E8771C'); R(g, x + 1, y - h - 1, w - 2, 1, '#E8771C'); R(g, x + w / 2 - .5, y - h - 2, 1, 2, '#6B4A1E'); R(g, x + 2 * s, y - h, .5, h, '#C85E12'); R(g, x + 4.5 * s, y - h, .5, h, '#C85E12'); }
 
   // грядки: 3 в ряд (больше 6 — по 4)
-  function bedRects(n) {
-    const cols = n <= 6 ? 3 : 4, rows = Math.ceil(n / cols), x0 = 38, x1 = 188, y0 = 62, y1 = 116;
+  // грядки (клумбы): по 3 в ряд, 7–8 — по 4, 9–10 — по 5; форма (forms, 24.11.2026) меняет размер внутри своей ячейки, низ — на месте
+  const FORM_SZ = { round: [30, 18], square: [22, 20], long: [999, 10], heart: [26, 20] }; // [ширина (не больше ячейки), высота]
+  function bedRects(n, forms) {
+    const cols = n <= 6 ? 3 : n <= 8 ? 4 : 5, rows = Math.ceil(n / cols), x0 = 40, x1 = W - 8, y0 = 64, y1 = H - 6;
     const bw = (x1 - x0) / cols - 6, rh = (y1 - y0) / rows, bh = Math.min(15, rh - 10);
-    return Array.from({ length: n }, (_, i) => ({ x: Math.round(x0 + (i % cols) * (bw + 6)), y: Math.round(y0 + Math.floor(i / cols) * rh + (rh - bh)), w: Math.round(bw), h: bh }));
+    return Array.from({ length: n }, (_, i) => {
+      const f = (forms || {})['b' + i] || 'rect', z = FORM_SZ[f], cx = x0 + (i % cols) * (bw + 6) + bw / 2, bot = y0 + Math.floor(i / cols) * rh + rh;
+      const w = Math.round(z ? Math.min(bw, z[0]) : bw), h = z ? z[1] : bh;
+      return { x: Math.round(cx - w / 2), y: Math.round(bot - h), w, h, f };
+    });
   }
+  // строки формы: для каждой строки y (0…h-1) — отрезки [от, до)
+  function bedSpans(f, w, h, y) {
+    if (f === 'round') { const dy = (y + .5 - h / 2) / (h / 2), hw = w / 2 * Math.sqrt(Math.max(0, 1 - dy * dy)); return [[Math.round(w / 2 - hw), Math.round(w / 2 + hw)]]; }
+    if (f === 'heart') {
+      const ly = h * .34, out = [];
+      if (y < ly + 1) { for (const c of [w * .27, w * .73]) { const dy = (y + .5 - ly) / ly, hw = w * .27 * Math.sqrt(Math.max(0, 1 - dy * dy)); if (hw > .4) out.push([Math.round(c - hw), Math.round(c + hw)]); } return out.length === 2 && out[0][1] >= out[1][0] ? [[out[0][0], out[1][1]]] : out; }
+      const v = (y + .5 - ly) / (h - ly), hw = w / 2 * (1 - v); return [[Math.round(w / 2 - hw), Math.round(w / 2 + hw)]];
+    }
+    return [[0, w]];
+  }
+  function bedShape(g, r, d, c) { for (let y = -d; y < r.h + d; y++) for (const [a, b] of bedSpans(r.f, r.w + 2 * d, r.h + 2 * d, y + d)) R(g, r.x - d + a, r.y + y, b - a, 1, c); }
+  const inBed = (r, x, y) => { x = Math.floor(x - r.x); y = Math.floor(y - r.y); return y >= 0 && y < r.h && bedSpans(r.f, r.w, r.h, y).some(([a, b]) => x >= a && x < b); };
   function drawBed(g, r, b, season, sel) {
-    const wet = b && b.wet;
-    R(g, r.x - 1, r.y - 1, r.w + 2, r.h + 2, '#6B4A2E');
-    R(g, r.x, r.y, r.w, r.h, wet ? '#4A2E1E' : '#8A6446');
-    for (let i = 0; i < r.w / 3; i++) { const h = fnv(r.x + ':' + i); R(g, r.x + 1 + h % (r.w - 2), r.y + 1 + (h >>> 8) % (r.h - 2), 1, 1, wet ? '#3A2416' : '#A07A58'); }
-    if (b && !wet) for (let i = 0; i < 3; i++) R(g, r.x + 4 + i * r.w / 3, r.y + 3 + i % 2 * 4, 3, .5, '#6E4E34'); // трещинки сухой земли
-    R(g, r.x - 1, r.y + r.h - 1, r.w + 2, 2, '#9C7650'); R(g, r.x - 1, r.y + r.h + 1, r.w + 2, 1, '#6B4A2E');
-    if (season === 'winter') { R(g, r.x - 1, r.y - 2, r.w + 2, 1, '#FFFFFF'); if (!b) for (let i = 0; i < 4; i++) R(g, r.x + 3 + i * r.w / 4, r.y + 4 + i % 2 * 5, 4, 2, '#FFFFFF'); }
-    if (b) { R(g, r.x + 2, r.y + r.h + .5, r.w - 4, 1, '#5A3E26'); R(g, r.x + 2, r.y + r.h + .5, (r.w - 4) * b.k, 1, b.ready ? '#F7D774' : '#8ED26A'); } // полоска роста
+    const wet = b && b.wet, rect = !r.f || r.f === 'rect' || r.f === 'long' || r.f === 'square';
+    bedShape(g, r, 1, '#6B4A2E');
+    bedShape(g, r, 0, wet ? '#4A2E1E' : '#8A6446');
+    for (let i = 0; i < r.w / 3; i++) { const h = fnv(r.x + ':' + i), x = r.x + 1 + h % Math.max(1, r.w - 2), y = r.y + 1 + (h >>> 8) % Math.max(1, r.h - 2); if (inBed(r, x, y)) R(g, x, y, 1, 1, wet ? '#3A2416' : '#A07A58'); }
+    if (b && !wet) for (let i = 0; i < 3; i++) { const x = r.x + 4 + i * r.w / 3, y = r.y + 3 + i % 2 * 4; if (inBed(r, x, y) && inBed(r, x + 2, y)) R(g, x, y, 3, .5, '#6E4E34'); } // трещинки сухой земли
+    if (rect) { R(g, r.x - 1, r.y + r.h - 1, r.w + 2, 2, '#9C7650'); R(g, r.x - 1, r.y + r.h + 1, r.w + 2, 1, '#6B4A2E'); }
+    else { const s2 = bedSpans(r.f, r.w + 2, r.h + 2, r.h + 1); s2.forEach(([a, c]) => R(g, r.x - 1 + a, r.y + r.h, c - a, 1, '#9C7650')); R(g, r.x + r.w / 2 - 3, r.y + r.h + 1, 6, 1, '#6B4A2E'); } // бортик снизу
+    if (season === 'winter') { const t = bedSpans(r.f, r.w + 2, r.h + 2, 0); t.forEach(([a, c]) => R(g, r.x - 1 + a, r.y - 2, c - a, 1, '#FFFFFF')); if (!b) for (let i = 0; i < 4; i++) { const x = r.x + 3 + i * r.w / 4, y = r.y + 4 + i % 2 * 5; if (inBed(r, x, y) && inBed(r, x + 3, y + 1)) R(g, x, y, 4, 2, '#FFFFFF'); } }
+    const by2 = r.y + r.h + (rect ? .5 : 2.5); if (b) { R(g, r.x + 2, by2, r.w - 4, 1, '#5A3E26'); R(g, r.x + 2, by2, (r.w - 4) * b.k, 1, b.ready ? '#F7D774' : '#8ED26A'); } // полоска роста
     if (sel) { g.strokeStyle = '#F0A987'; g.lineWidth = 1; g.strokeRect(r.x - 2.5, r.y - 2.5, r.w + 5, r.h + 5); }
   }
   const TULIP = ['#E8445A', '#F6C531', '#B57BE0', '#FFFFFF', '#F29BBA'];
@@ -336,7 +363,7 @@
   function mountScene() {
     const o = D.owner;
     app.innerHTML = `<div class="gd-bar"><span class="gd-cap">🥕 ${esc(t('of').replace('{n}', o.nick))}</span><span class="gd-wx"></span><a class="pill-btn gd-home" href="${pre}/bird/?nick=${encodeURIComponent(o.nick)}#room">${t('home')}</a></div>
-      <div class="gd-stage"><canvas class="gd-cv" width="${W * K}" height="${H * K}" role="img" aria-label="${esc(t('of').replace('{n}', o.nick))}"></canvas><div class="gd-float" aria-live="polite"></div></div>
+      <div class="gd-scroll"><div class="gd-stage"><canvas class="gd-cv" width="${W * K}" height="${H * K}" role="img" aria-label="${esc(t('of').replace('{n}', o.nick))}"></canvas><div class="gd-float" aria-live="polite"></div></div></div>
       <div class="gd-panel"></div>`;
     const cv = app.querySelector('.gd-cv'), g = cv.getContext('2d');
     g.imageSmoothingEnabled = false;
@@ -368,7 +395,7 @@
         if (d < 1 && bird.next) { bird.tx = bird.next[0]; bird.ty = bird.next[1]; bird.next = bird.next[2]; }
         else if (d < 1) { // постоять, иногда поклевать, потом — на другую дорожку (по краю, мимо грядок)
           bird.wait = 20 + Math.random() * 80; bird.peck = Math.random() < .5 ? 30 : 0;
-          const ls = lanes(), ty = ls[Math.floor(Math.random() * ls.length)], tx = 36 + Math.random() * 148;
+          const ls = lanes(), ty = ls[Math.floor(Math.random() * ls.length)], tx = 36 + Math.random() * (W - 44);
           if (Math.abs(ty - bird.y) > 1) { bird.tx = 33; bird.next = [33, ty, [tx, ty]]; } else bird.tx = tx;
         }
         else { bird.x += dx / d * .6; bird.y += dy / d * .6; bird.dir = dx < 0 ? -1 : 1; bird.frame = Math.floor(now / 160) % 2; }
@@ -391,7 +418,7 @@
         const b = D.beds[i];
         drawBed(g, r, b, season, D.mine && sel === i && !EDIT);
         if (b && isTree(b.p)) drawTree(g, b.p, b.k, r.x + r.w / 2, r.y + r.h - 3, now, season, b.k > 0 || b.wet, b.ready, b.m);
-        else if (b) for (let j = 0; j < 3; j++) drawPlant(g, b.p, b.k, r.x + r.w * (1 + j * 2) / 6, r.y + r.h - 3, now, i * 3 + j, b.k > 0 || b.wet);
+        else if (b) for (let j = 0; j < 3; j++) drawPlant(g, b.p, b.k, r.x + r.w * (r.f === 'round' || r.f === 'heart' || r.f === 'square' ? [.27, .5, .73][j] : (1 + j * 2) / 6), r.y + r.h - (r.f === 'heart' ? 7 : r.f === 'round' ? 4 : 3), now, i * 3 + j, b.k > 0 || b.wet);
         if (D.mine && !EDIT && b && !b.today && !b.ready) { const x = r.x + r.w - 2, y = r.y - 4 + Math.round(Math.sin(now / 300 + i)); R(g, x - 1, y, 4, 4, '#5FB8F0'); R(g, x, y - 1, 2, 1, '#5FB8F0'); R(g, x + .5, y - 2, 1, 1, '#5FB8F0'); R(g, x, y + 1, 1, 1, '#BFE6FA'); } // капля на углу грядки: полей сегодня
         if (EDIT) { g.strokeStyle = EDIT.drag && EDIT.drag.key === 'b' + i ? '#F0A987' : 'rgba(255,255,255,.75)'; g.lineWidth = .5; g.strokeRect(r.x - 2.5, r.y - 2.5, r.w + 5, r.h + 5); }
       }]));
@@ -454,10 +481,11 @@
   // перестановка: места грядок и вещей — D.pos с сервера или EDIT.pos, пока хозяин двигает
   let EDIT = null;
   const POS = () => (EDIT ? EDIT.pos : D.pos) || {};
-  const bedsAt = () => bedRects(D.beds.length).map((r, i) => { const q = POS()['b' + i]; return q ? { ...r, x: q[0], y: q[1] } : r; });
+  const bedsAt = () => bedRects(D.beds.length, D.forms).map((r, i) => { const q = POS()['b' + i]; return q ? { ...r, x: q[0], y: q[1] } : r; });
   function editMode(on) {
     EDIT = on ? { pos: { ...(D.pos || {}) }, drag: null } : null;
     const cv = app.querySelector('.gd-cv'); if (cv) { cv.style.touchAction = on ? 'none' : ''; cv.classList.toggle('gd-edit', !!on); }
+    app.classList.toggle('gd-editing', !!on); // на телефоне при перестановке огород — во всю ширину, без прокрутки вбок
     panel();
   }
   function float(msg) { const f = app.querySelector('.gd-float'); if (!f) return; f.textContent = msg; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
@@ -481,7 +509,7 @@
       box.querySelectorAll('[data-mv]').forEach(b => { b.onclick = () => {
         const k = b.dataset.mv, pos = EDIT.pos;
         if (k === 'cancel') return editMode(false);
-        EDIT = null; app.querySelector('.gd-cv').style.touchAction = '';
+        EDIT = null; app.querySelector('.gd-cv').style.touchAction = ''; app.classList.remove('gd-editing');
         act('move', k === 'reset' ? { reset: true } : { pos }, () => float(t('moveSaved')));
       }; });
       return;
@@ -501,8 +529,13 @@
         const st = b.ready ? (isTree(b.p) ? t('treeReady') : t('ready')) : b.m ? [t('treeGrown', dur(b.left)), b.today ? t('wetToday') : b.wet ? t('wetYet') : t('dry')].join(' · ') : [t('left', dur(b.left)), b.today ? t('wetToday') : b.k === 0 && !b.wet ? t('seedNew') : b.wet ? t('wetYet') : t('dry')].join(' · ');
         h += `<div class="gd-info">${pic(b.p)}<p>${st}</p></div><div class="gd-row">${b.ready ? `<button type="button" class="cta-btn" data-harvest>${t('harvest')}</button>` : !b.today ? `<button type="button" class="cta-btn" data-water>${t('water')}</button>` : ''}<button type="button" class="pill-btn gd-dig" data-dig>${t('dig')}</button></div>`;
       }
+      const fNow = (D.forms || {})['b' + sel] || 'rect';
+      h += `<div class="gd-forms"><span class="gd-note">${t('form')}</span>${Object.keys(T.forms).map(f => `<button type="button" class="gd-chip gd-form${f === fNow ? ' on' : ''}" data-form="${f}" aria-pressed="${f === fNow}">${T.forms[f][L]}</button>`).join('')}</div>`;
       h += '</section>';
     } else h += `<p class="gd-note">${t('tapBed')}</p>`;
+    // клумбы: сколько есть, докупить
+    const nB = beds.length, mB = D.bedsMax || nB;
+    h += `<section class="gd-box"><h3>${t('bedsHead')}</h3><p>${t('bedsN', nB, mB)} ${nB >= mB ? t('bedsFull') : ''}</p>${nB < mB ? `<button type="button" class="pill-btn gd-addbed"${(D.bedBtn || 0) > (D.buttons || 0) ? ' disabled' : ''}>${t('bedAdd', D.bedBtn || 0)}</button>` : ''}<p class="gd-note">${t('bedsNote')}</p></section>`;
     // жуки
     const nb = (D.bugs || []).length;
     h += `<section class="gd-box"><h3>${t('bugsHead')}</h3><p>${nb ? t('bugsNow', nb) : t('bugsNone')} ${D.bugsGot ? t('bugsGot', D.bugsGot) : ''} ${nb ? '' : D.bugsLater ? t('bugsLater') : D.bugsGot ? t('bugsDone') : ''}</p><p class="gd-note">${t('bugsRule', D.bugBtn || 0)}</p></section>`;
@@ -528,6 +561,8 @@
     on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered + boost(r))));
     on('[data-water]', () => act('water', { bed: sel }, r => float('💧' + boost(r))));
     on('[data-harvest]', () => { const p = D.beds[sel] && D.beds[sel].p; act('harvest', { bed: sel }, r => { const m = p === 'mandrake' ? t('mandrake') : t('gotCrop', hname(p) + (r.n > 1 ? ' ×' + r.n : '')); float(m); toast(m); }); });
+    on('[data-form]', b => act('form', { bed: sel, form: b.dataset.form }));
+    on('.gd-addbed', () => act('addbed', {}, () => { sel = D.beds.length - 1; float(t('bedAdded')); }));
     on('[data-dig]', () => { if (confirm(t('digAsk'))) act('dig', { bed: sel }, () => float('🪓')); });
     on('.gd-move-btn', () => { editMode(true); const st = app.querySelector('.gd-stage'); if (st && st.getBoundingClientRect().top < 0) st.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));

@@ -1,4 +1,4 @@
-// Комната птички (профиль /bird/): пиксельная комната 192×120 — стены, пол, одно окно (вид за окном), шторы по бокам,
+// Комната птички (профиль /bird/): пиксельная комната 240×120 — стены, пол, одно окно (вид за окном), шторы по бокам,
 // мебель и вещи (ставятся на пол или друг на друга), украшения (висят где угодно: на ёлке, на стене). Птичка в комнате гуляет,
 // запрыгивает на мебель, спит на диване, играет в приставку. Вещи для комнаты — подарки того же каталога, что и для птички
 // (PPBirds.GIFTS: wall, floor, view, curtain, furn, deco) — их можно купить, подарить, получить в адвенте.
@@ -7,7 +7,7 @@
   const B = window.PPBirds;
   if (!B) return;
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
-  const RW = 192, RH = 120, FY = 86, GY = 113; // ширина, высота, низ стены, линия пола (на ней стоит мебель)
+  const RW = 240, RH = 120, FY = 86, GY = 113; // ширина (до 24.11.2026 — 192: шире, а высота та же — у мебели в базе сохранены y), высота, низ стены, линия пола (на ней стоит мебель)
   const WX = 124, WY = 14, WW = 42, WH = 42;   // окно
   const rngOf = seed => { let a = seed >>> 0 || 1; return () => (a = (a * 1103515245 + 12345) % 2147483648) / 2147483648; };
   const R = (g, x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), w, h); };
@@ -1827,7 +1827,7 @@
     const jumps = new Map(), lids = new Map(); // вещь → полёт из коробки; коробка → когда приоткрыта крышка
     const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
-    box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
+    box.innerHTML = `<div class="room-wrap"><div class="room-scroll"><div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div></div></div>
       <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hintOff')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-clear" hidden></button><button type="button" class="room-edit" aria-pressed="false"></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = o.scale || 4; cv.width = RW * S; cv.height = RH * S;
@@ -2660,7 +2660,7 @@
       doorBtn.onclick = e => { e.stopPropagation(); openPlan(plan.hidden); };
       plan.addEventListener('click', e => { if (e.target === plan) openPlan(false); });
       box.addEventListener('keydown', e => { if (e.key === 'Escape' && !plan.hidden) openPlan(false); });
-      stage.appendChild(plan); stage.appendChild(doorBtn);
+      const wrap = box.querySelector('.room-wrap') || stage; wrap.appendChild(plan); wrap.appendChild(doorBtn); // не в прокрутке: на телефоне комната листается вбок, а дверь и план дома — на месте
       if (o.mine) {
         const bookBtn = document.createElement('button'); bookBtn.type = 'button'; bookBtn.className = 'room-book-btn'; bookBtn.textContent = '📖';
         bookBtn.title = ['Recipe book', 'Книга рецептов', 'Recepšu grāmata'][L]; bookBtn.setAttribute('aria-label', bookBtn.title);

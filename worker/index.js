@@ -341,7 +341,7 @@ function cleanOne(room, own, used, bare) {
     if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
     const key = it.k + '|' + it.v; if ((used[key] || 0) >= (PPCanDo.isAlbum(it.k, it.v) ? 1 : own[key] || 0)) continue; // альбом карточек — в каждой комнате сам, один
     used[key] = (used[key] || 0) + 1;
-    const x = Math.max(-10, Math.min(200, Math.round(Number(it.x) || 0))), o = { k: it.k, v: String(it.v), x };
+    const x = Math.max(-10, Math.min(248, Math.round(Number(it.x) || 0))), o = { k: it.k, v: String(it.v), x }; // комната 240 шириной (room.js RW, с 24.11.2026)
     // украшения — всегда со своим y; мебель — если её поставили руками (иначе стоит на полу/на том, что под ней)
     if (it.k === 'deco') o.y = Math.max(0, Math.min(120, Math.round(Number(it.y) || 0)));
     else if (it.y != null && Number.isFinite(Number(it.y))) o.y = Math.max(-60, Math.min(120, Math.round(Number(it.y))));
@@ -379,7 +379,7 @@ const STARTER_BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox'];
 function boxSpot(room) {
   const floor = (room.items || []).filter(it => it.k === 'furn' && it.in == null && (it.y == null || it.y > 80));
   let best = null;
-  for (let x = 0; x <= 172; x += 2) {
+  for (let x = 0; x <= 220; x += 2) { // комната 240 шириной (room.js RW)
     const hit = floor.reduce((a, it) => a + Math.max(0, Math.min(x + 20, it.x + 24) - Math.max(x, it.x)), 0), sc = hit * 1000 + Math.abs(x - 150);
     if (!best || sc < best.sc) best = { x, sc };
   }
