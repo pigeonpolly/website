@@ -111,7 +111,7 @@
     gotAll: [n => `🧺 Harvested: ${n}`, n => `🧺 Собрано: ${n}`, n => `🧺 Novākts: ${n}`],
     sellAll: [n => `💰 Sell all for ${n} 🔘`, n => `💰 Продать всё за ${n} 🔘`, n => `💰 Pārdot visu par ${n} 🔘`],
     nothingReady: ['Nothing is ready yet', 'Пока ничего не поспело', 'Vēl nekas nav gatavs'],
-    choresLeaves: ['🍂 Leaves', '🍂 Листья', '🍂 Lapas'], choresSnow: ['❄️ Snow', '❄️ Сугробы', '❄️ Sniegs'],
+    choresLeaves: ['🍂 Leaves', '🍂 Листья', '🍂 Lapas'], choresSnow: ['❄️ Snow', '❄️ Сугробы', '❄️ Sniegs'], choresHead: ['🧹 Clean-up', '🧹 Уборка', '🧹 Uzkopšana'],
     choresNow: [n => `Leaf piles on the grass: ${n}. Tap one to clear it.`, n => `Куч листьев на траве: ${n}. Нажми на кучу — уберёшь.`, n => `Lapu kaudzes zālē: ${n}. Pieskaries kaudzei — novāksi.`],
     choresNowSnow: [n => `Snowdrifts in the garden: ${n}. Tap one to clear it.`, n => `Сугробов в огороде: ${n}. Нажми на сугроб — уберёшь.`, n => `Sniega kupenas dārzā: ${n}. Pieskaries kupenai — novāksi.`],
     choresAll: [n => `🧹 Clear all for ${n} 🔘`, n => `🧹 Убрать всё за ${n} 🔘`, n => `🧹 Novākt visu par ${n} 🔘`],
@@ -624,8 +624,8 @@
     const wk = D.week || {}, line = (k, w) => w ? `<li>${t(k, w.n, w.need)}${w.got ? ' ' + t('gotSeed', esc(cname(w.got))) : ''}<span class="gd-bar-p"><i style="width:${Math.round(100 * w.n / Math.max(1, w.need))}%"></i></span></li>` : '';
     h += `<section class="gd-box"><h3>${t('specialHead')}</h3><ul class="gd-week">${line('rare', wk.rare)}${line('magic', wk.magic)}</ul><p class="gd-note">${t('specialNote')}</p></section>`;
     // уборка: листья осенью, сугробы зимой
-    const ch = D.chores || [], winter = D.season === 'winter';
-    h += `<section class="gd-box"><h3>${winter ? t('choresSnow') : t('choresLeaves')}</h3>`;
+    const ch = D.chores || [], winter = D.season === 'winter', chHead = winter ? t('choresSnow') : D.season === 'autumn' ? t('choresLeaves') : t('choresHead');
+    h += `<section class="gd-box"><h3>${chHead}</h3>`;
     if (!D.cleanOn) h += `<p class="gd-note">${t('choresOther')}</p>`;
     else if (ch.length) h += `<p>${winter ? t('choresNowSnow', ch.length) : t('choresNow', ch.length)}</p><p class="gd-note">${t('choresNote', D.cleanBtn || 0)}</p><button type="button" class="pill-btn" data-clean-all>${t('choresAll', ch.length * (D.cleanPay || 0))}</button>`;
     else if (winter || D.season === 'autumn') h += `<p class="gd-note">${t('choresClean')}</p>`;
