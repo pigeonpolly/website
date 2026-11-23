@@ -6,7 +6,8 @@
   var LI = { en: 0, ru: 1, lv: 2 }[L] || 0;
   var now = new Date();
   var first = { y: now.getFullYear(), m: now.getMonth() + 1 };          // текущий месяц
-  var last = shift(first, now.getDate() >= 20 ? 1 : 0);                  // следующий открывается с 20-го
+  var last = shift(first, now.getDate() >= 20 ? 1 : 0);                  // следующий открывается с 20-го; дальше — любой месяц, где все дни заполнены
+  var got = {};                                                          // ym → days (кэш ответов)
   var days = [], title = '';
   var cur = now.getDate() >= 20 ? last : first;                        // с 20-го открываем месяц вперёд
   var mEl = document.getElementById('pr-m');
@@ -37,6 +38,25 @@
     }).join('') : '<p class="pr-wait">—</p>';
   }
 
+  function full(d) { return d && d.length && d.every(function (x) { return x.subject && x.subject[0]; }); }
+  function get(o) {
+    var k = ym(o);
+    if (got[k]) return Promise.resolve(got[k]);
+    return fetch('/api/challenge/month?m=' + k, { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (!d || !d.days) throw new Error('no'); got[k] = d.days; return d.days; });
+  }
+  // следующий месяц уже заполнен целиком — пускаем стрелку «→» к нему
+  function probe(o) {
+    var n = shift(o, 1);
+    if (!before(last, n)) return;
+    get(n).then(function (d) {
+      if (!full(d) || before(n, last) || ym(o) !== ym(cur)) return;
+      last = n;
+      if (next) next.disabled = false;
+    }).catch(function () {});
+  }
+
   function load(o) {
     if (before(o, first) || before(last, o)) return;
     cur = o;
@@ -45,9 +65,8 @@
     if (prev) prev.disabled = !before(first, o);
     if (next) next.disabled = !before(o, last);
     g.innerHTML = '<p class="pr-wait">…</p>';
-    fetch('/api/challenge/month?m=' + ym(o), { credentials: 'same-origin' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { if (!d || !d.days) throw new Error('no'); days = d.days; draw(); })
+    get(o)
+      .then(function (d) { if (ym(o) !== ym(cur)) return; days = d; draw(); probe(o); })
       .catch(function () { days = []; g.innerHTML = '<p class="pr-wait">…</p>'; });
   }
 
