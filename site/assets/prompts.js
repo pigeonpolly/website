@@ -6,8 +6,10 @@
   var LI = { en: 0, ru: 1, lv: 2 }[L] || 0;
   var now = new Date();
   var first = { y: now.getFullYear(), m: now.getMonth() + 1 };          // текущий месяц
-  var last = shift(first, now.getDate() >= 20 ? 1 : 0);                  // следующий открывается с 20-го; дальше — любой месяц, где все дни заполнены
-  var got = {};                                                          // ym → days (кэш ответов)
+  var last = shift(first, now.getDate() >= 20 ? 1 : 0);                  // следующий открывается с 20-го; Алине (admin) дальше — любой месяц, где все дни заполнены
+  var got = {}, admin = null;                                            // admin: null — ещё не знаем
+  var who = fetch('/api/whoami', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { admin = !!(d && d.user && d.user.admin); }).catch(function () { admin = false; });                                                          // ym → days (кэш ответов)
   var days = [], title = '';
   var cur = now.getDate() >= 20 ? last : first;                        // с 20-го открываем месяц вперёд
   var mEl = document.getElementById('pr-m');
@@ -46,8 +48,10 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) { if (!d || !d.days) throw new Error('no'); got[k] = d.days; return d.days; });
   }
-  // следующий месяц уже заполнен целиком — пускаем стрелку «→» к нему
+  // только Алине: следующий месяц уже заполнен целиком — пускаем стрелку «→» к нему
   function probe(o) {
+    if (admin === null) { who.then(function () { probe(o); }); return; }
+    if (!admin) return;
     var n = shift(o, 1);
     if (!before(last, n)) return;
     get(n).then(function (d) {
