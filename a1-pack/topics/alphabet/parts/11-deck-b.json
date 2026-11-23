@@ -1,0 +1,334 @@
+{
+ "deck": [
+  {
+   "type": "section",
+   "num": "02",
+   "title": "Tricky *letters*",
+   "text": "burti, ko latvieši bieži jauc",
+   "notes": "Otrā daļa. Šeit galvenās kļūdas: E, I, A, R, G, J — latviešu ieradums saukt burtus latviski."
+  },
+  {
+   "type": "compare",
+   "title": "Latviski vs *English*",
+   "left": {
+    "title": "Latviski",
+    "items": [
+     "E — «e»",
+     "I — «i»",
+     "A — «a»",
+     "R — «er»",
+     "J — «jē»",
+     "G — «gā»"
+    ]
+   },
+   "right": {
+    "title": "English",
+    "items": [
+     "E — **/iː/**",
+     "I — **/aɪ/**",
+     "A — **/eɪ/**",
+     "R — **/ɑː/**",
+     "J — **/dʒeɪ/**",
+     "G — **/dʒiː/**"
+    ]
+   },
+   "note": "Burts tas pats — nosaukums cits!",
+   "notes": "Nolasi katru pāri skaļi: vispirms latviski, tad angliski. Latviskais atveidojums («ī», «ai») ir tikai aptuvens — klausies izrunu."
+  },
+  {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "oops",
+   "text": "Rezervēju galdiņu Līgai. Pa telefonu runāju ātri un G nosaucu kā /dʒeɪ/ — tas ir J! Uz galdiņa kartīte: «Jīga». Līga smējās. Mācība: G — /dʒiː/, J — /dʒeɪ/.",
+   "en": "Sorry, Līga! G is /dʒiː/. J is /dʒeɪ/.",
+   "notes": "Oskara kļūda: sajauca G un J. Lai studenti atkārto: G — /dʒiː/, J — /dʒeɪ/. Pieminēt arī: runā lēnām — Slowly, please."
+  },
+  {
+   "type": "switcher",
+   "title": "Tricky letters: *sound* & word",
+   "pose": "idea",
+   "modes": [
+    "Burts",
+    "Skaņa",
+    "Vārds"
+   ],
+   "rows": {
+    "E": [
+     "E",
+     "/iː/ — kā *tea*",
+     "**e**mail"
+    ],
+    "I": [
+     "I",
+     "/aɪ/ — kā *my*",
+     "h**i**"
+    ],
+    "A": [
+     "A",
+     "/eɪ/ — kā *day*",
+     "n**a**me"
+    ],
+    "R": [
+     "R",
+     "/ɑː/ — kā *car*",
+     "ca**r**"
+    ],
+    "G": [
+     "G",
+     "/dʒiː/ — kā *tea*",
+     "**G**ermany"
+    ],
+    "J": [
+     "J",
+     "/dʒeɪ/ — kā *day*",
+     "**j**ob"
+    ],
+    "Y": [
+     "Y",
+     "/waɪ/ — kā *why*",
+     "wh**y**"
+    ],
+    "W": [
+     "W",
+     "/ˈdʌbəl juː/",
+     "**www**"
+    ]
+   },
+   "lv": {
+    "E": [
+     "burts E",
+     "skan «ī»",
+     "e-pasts"
+    ],
+    "I": [
+     "burts I",
+     "skan «ai»",
+     "sveiki"
+    ],
+    "A": [
+     "burts A",
+     "skan «ei»",
+     "vārds"
+    ],
+    "R": [
+     "burts R",
+     "skan «ā»",
+     "auto"
+    ],
+    "G": [
+     "burts G",
+     "skan «džī»",
+     "Vācija"
+    ],
+    "J": [
+     "burts J",
+     "skan «džei»",
+     "darbs"
+    ],
+    "Y": [
+     "burts Y",
+     "skan «vai»",
+     "kāpēc"
+    ],
+    "W": [
+     "burts W",
+     "«dabl jū» — divkāršais U",
+     "tīmekļa adrese"
+    ]
+   },
+   "notes": "Pārslēdz režīmus: burts → skaņa → vārds. Lai studenti katru burtu atkārto skaļi. Britu izrunā car — bez R skaņas: /kɑː/."
+  },
+  {
+   "type": "quiz",
+   "question": "E-M-A-I-L: the first letter sounds ___.",
+   "options": [
+    "/e/",
+    "/iː/",
+    "/aɪ/"
+   ],
+   "answer": 1,
+   "why": "E = **/iː/**, kā *tea*. I = /aɪ/, kā *my*.",
+   "notes": "Biežākā kļūda: E saka kā latviešu «e». Lai visi pasaka EMAIL pa burtiem."
+  },
+  {
+   "type": "quiz",
+   "question": "J-A-N-I-S: the first letter is ___ — /dʒeɪ/.",
+   "options": [
+    "G",
+    "J",
+    "Y"
+   ],
+   "answer": 1,
+   "why": "J = **/dʒeɪ/** (kā *day*), G = /dʒiː/ (kā *tea*).",
+   "notes": "Atgādini Oskara stāstu par «Jīgu». Lai studenti pasaka abus burtus pēc kārtas: G, J."
+  },
+  {
+   "type": "vocab",
+   "title": "Letters we *mix* up",
+   "cols": 3,
+   "items": [
+    {
+     "en": "E / I",
+     "ipa": "/iː/ · /aɪ/",
+     "lv": "«ī» / «ai»"
+    },
+    {
+     "en": "G / J",
+     "ipa": "/dʒiː/ · /dʒeɪ/",
+     "lv": "«džī» / «džei»"
+    },
+    {
+     "en": "A / R",
+     "ipa": "/eɪ/ · /ɑː/",
+     "lv": "«ei» / «ā»"
+    },
+    {
+     "en": "A / E",
+     "ipa": "/eɪ/ · /iː/",
+     "lv": "«ei» / «ī»"
+    },
+    {
+     "en": "V / W",
+     "ipa": "/viː/ · /ˈdʌbəl juː/",
+     "lv": "«vī» / «dabl jū»"
+    },
+    {
+     "en": "U / Y",
+     "ipa": "/juː/ · /waɪ/",
+     "lv": "«jū» / «vai»"
+    }
+   ],
+   "notes": "Pāri, ko latvieši jauc visbiežāk. Klikšķini kartīti — tulkojums, skaļrunis — izruna. Lai studenti pasaka katru pāri divreiz."
+  },
+  {
+   "type": "examples",
+   "title": "Short words, *letter* by letter",
+   "pose": "guide",
+   "items": [
+    {
+     "en": "T-E-A — tea",
+     "lv": "tēja"
+    },
+    {
+     "en": "B-U-S — bus",
+     "lv": "autobuss"
+    },
+    {
+     "en": "M-A-P — map",
+     "lv": "karte"
+    },
+    {
+     "en": "C-A-T — cat",
+     "lv": "kaķis"
+    },
+    {
+     "en": "T-A-X-I — taxi",
+     "lv": "taksometrs"
+    },
+    {
+     "en": "H-O-T-E-L — hotel",
+     "lv": "viesnīca"
+    }
+   ],
+   "notes": "Ar → atklāj tulkojumu. Lai studenti vispirms pasaka burtus, tad vārdu. Uzmanību: H — /eɪtʃ/, X — /eks/."
+  },
+  {
+   "type": "build",
+   "title": "Build the *question*",
+   "words": "E / that / or / Is / I",
+   "answer": "Is that E or I?",
+   "lv": "Vai tas ir E vai I? — saliec angliski.",
+   "notes": "Noderīgs jautājums, ja nesaprati burtu. Is that …? — no iepriekšējās tēmas (am / is / are). Pārbaudīt vai A — atbilde."
+  },
+  {
+   "type": "oscar",
+   "kind": "fact",
+   "pose": "bigben",
+   "side": "right",
+   "text": "Britānijā pēdējo burtu sauc **zed**, ASV — *zee*. Mēs esam pie Elizabeth Tower, tātad — zed!",
+   "en": "In the UK, Z is zed.",
+   "notes": "Pārbaudāms fakts: britu Z = zed, amerikāņu — zee. Šajā kursā lietojam britu formu."
+  },
+  {
+   "type": "quiz",
+   "question": "In British English, H is ___.",
+   "options": [
+    "«ha»",
+    "aitch",
+    "«hey»"
+   ],
+   "answer": 1,
+   "why": "H = **aitch** /eɪtʃ/: H-O-T-E-L.",
+   "notes": "Latviski «hā», angliski /eɪtʃ/. Lai studenti pasaka H-O-T-E-L pa burtiem."
+  },
+  {
+   "type": "picker",
+   "title": "Spell the *word*",
+   "hint": "Nospied «Griezt»",
+   "lv": "Pasaki vārdu pa burtiem skaļi sev. Tad pieraksti un pārbaudi.",
+   "pose": "teacher",
+   "items": [
+    "Spell: London",
+    "Spell: taxi",
+    "Spell: coffee",
+    "Spell: ticket",
+    "Spell: Riga",
+    "Spell: hotel",
+    "Spell: queue",
+    "Spell: passport"
+   ],
+   "notes": "Griez — katrs students pats pasaka vārdu pa burtiem. Coffee, passport — divi vienādi burti; tos sīkāk skatīsim 3. daļā, tagad drīkst teikt F-F."
+  },
+  {
+   "type": "task",
+   "title": "Record *yourself*",
+   "minutes": 8,
+   "mode": "Individuāli",
+   "steps": [
+    "Izvēlies 10 vārdus.",
+    "Ieslēdz diktofonu telefonā.",
+    "Pasaki katru pa burtiem: *T-E-A — tea*.",
+    "Noklausies: vai E, I, G, J — pareizi?"
+   ],
+   "box": "tea · bus · map · taxi · hotel · London · coffee · ticket · queue · passport",
+   "notes": "Individuāls darbs ar taimeri. Ieteikums: klausīties ierakstu un atzīmēt 1–2 burtus, kurus vēl vajag trenēt."
+  },
+  {
+   "type": "build",
+   "title": "Build the *question*",
+   "words": "you / that, / Can / please / spell",
+   "answer": "Can you spell that, please?",
+   "lv": "Vai tu vari to pateikt pa burtiem, lūdzu? — saliec angliski.",
+   "notes": "Pieklājīgs jautājums viesnīcā vai pa telefonu. Komats — pirms please."
+  },
+  {
+   "type": "quiz",
+   "question": "___ = /ˈdʌbəl juː/.",
+   "options": [
+    "V",
+    "W",
+    "U"
+   ],
+   "answer": 1,
+   "why": "W = **double u**, nevis «ve». V = /viː/.",
+   "notes": "Latviski bieži saka «dubult-ve». Lai studenti pasaka: www — double u, double u, double u."
+  },
+  {
+   "type": "big",
+   "kicker": "Tea break · 10 min",
+   "text": "It's *tea* time!",
+   "lv": "Pauze 10 minūtes. T-E-A — tea!",
+   "pose": "tea",
+   "notes": "Pauze 10 minūtes. Ieslēdz taimeri vai pasaki, cikos turpinām."
+  },
+  {
+   "type": "oscar",
+   "kind": "joke",
+   "pose": "spill",
+   "side": "right",
+   "text": "Kurš burts ir dzēriens? **T** — *tea*! To tikko izlēju… Kurš burts ir jautājums? **Y** — *why*! Kurš burts ir dārzenis? **P** — *pea*!",
+   "en": "What letter is a drink? T! What letter is a question? Y!",
+   "notes": "Viegls sākums pēc pauzes. T skan kā tea, Y — kā why, P — kā pea (zirnis). Lai studenti atkārto burtus un vārdus."
+  }
+ ]
+}
