@@ -82,7 +82,7 @@
     saplingsNote: ['Trees grow for a long time, one per bed. Then they stay and bear fruit again and again.', 'Деревья растут долго, одно на грядку. Потом остаются и плодоносят снова и снова.', 'Koki aug ilgi, viens dobē. Pēc tam paliek un nes augļus atkal un atkal.'],
     again: [n => `fruit every ${n} d`, n => `плоды каждые ${n} дн.`, n => `augļi ik pēc ${n} d.`],
     move: ['✋ Move things', '✋ Переставить', '✋ Pārkārtot'],
-    moveHint: ['Drag beds and things with your finger or mouse. Then tap “Save”.', 'Перетащи грядки и вещи пальцем или мышкой. Потом — «Сохранить».', 'Velc dobes un lietas ar pirkstu vai peli. Pēc tam — «Saglabāt».'],
+    moveHint: ['Drag beds and things with your finger or mouse. What is lower on the scene is closer. Then tap “Save”.', 'Перетащи грядки и вещи пальцем или мышкой. Что ниже на сцене — то ближе. Потом — «Сохранить».', 'Velc dobes un lietas ar pirkstu vai peli. Kas ainā zemāk — tas tuvāk. Pēc tam — «Saglabāt».'],
     moveSave: ['✅ Save', '✅ Сохранить', '✅ Saglabāt'],
     moveCancel: ['Cancel', 'Отмена', 'Atcelt'],
     moveReset: ['↩ As it was at first', '↩ Как было сначала', '↩ Kā bija sākumā'],
