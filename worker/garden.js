@@ -302,13 +302,15 @@ export async function gardenApi(req, env, url, h) {
     await env.DB.prepare('UPDATE garden SET hide = ? WHERE user_id = ?').bind(JSON.stringify(hide.slice(-40)), u.id).run();
     return out();
   }
-  if (p === '/api/garden/move') { // перестановка: {pos: {b0: [x, y], 'i:gnome': [x, y]}} целиком или {reset: true} — как было
+  if (p === '/api/garden/move') { // перестановка: {pos: {b0: [x, y, z], 'i:gnome': [x, y, z]}} целиком или {reset: true} — как было
     const pos = {};
     if (!b.reset) for (const [k, v] of Object.entries(b.pos && typeof b.pos === 'object' ? b.pos : {}).slice(0, 80)) {
       if (!(/^b\d{1,2}$/.test(k) && +k.slice(1) < s.beds.length) && !/^i:[a-z0-9]{1,24}$/.test(k)) continue;
-      if (!Array.isArray(v) || v.length !== 2) continue;
+      if (!Array.isArray(v) || v.length < 2) continue;
       const x = Math.round(Number(v[0])), y = Math.round(Number(v[1]));
-      if (Number.isFinite(x) && Number.isFinite(y)) pos[k] = [Math.max(-10, Math.min(250, x)), Math.max(0, Math.min(155, y))];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      const z = v.length > 2 && Number.isFinite(Number(v[2])) ? Math.max(0, Math.min(300, Math.round(Number(v[2])))) : null;
+      pos[k] = z == null ? [Math.max(-10, Math.min(250, x)), Math.max(0, Math.min(155, y))] : [Math.max(-10, Math.min(250, x)), Math.max(0, Math.min(155, y)), z];
     }
     await env.DB.prepare('UPDATE garden SET pos = ? WHERE user_id = ?').bind(JSON.stringify(pos), u.id).run();
     return out();
