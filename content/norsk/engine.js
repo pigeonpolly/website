@@ -1039,6 +1039,53 @@
       ${LEVELS.map(l => { const xs = list.filter(([u]) => u.lvl === l.id); return xs.length ? `<h3>${l.id}</h3><div class="box conf"><dl>${xs.map(([u, c]) => `<dt>${fmt(c[0])} <a class="note-s" href="#u/${u.id}">урок</a></dt><dd>${c[1]}</dd>`).join('')}</dl></div>` : ''; }).join('')}
       ${q.length ? blockHTML('conf-q', 'Тест «Не путай»', [{ t: 'choice', q: shuffle(q).slice(0, 25) }]) : ''}`;
   }
+
+  // ---------- 🥸 Слова в картинках (данные — content/norsk/ordbilder.js → window.NO_ORD, собирает tools/norsk_gender/make.py) ----------
+  const ORDB = window.NO_ORD || { k: [], o: [] };
+  const PMARKS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="ob-stache" viewBox="0 0 100 36"><path d="M50 12C44 4 31 4 23 12C17 18 9 20 3 13C3 25 14 32 27 28C37 25 44 21 50 21C56 21 63 25 73 28C86 32 97 25 97 13C91 20 83 18 77 12C69 4 56 4 50 12Z" fill="#6b4426" stroke="#3f2614" stroke-width="2" stroke-linejoin="round"/><path d="M30 13C36 11 42 12 47 15M70 13C64 11 58 12 53 15" fill="none" stroke="#8b5e3a" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="ob-bow" viewBox="0 0 100 70"><path d="M48 30L36 62L44 60L50 66L52 34Z" fill="#e66f7c" stroke="#b9475a" stroke-width="2.5" stroke-linejoin="round"/><path d="M52 30L64 62L56 60L50 66L48 34Z" fill="#e66f7c" stroke="#b9475a" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 28C38 8 10 4 8 20C6 38 34 42 50 32Z" fill="#f2848f" stroke="#b9475a" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 28C62 8 90 4 92 20C94 38 66 42 50 32Z" fill="#f2848f" stroke="#b9475a" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="50" cy="30" rx="8" ry="9" fill="#e66f7c" stroke="#b9475a" stroke-width="2.5"/></symbol></defs></svg>`;
+  const glyphs = e => { try { return [...new Intl.Segmenter().segment(e)].length; } catch (x) { return e.length > 3 ? 2 : 1; } };
+  const SCN = { on: 'на', under: 'под', over: 'над', in: 'в', beside: 'рядом', behind: 'за', front: 'перед', between: 'между', around: 'вокруг', outside: 'снаружи' };
+  function ppic(e, kind) {
+    if (e.startsWith('t:')) return `<span class="ob-t">${esc(e.slice(2))}</span>`;
+    if (e.startsWith('s:')) { const k = e.slice(2); return `<span class="ob-sc ${k}" aria-label="${SCN[k] || ''}"><i class="bx">📦</i>${k === 'between' ? '<i class="bx b2">📦</i>' : ''}<i class="ct">🐱</i>${k === 'around' ? '<i class="ar">🔄</i>' : ''}${k === 'outside' ? '' : ''}</span>`; }
+    const n = glyphs(e), emo = `<span class="ob-e${n > 1 ? ' m' + Math.min(n, 3) : ''}">${esc(e)}</span>`;
+    if (kind === 'et') return `<span class="ob-h l">${emo}</span><span class="ob-h r">${emo}</span>`;
+    return emo;
+  }
+  function kjonnCard([art, w, ru, e, y, t]) {
+    const mark = art === 'en' ? `<svg class="ob-st" style="top:${{ f: 66, b: 50 }[y] || 56}%" viewBox="0 0 100 36"><use href="#ob-stache"/></svg>` : art === 'ei' ? '<svg class="ob-bw" viewBox="0 0 100 70"><use href="#ob-bow"/></svg>' : '';
+    return `<div class="ob-c g-${art}" tabindex="0"><div class="ob-p">${ppic(e, art)}${mark}</div><b class="ob-w"><i>${art}</i> ${esc(w)}</b><span class="ob-tr">[${esc(t)}]</span><span class="ob-ru">${esc(ru)}</span></div>`;
+  }
+  const ppTools = (id, n, quiz) => `<div class="ob-bar"><label class="ob-jump">Тема: <select id="${id}-jump">${ORDB[id === 'pk' ? 'k' : 'o'].map((t, i) => `<option value="${i}">${esc(t[1])}</option>`).join('')}</select></label><button type="button" class="btn small" data-ppquiz aria-pressed="false">🙈 ${quiz}</button></div>`;
+  function kjonnPage() {
+    const n = ORDB.k.reduce((a, t) => a + t[2].length, 0), c = g => ORDB.k.reduce((a, t) => a + t[2].filter(x => x[0] === g).length, 0);
+    view.innerHTML = `${PMARKS}<div class="uhead"><div class="lv">Справочник</div><h2>en · ei · et в картинках</h2><p class="sub">${n} существительных A1–A2: ${c('en')} en, ${c('ei')} ei, ${c('et')} et — по темам, в каждой три колонки.</p></div>
+      <div class="ob-leg"><span class="g-en"><b>en</b> — мужской род, «с усами»</span><span class="g-ei"><b>ei</b> — женский, «с бантиком»</span><span class="g-et"><b>et</b> — средний, «разрезаны пополам»</span></div>
+      <p class="note-s">Транскрипция — русскими буквами, двоеточие — долгий звук: bok [бу:к]. Слова женского рода в букмоле можно говорить и с en (ei jente = en jente), но с ei род легче запомнить.</p>
+      ${ppTools('pk', n, 'Проверь себя: спрятать род')}
+      <div class="ob" id="ob">${ORDB.k.map(([no, ru, rows], i) => { const g = { en: [], ei: [], et: [] }; rows.forEach(r => g[r[0]].push(r));
+        return `<section class="ob-s" data-i="${i}"><h3>${esc(no)} <small>/ ${esc(ru)}</small></h3><div class="ob-3">${['en', 'ei', 'et'].map(a => `<div class="ob-col g-${a}" style="flex:${Math.max(g[a].length, 2)} 1 0"><div class="ob-hd">${a}</div><div class="ob-g">${g[a].map(kjonnCard).join('') || '<span class="note-s">—</span>'}</div></div>`).join('')}</div></section>`; }).join('')}</div>`;
+  }
+  const PTYPE = { v: 'Глаголы', a: 'Прилагательные', b: 'Наречия', pr: 'Предлоги', p: 'Местоимения', q: 'Вопросы', k: 'Союзы', n: 'Числа', f: 'Фразы', w: 'Слова' };
+  const PORDER = ['f', 'q', 'p', 'n', 'w', 'v', 'a', 'pr', 'b', 'k'];
+  function ordCard([t, w, ru, e, tr, pr]) {
+    return `<div class="ob-c o-${t}" tabindex="0"><div class="ob-p">${ppic(e)}</div><b class="ob-w">${t === 'v' ? '<i>å</i> ' : ''}${esc(w)}</b>${pr ? `<span class="ob-pr">${esc(pr)}</span>` : ''}<span class="ob-tr">[${esc(tr)}]</span><span class="ob-ru">${esc(ru)}</span></div>`;
+  }
+  function ordPage() {
+    const n = ORDB.o.reduce((a, t) => a + t[2].length, 0);
+    view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Слова в картинках</h2><p class="sub">${n} слов A1–A2 кроме существительных: глаголы, прилагательные, наречия, предлоги, числа, местоимения и фразы — по темам.</p></div>
+      <p class="note-s">У глаголов — инфинитив с å и под ним настоящее время: å spise — spiser. Транскрипция — русскими буквами, двоеточие — долгий звук.</p>
+      ${ppTools('po', n, 'Проверь себя: спрятать перевод')}
+      <div class="ob" id="ob">${ORDB.o.map(([no, ru, rows], i) => `<section class="ob-s" data-i="${i}"><h3>${esc(no)} <small>/ ${esc(ru)}</small></h3>${PORDER.filter(t => rows.some(r => r[0] === t)).map(t => `<div class="ob-tg o-${t}">${PTYPE[t]}</div><div class="ob-g">${rows.filter(r => r[0] === t).map(ordCard).join('')}</div>`).join('')}</section>`).join('')}</div>`;
+  }
+  view.addEventListener('change', e => { const s = e.target.closest('#pk-jump, #po-jump'); if (s) { const el = $(`.ob-s[data-i="${s.value}"]`, view); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+  view.addEventListener('click', e => {
+    const q = e.target.closest('[data-ppquiz]'); if (q) { const on = $('#ob').classList.toggle('quiz'); q.setAttribute('aria-pressed', on); $$('.ob-c.open', view).forEach(c => c.classList.remove('open')); return; }
+    const c = e.target.closest('.ob.quiz .ob-c'); if (c) c.classList.toggle('open');
+  });
+  view.addEventListener('keydown', e => { const c = e.target.closest('.ob.quiz .ob-c'); if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); c.classList.toggle('open'); } });
   function topicsPage() {
     const n = Object.values(TOPICS).reduce((a, t) => a + t.w.length, 0);
     view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Тематический словарь</h2><p class="sub">${Object.keys(TOPICS).length} тем · ${n} слов — по одной теме в каждом уроке. К концу курса — словарь на все случаи жизни.</p></div>
@@ -1159,6 +1206,8 @@
       <li><a href="#irr" data-to="irr"><span class="n">🔤</span><span class="t">Сильные глаголы</span></a></li>
       <li><a href="#series" data-to="series"><span class="n">🗣</span><span class="t">Выражения и сериалы</span></a></li>
       <li><a href="#topics" data-to="topics"><span class="n">🗂</span><span class="t">Тематический словарь</span></a></li>
+      <li><a href="#kjonn" data-to="kjonn"><span class="n">🥸</span><span class="t">en · ei · et в картинках</span></a></li>
+      <li><a href="#ord" data-to="ord"><span class="n">🖍</span><span class="t">Слова в картинках</span></a></li>
       <li><a href="#ach" data-to="ach"><span class="n">🏆</span><span class="t">Ачивки</span></a></li>
       <li><a href="#src" data-to="src"><span class="n">📚</span><span class="t">Источники</span></a></li>`;
   }
@@ -1195,6 +1244,8 @@
     else if (a === 'etym') etymPage();
     else if (a === 'pods') podsPage();
     else if (a === 'topics') topicsPage();
+    else if (a === 'kjonn') kjonnPage();
+    else if (a === 'ord') ordPage();
     else homePage();
     if (a !== 'u') delete view.dataset.unit;
     for (const x of $$('#toc a')) x.classList.toggle('on', x.dataset.to === h);

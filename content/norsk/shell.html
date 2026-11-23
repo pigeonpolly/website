@@ -383,6 +383,56 @@ figure.tenniel.side { float: right; max-width: 120px; margin: 0 0 8px 12px; } fi
   .reading { padding: 14px; }
   .words .acts { grid-row: 1; }
 }
+
+/* 🥸 Слова в картинках (#kjonn, #ord) */
+.ob-leg { display: flex; flex-wrap: wrap; gap: 6px 20px; font-family: var(--f-ui); font-size: 15px; margin: 8px 0; }
+.ob-leg .g-en, .ob-col.g-en .ob-hd, .ob-c.g-en .ob-w i { color: #4f74a8; } .ob-leg .g-ei, .ob-col.g-ei .ob-hd, .ob-c.g-ei .ob-w i { color: #c95a6a; } .ob-leg .g-et, .ob-col.g-et .ob-hd, .ob-c.g-et .ob-w i { color: #4f8c55; }
+:root[data-theme="night"] .ob-leg .g-en, :root[data-theme="night"] .ob-col.g-en .ob-hd, :root[data-theme="night"] .ob-c.g-en .ob-w i, :root[data-theme="forest"] .ob-leg .g-en, :root[data-theme="forest"] .ob-col.g-en .ob-hd, :root[data-theme="forest"] .ob-c.g-en .ob-w i { color: #8fb4ec; }
+:root[data-theme="night"] .ob-leg .g-ei, :root[data-theme="night"] .ob-col.g-ei .ob-hd, :root[data-theme="night"] .ob-c.g-ei .ob-w i, :root[data-theme="forest"] .ob-leg .g-ei, :root[data-theme="forest"] .ob-col.g-ei .ob-hd, :root[data-theme="forest"] .ob-c.g-ei .ob-w i { color: #f29aa6; }
+:root[data-theme="night"] .ob-leg .g-et, :root[data-theme="night"] .ob-col.g-et .ob-hd, :root[data-theme="night"] .ob-c.g-et .ob-w i, :root[data-theme="forest"] .ob-leg .g-et, :root[data-theme="forest"] .ob-col.g-et .ob-hd, :root[data-theme="forest"] .ob-c.g-et .ob-w i { color: #8fd39a; }
+.ob-bar { position: sticky; top: 52px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; background: var(--paper); padding: 8px 0; font-family: var(--f-ui); font-size: 14px; }
+.ob-bar select { font: inherit; padding: 4px 6px; border-radius: 8px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); max-width: 60vw; }
+.ob-s { scroll-margin-top: 110px; }
+.ob-s h3 small { color: var(--muted); font-weight: 400; }
+.ob-3 { display: flex; gap: 14px; align-items: flex-start; }
+.ob-col { min-width: 0; }
+.ob-hd { font: 700 20px var(--f-ui); border-bottom: 2px solid currentColor; margin-bottom: 8px; padding-left: 2px; }
+.ob-g { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.ob-c { background: var(--card); border: 1px solid var(--rule); border-radius: 14px 11px 16px 10px; padding: 8px 4px 7px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: var(--f-ui); line-height: 1.15; }
+.ob-p { position: relative; width: 84px; height: 72px; display: grid; place-items: center; }
+.ob-e { font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; font-size: 52px; line-height: 1; white-space: nowrap; }
+.ob-e.m2 { font-size: 34px; } .ob-e.m3 { font-size: 25px; }
+.ob-t { font: 700 34px/1 var(--f-ui); color: var(--accent); white-space: nowrap; }
+.ob-c .ob-t:only-child { font-size: clamp(18px, 6vw, 34px); }
+.ob-st { position: absolute; left: 50%; width: 54px; transform: translate(-50%, -50%) rotate(-3deg); pointer-events: none; }
+.ob-bw { position: absolute; width: 38px; top: -4px; right: 2px; transform: rotate(14deg); pointer-events: none; }
+.ob-h { position: absolute; inset: 0; display: grid; place-items: center; }
+.ob-h.l { clip-path: inset(0 50% 0 0); transform: translateX(-6px) rotate(-6deg); }
+.ob-h.r { clip-path: inset(0 0 0 50%); transform: translateX(6px) rotate(6deg); }
+.ob-w { font-size: 16px; margin-top: 2px; overflow-wrap: anywhere; } .ob-w i { font-style: normal; color: var(--muted); }
+.ob-pr { font-size: 13px; color: var(--muted); }
+.ob-tr { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.ob-ru { font-size: 13px; color: var(--ink); opacity: .8; overflow-wrap: anywhere; }
+.ob-tg { font: 600 13px var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 10px 0 6px; padding-left: 8px; border-left: 4px solid var(--accent); }
+.ob-tg.o-v { border-color: #4f74a8; } .ob-tg.o-a { border-color: #d0823a; } .ob-tg.o-b { border-color: #8a5bb5; } .ob-tg.o-pr { border-color: #2f8f8a; } .ob-tg.o-n { border-color: #c9a227; } .ob-tg.o-p { border-color: #c95a8a; } .ob-tg.o-f { border-color: #4f8c55; } .ob-tg.o-q { border-color: #c44a3a; }
+.ob-sc { position: relative; width: 80px; height: 70px; display: block; } .ob-sc i { position: absolute; font-style: normal; font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; line-height: 1; }
+.ob-sc .bx { font-size: 38px; left: 21px; top: 30px; } .ob-sc .ct { font-size: 28px; left: 26px; top: 2px; z-index: 2; }
+.ob-sc.under .bx { top: 0; } .ob-sc.under .ct { top: 40px; }
+.ob-sc.over .ct { top: -6px; } .ob-sc.over .bx { top: 34px; }
+.ob-sc.in .bx { z-index: 3; top: 28px; } .ob-sc.in .ct { top: 24px; left: 28px; font-size: 24px; z-index: 2; }
+.ob-sc.beside .bx { left: 2px; top: 30px; } .ob-sc.beside .ct { left: 46px; top: 36px; }
+.ob-sc.behind .bx { z-index: 3; top: 30px; left: 18px; } .ob-sc.behind .ct { top: 20px; left: 38px; font-size: 26px; z-index: 1; }
+.ob-sc.front .bx { top: 16px; left: 30px; font-size: 32px; } .ob-sc.front .ct { top: 36px; left: 14px; font-size: 32px; z-index: 3; }
+.ob-sc.between .bx { left: -2px; top: 34px; font-size: 30px; } .ob-sc.between .b2 { left: 52px; } .ob-sc.between .ct { left: 27px; top: 38px; font-size: 26px; }
+.ob-sc.around .bx { left: 24px; top: 22px; font-size: 30px; } .ob-sc.around .ar { font-size: 64px; left: 8px; top: 2px; opacity: .35; } .ob-sc.around .ct { left: 50px; top: 0; font-size: 22px; }
+.ob-sc.outside .bx { left: 2px; top: 22px; font-size: 44px; } .ob-sc.outside .ct { left: 50px; top: 38px; font-size: 26px; }
+.ob.quiz .ob-c { cursor: pointer; }
+.ob.quiz .ob-c.g-en:not(.open) .ob-w i, .ob.quiz .ob-c.g-ei:not(.open) .ob-w i, .ob.quiz .ob-c.g-et:not(.open) .ob-w i { color: transparent; border-bottom: 2px dashed var(--muted); }
+.ob.quiz .ob-c:not(.open) .ob-st, .ob.quiz .ob-c:not(.open) .ob-bw { visibility: hidden; }
+.ob.quiz .ob-c:not(.open) .ob-h { transform: none; }
+.ob.quiz .ob-c[class*="o-"]:not(.open) .ob-ru { color: transparent; background: var(--paper-2); border-radius: 6px; }
+.ob.quiz .ob-3 { } 
+@media (max-width: 720px) { .ob-3 { flex-direction: column; gap: 4px; } .ob-col { width: 100%; flex: none !important; } .ob-g { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); } }
 </style>
 </head>
 <body>
@@ -391,7 +441,8 @@ figure.tenniel.side { float: right; max-width: 120px; margin: 0 0 8px 12px; } fi
   <a class="chip" href="/ru/" title="На сайт pigeonpolly.com" aria-label="На сайт">🏠</a>
   <a class="brand" href="#home">Norsk <span>A1–C2</span></a>
   <div class="grow"><div class="meter" title="Прогресс по всему учебнику" aria-hidden="true"><i id="meter"></i></div><span class="pct" id="pct">0 %</span></div>
-  <a class="chip" href="/members/norsk/norsk-a1-a2-en-ei-et.pdf" target="_blank" rel="noopener" title="720 слов A1–A2: en, ei, et в картинках (PDF)">🥸<span class="hide-s"> en·ei·et</span></a>
+  <a class="chip" href="#kjonn" title="en · ei · et: 720 существительных в картинках">🥸<span class="hide-s"> en·ei·et</span></a>
+  <a class="chip" href="#ord" title="Глаголы, прилагательные, числа и другие слова в картинках">🖍<span class="hide-s"> ord</span></a>
   <a class="chip hide-s" href="#ach" id="achip" title="Ачивки">🏆 0</a>
   <a class="chip" href="#dict" id="dchip" title="Мой словарь">📒 0</a>
   <a class="chip" href="/norsk/avis/" title="Morgenavis — утренняя газета на норвежском">📰</a>
