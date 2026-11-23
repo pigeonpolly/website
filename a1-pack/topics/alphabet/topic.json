@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "slug": "alphabet",
+    "title_en": "The *alphabet*",
+    "title_lv": "Alfabēts — burti, vārds pa burtiem, e-pasts",
+    "course": "English A1",
+    "level": "A1",
+    "lesson": 2,
+    "minutes": 180,
+    "accent": "#9A6A12",
+    "sources": [
+      {"name": "British Council LearnEnglish", "url": "https://learnenglish.britishcouncil.org/"},
+      {"name": "Cambridge English", "url": "https://www.cambridgeenglish.org/learning-english/"},
+      {"name": "BBC Learning English", "url": "https://www.bbc.co.uk/learningenglish/"},
+      {"name": "English Vocabulary Profile", "url": "https://www.englishprofile.org/wordlists/evp"},
+      {"name": "CEFR", "url": "https://www.coe.int/en/web/common-european-framework-reference-languages"}
+    ]
+  }
+}
