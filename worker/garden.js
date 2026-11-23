@@ -42,11 +42,10 @@ export const GARDEN_RULES = {
   gardenSeason: 'auto', // погода и вид: auto — по календарю (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень)
   gardenCleanOn: true, gardenCleanPiles: 3, gardenCleanPay: 1, gardenCleanBtn: 2, gardenCompostH: 6, // уборка листьев/снега и компост
   gardenLvlXp: 50, // опыт фермы: сколько XP на новый уровень
-  gardenOrderPct: 150, // заказ дня: пуговки — % от цены урожая в заказе
 };
 export const GARDEN_RANGE = { gardenDropPct: [0, 100], gardenDropDay: [0, 20], gardenRareDays: [1, 30], gardenMagicDays: [1, 30], gardenRareMul: [1, 20], gardenMagicMul: [1, 20], gardenTreeSeedMul: [1, 20], gardenTreeSellMul: [0.5, 20], gardenTreeAgainPct: [5, 100], gardenBeds: [1, 12], gardenBedsMax: [1, 12], gardenBedBtn: [0, 10000], gardenBedSell: [0, 100], gardenWetH: [1, 72], gardenSeedPct: [0, 100], gardenSellPct: [0, 100], gardenStarter: [0, 20], gardenBugMax: [0, 10], gardenBugChance: [0, 100], gardenBugBtn: [0, 100],
-  gardenCleanPiles: [0, 10], gardenCleanPay: [0, 100], gardenCleanBtn: [0, 100], gardenCompostH: [1, 48], gardenLvlXp: [10, 500], gardenOrderPct: [100, 500] };
-export const GARDEN_INT = ['gardenBedsMax', 'gardenBedBtn', 'gardenBedSell', 'gardenTreeAgainPct', 'gardenDropDay', 'gardenRareDays', 'gardenMagicDays', 'gardenBeds', 'gardenWetH', 'gardenStarter', 'gardenBugMax', 'gardenBugChance', 'gardenBugBtn', 'gardenCleanPiles', 'gardenCleanPay', 'gardenCleanBtn', 'gardenCompostH', 'gardenLvlXp', 'gardenOrderPct'];
+  gardenCleanPiles: [0, 10], gardenCleanPay: [0, 100], gardenCleanBtn: [0, 100], gardenCompostH: [1, 48], gardenLvlXp: [10, 500] };
+export const GARDEN_INT = ['gardenBedsMax', 'gardenBedBtn', 'gardenBedSell', 'gardenTreeAgainPct', 'gardenDropDay', 'gardenRareDays', 'gardenMagicDays', 'gardenBeds', 'gardenWetH', 'gardenStarter', 'gardenBugMax', 'gardenBugChance', 'gardenBugBtn', 'gardenCleanPiles', 'gardenCleanPay', 'gardenCleanBtn', 'gardenCompostH', 'gardenLvlXp'];
 export const GARDEN_BOOL = ['gardenOn', 'gardenCleanOn'];
 export const GARDEN_SEASONS = ['auto', 'autumn', 'winter', 'spring', 'summer'];
 
@@ -81,14 +80,13 @@ const sellPct = (R, k) => R.gardenSellPct * CROPS[k] * sellMul(R, k) * (TIER[k] 
 export const grown = (b, now, wetH) => !b ? 0 : (b.g || 0) + (b.w ? Math.max(0, Math.min(now - b.w, wetH * HOUR)) : 0);
 // опыт фермы: уровень от накопленного XP (gardenLvlXp — сколько на уровень)
 export const levelOf = (xp, R) => 1 + Math.floor(Math.max(0, Number(xp) || 0) / Math.max(10, R.gardenLvlXp || 50));
-// заказ дня: два простых растения из корзинки, цена — по урожаю, награда — % от неё
+// заказ дня: два простых растения из корзинки; награда — ровно вдвое больше, чем дали бы за них при продаже
 export function orderOf(uid, day, R) {
   const h = fnv(uid + ':' + day + ':order'), list = ['radish', 'lettuce', 'carrot', 'tulip'];
   const a = list[h % list.length];
   let b = list[(h >>> 5) % list.length]; if (b === a) b = list[(h >>> 9) % list.length]; if (b === a) b = a === 'radish' ? 'lettuce' : 'radish';
   const items = [{ p: a, n: 1 + (h >>> 12) % 2 }, { p: b, n: 1 + (h >>> 16) % 2 }];
-  const value = items.reduce((sum, x) => sum + sellPct(R, x.p) * x.n, 0);
-  return { day, items, value, seed: list[(h >>> 20) % list.length] };
+  return { day, items, seed: list[(h >>> 20) % list.length] };
 }
 // жуки дня: [{i, at, bed}] — сколько и когда вылезают, одинаково при каждом запросе (от птички и дня)
 export function bugsOf(uid, day, R) {
@@ -120,6 +118,7 @@ export async function gardenApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h, R = h.rules(), now = Date.now();
   const unit = await h.unit();
   const prices = () => Object.fromEntries(Object.entries(CROPS).map(([k, d]) => [k, { days: d, seed: NOSALE(k) ? null : h.btnOf(R.gardenSeedPct * d * (TIER[k] === 'tree' ? R.gardenTreeSeedMul : 1), unit), sell: h.btnOf(sellPct(R, k), unit), tier: TIER[k] || '', again: TIER[k] === 'tree' ? Math.round(d * R.gardenTreeAgainPct / 10) / 10 : undefined }]));
+  const orderReward = ord => ord.items.reduce((sum, x) => sum + h.btnOf(sellPct(R, x.p), unit) * x.n, 0) * 2; // ровно ×2 к продаже
   const rowOf = async uid => {
     let r = await env.DB.prepare('SELECT * FROM garden WHERE user_id = ?').bind(uid).first();
     if (!r) {
@@ -158,7 +157,7 @@ export async function gardenApi(req, env, url, h) {
   const state = async (u, s) => {
     const today = h.rigaDay(), all = bugsOf(u.id, today, R), season = seasonOf(R, today), items = await itemsOf(u.id), hide = parse(s.row.hide, []);
     const chows = choresOf(u.id, today, R, season), got = s.row.chore_day === today ? parse(s.row.chore_got, []) : [];
-    const ord = orderOf(u.id, today, R), order = { ...ord, done: s.row.order_day === today, reward: h.btnOf(ord.value * (R.gardenOrderPct || 150) / 100, unit), can: ord.items.every(x => (s.crop[x.p] || 0) >= x.n) };
+    const ord = orderOf(u.id, today, R), order = { ...ord, done: s.row.order_day === today, reward: orderReward(ord), can: ord.items.every(x => (s.crop[x.p] || 0) >= x.n) };
     const xp = Number(s.row.xp) || 0, level = levelOf(xp, R), lvlXp = Math.max(10, R.gardenLvlXp || 50);
     return { on: R.gardenOn, beds: s.beds.map(b => view(b, today)), seeds: s.seeds, crop: s.crop, prices: prices(), bugs: bugsView(u.id, s.got, s.beds.length), forms: parse(s.row.forms, {}), bedsMax: Math.max(R.gardenBeds, R.gardenBedsMax || 10), bedBtn: R.gardenBedBtn, bedSell: R.gardenBedSell, bedbag: s.row.bedbag || 0,
       bugsGot: s.got.length, bugsLater: all.some(b => b.at > now), bugBtn: R.gardenBugBtn, wetH: R.gardenWetH, season, today,
@@ -423,7 +422,7 @@ export async function gardenApi(req, env, url, h) {
     if (!ord.items.every(x => (s.crop[x.p] || 0) >= x.n)) fail(409, 'ordnofruit');
     for (const x of ord.items) { s.crop[x.p] -= x.n; if (!s.crop[x.p]) delete s.crop[x.p]; }
     s.seeds[ord.seed] = (s.seeds[ord.seed] || 0) + 1;
-    const reward = h.btnOf(ord.value * (R.gardenOrderPct || 150) / 100, unit);
+    const reward = orderReward(ord);
     await save({ crop: s.crop, seeds: s.seeds, order_day: today });
     const got = reward > 0 ? await h.award(u.id, 'gorder', today, reward) : 0;
     await addXp(10);

@@ -90,7 +90,7 @@ file	site/assets/about-admin.js	site/assets/about-admin.js	0	47 строк, 6 К
 file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 КБ
 file	site/assets/account.js	site/assets/account.js	0	434 строк, 43 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
-file	site/assets/admin.js	site/assets/admin.js	0	1565 строк, 237 КБ
+file	site/assets/admin.js	site/assets/admin.js	0	1564 строк, 237 КБ
 file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	403 строк, 32 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	304 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
@@ -424,7 +424,7 @@ file	worker/english-page.js	worker/english-page.js	0	2 строк, 1184 КБ · 
 file	worker/english.js	worker/english.js	0	59 строк, 5 КБ
 file	worker/flock-news.js	worker/flock-news.js	0	123 строк, 10 КБ
 file	worker/flock.js	worker/flock.js	0	124 строк, 10 КБ
-file	worker/garden.js	worker/garden.js	0	490 строк, 43 КБ
+file	worker/garden.js	worker/garden.js	0	489 строк, 43 КБ
 file	worker/guides.js	worker/guides.js	0	199 строк, 15 КБ
 file	worker/ideas.js	worker/ideas.js	0	197 строк, 17 КБ
 file	worker/index.js	worker/index.js	0	3282 строк, 324 КБ
@@ -1924,22 +1924,22 @@ sym	LEVEL_RU	site/assets/admin.js	784	const
 sym	BADGE_COND	site/assets/admin.js	786	const
 sym	BADGE_FIXED	site/assets/admin.js	800	const
 sym	rules	site/assets/admin.js	801	fn
-sym	taxDialog	site/assets/admin.js	1084	fn
-sym	PPGiftDialog	site/assets/admin.js	1119	win
-sym	giftDialog	site/assets/admin.js	1120	fn
-sym	PR	site/assets/admin.js	1241	const
-sym	effPrice	site/assets/admin.js	1242	const
-sym	sFilter	site/assets/admin.js	1243	const
-sym	shop	site/assets/admin.js	1244	fn
-sym	bSort	site/assets/admin.js	1381	const
-sym	bPick	site/assets/admin.js	1382	const
-sym	sendDialog	site/assets/admin.js	1384	const
-sym	pickLabel	site/assets/admin.js	1394	const
-sym	birds	site/assets/admin.js	1395	fn
-sym	subscribers	site/assets/admin.js	1520	fn
-sym	backupBox	site/assets/admin.js	1545	const
-sym	wireBackup	site/assets/admin.js	1551	fn
-sym	backup	site/assets/admin.js	1557	fn
+sym	taxDialog	site/assets/admin.js	1083	fn
+sym	PPGiftDialog	site/assets/admin.js	1118	win
+sym	giftDialog	site/assets/admin.js	1119	fn
+sym	PR	site/assets/admin.js	1240	const
+sym	effPrice	site/assets/admin.js	1241	const
+sym	sFilter	site/assets/admin.js	1242	const
+sym	shop	site/assets/admin.js	1243	fn
+sym	bSort	site/assets/admin.js	1380	const
+sym	bPick	site/assets/admin.js	1381	const
+sym	sendDialog	site/assets/admin.js	1383	const
+sym	pickLabel	site/assets/admin.js	1393	const
+sym	birds	site/assets/admin.js	1394	fn
+sym	subscribers	site/assets/admin.js	1519	fn
+sym	backupBox	site/assets/admin.js	1544	const
+sym	wireBackup	site/assets/admin.js	1550	fn
+sym	backup	site/assets/admin.js	1556	fn
 sym	ADV_SP	site/assets/advent-admin.js	39	const
 sym	FILE_MAX	site/assets/advent-admin.js	40	const
 sym	advSet	site/assets/advent-admin.js	41	fn
@@ -6462,37 +6462,37 @@ sym	featherNews	worker/flock.js	120	fn
 sym	GARDEN_TABLES	worker/garden.js	17	const
 sym	GARDEN_ALTER	worker/garden.js	24	const
 sym	GARDEN_RULES	worker/garden.js	30	const
-sym	GARDEN_RANGE	worker/garden.js	47	const
-sym	GARDEN_INT	worker/garden.js	49	const
-sym	GARDEN_BOOL	worker/garden.js	50	const
-sym	GARDEN_SEASONS	worker/garden.js	51	const
-sym	CROPS	worker/garden.js	54	const
-sym	TIER	worker/garden.js	58	const
-sym	NOSALE	worker/garden.js	60	const
-sym	SIMPLE	worker/garden.js	61	const
-sym	ofTier	worker/garden.js	62	const
-sym	starter	worker/garden.js	63	const
-sym	sellMul	worker/garden.js	64	const
-sym	back	worker/garden.js	65	const
-sym	run	worker/garden.js	67	const
-sym	DAY	worker/garden.js	68	const
-sym	FORMS	worker/garden.js	69	const
-sym	bedsN	worker/garden.js	71	const
-sym	parse	worker/garden.js	73	const
-sym	fnv	worker/garden.js	74	const
-sym	dayOf	worker/garden.js	75	const
-sym	needMs	worker/garden.js	78	const
-sym	sellPct	worker/garden.js	80	const
-sym	grown	worker/garden.js	81	const
-sym	levelOf	worker/garden.js	83	const
-sym	orderOf	worker/garden.js	85	fn
-sym	bugsOf	worker/garden.js	94	fn
-sym	choresOf	worker/garden.js	101	fn
-sym	shiftBeds	worker/garden.js	107	const
-sym	gardenApi	worker/garden.js	119	fn
-sym	seasonOf	worker/garden.js	461	fn
-sym	gardenDrop	worker/garden.js	468	fn
-sym	gardenNews	worker/garden.js	484	fn
+sym	GARDEN_RANGE	worker/garden.js	46	const
+sym	GARDEN_INT	worker/garden.js	48	const
+sym	GARDEN_BOOL	worker/garden.js	49	const
+sym	GARDEN_SEASONS	worker/garden.js	50	const
+sym	CROPS	worker/garden.js	53	const
+sym	TIER	worker/garden.js	57	const
+sym	NOSALE	worker/garden.js	59	const
+sym	SIMPLE	worker/garden.js	60	const
+sym	ofTier	worker/garden.js	61	const
+sym	starter	worker/garden.js	62	const
+sym	sellMul	worker/garden.js	63	const
+sym	back	worker/garden.js	64	const
+sym	run	worker/garden.js	66	const
+sym	DAY	worker/garden.js	67	const
+sym	FORMS	worker/garden.js	68	const
+sym	bedsN	worker/garden.js	70	const
+sym	parse	worker/garden.js	72	const
+sym	fnv	worker/garden.js	73	const
+sym	dayOf	worker/garden.js	74	const
+sym	needMs	worker/garden.js	77	const
+sym	sellPct	worker/garden.js	79	const
+sym	grown	worker/garden.js	80	const
+sym	levelOf	worker/garden.js	82	const
+sym	orderOf	worker/garden.js	84	fn
+sym	bugsOf	worker/garden.js	92	fn
+sym	choresOf	worker/garden.js	99	fn
+sym	shiftBeds	worker/garden.js	105	const
+sym	gardenApi	worker/garden.js	117	fn
+sym	seasonOf	worker/garden.js	460	fn
+sym	gardenDrop	worker/garden.js	467	fn
+sym	gardenNews	worker/garden.js	483	fn
 sym	KEY	worker/guides.js	5	const
 sym	GUIDES_ALTER	worker/guides.js	7	const
 sym	SEEN_MAX	worker/guides.js	8	const
