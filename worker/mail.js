@@ -4,7 +4,7 @@
 // Рассылка из кабинета (✉️ Письма, site/assets/mail-admin.js): письмо на 3 языках → mail_out, отправка порциями: сразу и раз в час (mailCron),
 // не больше MAIL_DAY_MAX в сутки вместе с письмами об адвенте и праздниках Воббленда (worker/wl-holidays.js — только при mail_games = 1) (Resend бесплатно: 100 в сутки).
 import { mailOn, sendMail } from './auth.js';
-import { grown, CROPS } from './garden.js';
+import { grown, needMs, CROPS } from './garden.js';
 
 export const MAIL_CATS = ['games', 'feat', 'news'];
 export const MAIL_TABLES = [
@@ -123,8 +123,8 @@ export async function mailGamesCron(env, h) {
   for (const u of (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang, g.beds FROM users u JOIN garden g ON g.user_id = u.id WHERE ${base}
     AND COALESCE(u.last_seen, 0) < ? AND COALESCE(u.mail_g_garden, 0) < ? AND g.beds LIKE '%"p"%' LIMIT 200`).bind(t - 86400, t - R.mailGardenDays * 86400).all().catch(() => ({ results: [] }))).results) {
     const beds = parseJ(u.beds, []).filter(b => b && CROPS[b.p]);
-    const ripe = beds.some(b => grown(b, ms, wetH) >= CROPS[b.p] * 864e5);
-    const dry = beds.some(b => grown(b, ms, wetH) < CROPS[b.p] * 864e5 && (!b.w || ms - b.w > (wetH + 6) * 36e5));
+    const ripe = beds.some(b => grown(b, ms, wetH) >= needMs(b, R));
+    const dry = beds.some(b => grown(b, ms, wetH) < needMs(b, R) && (!b.w || ms - b.w > (wetH + 6) * 36e5));
     if (ripe || dry) add(u, 'garden', { ripe, dry });
   }
   // 🕵️ Титос: следующее дело ждёт

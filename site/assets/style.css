@@ -5065,6 +5065,9 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .gd-row:empty { display: none; }
 .gd-ok { font: 600 15px var(--sans); color: #8ED26A; }
 .gd-note { font: 14px/1.45 var(--sans); opacity: .78; margin: 0; }
+.gd-cv.gd-edit { outline: 3px dashed var(--peach); outline-offset: -3px; } /* ✋ перестановка грядок и вещей */
+.gd-sub { margin: 14px 0 2px; font: 600 16px var(--sans); }
+.gd-over { opacity: 1; font-weight: 600; }
 .gd-sel, .gd-box { padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
 .gd-sel { border-color: var(--peach); }
 .gd-info { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
