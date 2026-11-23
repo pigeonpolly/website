@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 455, страниц 58, маршрутов 221, таблиц 80, ключей meta 73, имён 6175, разделов доков 255
+# файлов 455, страниц 58, маршрутов 221, таблиц 80, ключей meta 73, имён 6178, разделов доков 255
 file	build.py	build.py	0	897 строк, 61 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -59,7 +59,7 @@ file	docs/a1-pack.md	docs/a1-pack.md	0	10 строк, 2 КБ
 file	docs/admin.md	docs/admin.md	0	180 строк, 52 КБ
 file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
 file	docs/basics.md	docs/basics.md	0	47 строк, 10 КБ
-file	docs/bird.md	docs/bird.md	0	124 строк, 68 КБ
+file	docs/bird.md	docs/bird.md	0	125 строк, 69 КБ
 file	docs/blog.md	docs/blog.md	0	122 строк, 39 КБ
 file	docs/cards.md	docs/cards.md	0	109 строк, 24 КБ
 file	docs/challenge.md	docs/challenge.md	0	152 строк, 63 КБ
@@ -75,7 +75,7 @@ file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	390 строк, 78 КБ
 file	docs/palettes.md	docs/palettes.md	0	82 строк, 46 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	226 строк, 60 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	227 строк, 60 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/postcards.md	docs/postcards.md	0	25 строк, 6 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
@@ -90,7 +90,7 @@ file	site/assets/about-admin.js	site/assets/about-admin.js	0	47 строк, 6 К
 file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 КБ
 file	site/assets/account.js	site/assets/account.js	0	434 строк, 43 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
-file	site/assets/admin.js	site/assets/admin.js	0	1562 строк, 236 КБ
+file	site/assets/admin.js	site/assets/admin.js	0	1565 строк, 237 КБ
 file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	403 строк, 32 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	304 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
@@ -131,7 +131,7 @@ file	site/assets/freebies.css	site/assets/freebies.css	0	22 строк, 2 КБ
 file	site/assets/freebies.js	site/assets/freebies.js	0	92 строк, 11 КБ
 file	site/assets/games-hub.js	site/assets/games-hub.js	0	40 строк, 2 КБ
 file	site/assets/garden-items.js	site/assets/garden-items.js	0	172 строк, 21 КБ
-file	site/assets/garden.js	site/assets/garden.js	0	678 строк, 73 КБ
+file	site/assets/garden.js	site/assets/garden.js	0	724 строк, 79 КБ
 file	site/assets/guides-admin.js	site/assets/guides-admin.js	0	110 строк, 14 КБ
 file	site/assets/hatch.js	site/assets/hatch.js	0	123 строк, 9 КБ
 file	site/assets/how.css	site/assets/how.css	0	150 строк, 10 КБ
@@ -179,7 +179,7 @@ file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
 file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 120 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
 file	site/assets/spectral.min.js	site/assets/spectral.min.js	0	2 строк, 12 КБ
-file	site/assets/style.css	site/assets/style.css	0	5760 строк, 517 КБ
+file	site/assets/style.css	site/assets/style.css	0	5784 строк, 520 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/tarot.css	site/assets/tarot.css	0	70 строк, 6 КБ
 file	site/assets/tarot.js	site/assets/tarot.js	0	342 строк, 18 КБ
@@ -424,7 +424,7 @@ file	worker/english-page.js	worker/english-page.js	0	2 строк, 1184 КБ · 
 file	worker/english.js	worker/english.js	0	59 строк, 5 КБ
 file	worker/flock-news.js	worker/flock-news.js	0	123 строк, 10 КБ
 file	worker/flock.js	worker/flock.js	0	124 строк, 10 КБ
-file	worker/garden.js	worker/garden.js	0	430 строк, 38 КБ
+file	worker/garden.js	worker/garden.js	0	488 строк, 42 КБ
 file	worker/guides.js	worker/guides.js	0	199 строк, 15 КБ
 file	worker/ideas.js	worker/ideas.js	0	197 строк, 17 КБ
 file	worker/index.js	worker/index.js	0	3282 строк, 324 КБ
@@ -1924,22 +1924,22 @@ sym	LEVEL_RU	site/assets/admin.js	784	const
 sym	BADGE_COND	site/assets/admin.js	786	const
 sym	BADGE_FIXED	site/assets/admin.js	800	const
 sym	rules	site/assets/admin.js	801	fn
-sym	taxDialog	site/assets/admin.js	1081	fn
-sym	PPGiftDialog	site/assets/admin.js	1116	win
-sym	giftDialog	site/assets/admin.js	1117	fn
-sym	PR	site/assets/admin.js	1238	const
-sym	effPrice	site/assets/admin.js	1239	const
-sym	sFilter	site/assets/admin.js	1240	const
-sym	shop	site/assets/admin.js	1241	fn
-sym	bSort	site/assets/admin.js	1378	const
-sym	bPick	site/assets/admin.js	1379	const
-sym	sendDialog	site/assets/admin.js	1381	const
-sym	pickLabel	site/assets/admin.js	1391	const
-sym	birds	site/assets/admin.js	1392	fn
-sym	subscribers	site/assets/admin.js	1517	fn
-sym	backupBox	site/assets/admin.js	1542	const
-sym	wireBackup	site/assets/admin.js	1548	fn
-sym	backup	site/assets/admin.js	1554	fn
+sym	taxDialog	site/assets/admin.js	1084	fn
+sym	PPGiftDialog	site/assets/admin.js	1119	win
+sym	giftDialog	site/assets/admin.js	1120	fn
+sym	PR	site/assets/admin.js	1241	const
+sym	effPrice	site/assets/admin.js	1242	const
+sym	sFilter	site/assets/admin.js	1243	const
+sym	shop	site/assets/admin.js	1244	fn
+sym	bSort	site/assets/admin.js	1381	const
+sym	bPick	site/assets/admin.js	1382	const
+sym	sendDialog	site/assets/admin.js	1384	const
+sym	pickLabel	site/assets/admin.js	1394	const
+sym	birds	site/assets/admin.js	1395	fn
+sym	subscribers	site/assets/admin.js	1520	fn
+sym	backupBox	site/assets/admin.js	1545	const
+sym	wireBackup	site/assets/admin.js	1551	fn
+sym	backup	site/assets/admin.js	1557	fn
 sym	ADV_SP	site/assets/advent-admin.js	39	const
 sym	FILE_MAX	site/assets/advent-admin.js	40	const
 sym	advSet	site/assets/advent-admin.js	41	fn
@@ -2797,64 +2797,65 @@ sym	oldName	site/assets/garden-items.js	167	const
 sym	PPGardenItems	site/assets/garden-items.js	171	win
 sym	app	site/assets/garden.js	6	const
 sym	pre	site/assets/garden.js	8	const
-sym	CROP	site/assets/garden.js	132	const
-sym	HARV	site/assets/garden.js	144	const
-sym	TALL	site/assets/garden.js	149	const
-sym	cname	site/assets/garden.js	150	const
-sym	hname	site/assets/garden.js	151	const
-sym	esc	site/assets/garden.js	152	const
-sym	api	site/assets/garden.js	153	const
-sym	toast	site/assets/garden.js	155	const
-sym	dur	site/assets/garden.js	156	const
-sym	fnv	site/assets/garden.js	157	const
-sym	NIGHT_ON	site/assets/garden.js	160	const
-sym	TIER_OF	site/assets/garden.js	161	const
-sym	isTree	site/assets/garden.js	163	const
-sym	SKY	site/assets/garden.js	166	const
-sym	NIGHT	site/assets/garden.js	167	const
-sym	GROUND	site/assets/garden.js	168	const
-sym	TREE	site/assets/garden.js	169	const
-sym	bgLayer	site/assets/garden.js	171	fn
-sym	pumpkinAt	site/assets/garden.js	215	fn
-sym	FORM_SZ	site/assets/garden.js	219	const
-sym	bedRects	site/assets/garden.js	220	fn
-sym	bedSpans	site/assets/garden.js	230	fn
-sym	bedShape	site/assets/garden.js	239	fn
-sym	inBed	site/assets/garden.js	240	const
-sym	drawBed	site/assets/garden.js	241	fn
-sym	TULIP	site/assets/garden.js	253	const
-sym	drawPlant	site/assets/garden.js	254	fn
-sym	TREES	site/assets/garden.js	289	const
-sym	drawTree	site/assets/garden.js	301	fn
-sym	drawBug	site/assets/garden.js	346	fn
-sym	drawChore	site/assets/garden.js	353	fn
-sym	icons	site/assets/garden.js	359	const
-sym	icon	site/assets/garden.js	360	fn
-sym	pic	site/assets/garden.js	368	const
-sym	weatherOf	site/assets/garden.js	371	fn
-sym	particles	site/assets/garden.js	375	fn
-sym	nick	site/assets/garden.js	382	const
-sym	load	site/assets/garden.js	383	fn
-sym	scene	site/assets/garden.js	388	const
-sym	render	site/assets/garden.js	389	fn
-sym	mountScene	site/assets/garden.js	399	fn
-sym	shown	site/assets/garden.js	523	const
-sym	EDIT	site/assets/garden.js	525	const
-sym	POS	site/assets/garden.js	526	const
-sym	bedsAt	site/assets/garden.js	527	const
-sym	editMode	site/assets/garden.js	528	fn
-sym	float	site/assets/garden.js	535	fn
-sym	setButtons	site/assets/garden.js	536	fn
-sym	act	site/assets/garden.js	537	fn
-sym	catchBug	site/assets/garden.js	550	fn
-sym	cleanPile	site/assets/garden.js	551	fn
-sym	cleanAll	site/assets/garden.js	552	fn
-sym	removeBed	site/assets/garden.js	557	fn
-sym	placeBed	site/assets/garden.js	560	fn
-sym	sellBed	site/assets/garden.js	563	fn
-sym	panel	site/assets/garden.js	570	fn
-sym	shop	site/assets/garden.js	663	fn
-sym	PPGardenPlants	site/assets/garden.js	674	win
+sym	CROP	site/assets/garden.js	145	const
+sym	HARV	site/assets/garden.js	157	const
+sym	TALL	site/assets/garden.js	162	const
+sym	cname	site/assets/garden.js	163	const
+sym	hname	site/assets/garden.js	164	const
+sym	esc	site/assets/garden.js	165	const
+sym	api	site/assets/garden.js	166	const
+sym	toast	site/assets/garden.js	168	const
+sym	dur	site/assets/garden.js	169	const
+sym	fnv	site/assets/garden.js	170	const
+sym	NIGHT_ON	site/assets/garden.js	173	const
+sym	TIER_OF	site/assets/garden.js	174	const
+sym	isTree	site/assets/garden.js	176	const
+sym	SKY	site/assets/garden.js	179	const
+sym	NIGHT	site/assets/garden.js	180	const
+sym	GROUND	site/assets/garden.js	181	const
+sym	TREE	site/assets/garden.js	182	const
+sym	bgLayer	site/assets/garden.js	184	fn
+sym	pumpkinAt	site/assets/garden.js	228	fn
+sym	FORM_SZ	site/assets/garden.js	232	const
+sym	bedRects	site/assets/garden.js	233	fn
+sym	bedSpans	site/assets/garden.js	243	fn
+sym	bedShape	site/assets/garden.js	252	fn
+sym	inBed	site/assets/garden.js	253	const
+sym	drawBed	site/assets/garden.js	254	fn
+sym	TULIP	site/assets/garden.js	266	const
+sym	drawPlant	site/assets/garden.js	267	fn
+sym	TREES	site/assets/garden.js	302	const
+sym	drawTree	site/assets/garden.js	314	fn
+sym	drawBug	site/assets/garden.js	359	fn
+sym	drawChore	site/assets/garden.js	366	fn
+sym	icons	site/assets/garden.js	372	const
+sym	icon	site/assets/garden.js	373	fn
+sym	pic	site/assets/garden.js	381	const
+sym	weatherOf	site/assets/garden.js	384	fn
+sym	particles	site/assets/garden.js	388	fn
+sym	nick	site/assets/garden.js	395	const
+sym	load	site/assets/garden.js	396	fn
+sym	scene	site/assets/garden.js	401	const
+sym	render	site/assets/garden.js	402	fn
+sym	mountScene	site/assets/garden.js	412	fn
+sym	shown	site/assets/garden.js	548	const
+sym	EDIT	site/assets/garden.js	550	const
+sym	POS	site/assets/garden.js	551	const
+sym	bedsAt	site/assets/garden.js	552	const
+sym	editMode	site/assets/garden.js	553	fn
+sym	float	site/assets/garden.js	560	fn
+sym	syncTools	site/assets/garden.js	562	fn
+sym	setButtons	site/assets/garden.js	573	fn
+sym	act	site/assets/garden.js	574	fn
+sym	catchBug	site/assets/garden.js	587	fn
+sym	cleanPile	site/assets/garden.js	588	fn
+sym	cleanAll	site/assets/garden.js	589	fn
+sym	removeBed	site/assets/garden.js	594	fn
+sym	placeBed	site/assets/garden.js	597	fn
+sym	sellBed	site/assets/garden.js	600	fn
+sym	panel	site/assets/garden.js	607	fn
+sym	shop	site/assets/garden.js	709	fn
+sym	PPGardenPlants	site/assets/garden.js	720	win
 sym	esc	site/assets/guides-admin.js	4	const
 sym	ERR	site/assets/guides-admin.js	5	const
 sym	api	site/assets/guides-admin.js	7	const
@@ -6454,36 +6455,38 @@ sym	stateOf	worker/flock.js	106	fn
 sym	featherNews	worker/flock.js	120	fn
 sym	GARDEN_TABLES	worker/garden.js	17	const
 sym	GARDEN_ALTER	worker/garden.js	24	const
-sym	GARDEN_RULES	worker/garden.js	29	const
-sym	GARDEN_RANGE	worker/garden.js	44	const
-sym	GARDEN_INT	worker/garden.js	46	const
-sym	GARDEN_BOOL	worker/garden.js	47	const
-sym	GARDEN_SEASONS	worker/garden.js	48	const
-sym	CROPS	worker/garden.js	51	const
-sym	TIER	worker/garden.js	55	const
-sym	NOSALE	worker/garden.js	57	const
-sym	SIMPLE	worker/garden.js	58	const
-sym	ofTier	worker/garden.js	59	const
-sym	starter	worker/garden.js	60	const
-sym	sellMul	worker/garden.js	61	const
-sym	back	worker/garden.js	62	const
-sym	run	worker/garden.js	64	const
-sym	DAY	worker/garden.js	65	const
-sym	FORMS	worker/garden.js	66	const
-sym	bedsN	worker/garden.js	68	const
-sym	parse	worker/garden.js	70	const
-sym	fnv	worker/garden.js	71	const
-sym	dayOf	worker/garden.js	72	const
-sym	needMs	worker/garden.js	75	const
-sym	sellPct	worker/garden.js	77	const
-sym	grown	worker/garden.js	78	const
-sym	bugsOf	worker/garden.js	80	fn
-sym	choresOf	worker/garden.js	87	fn
-sym	shiftBeds	worker/garden.js	93	const
-sym	gardenApi	worker/garden.js	105	fn
-sym	seasonOf	worker/garden.js	401	fn
-sym	gardenDrop	worker/garden.js	408	fn
-sym	gardenNews	worker/garden.js	424	fn
+sym	GARDEN_RULES	worker/garden.js	30	const
+sym	GARDEN_RANGE	worker/garden.js	47	const
+sym	GARDEN_INT	worker/garden.js	49	const
+sym	GARDEN_BOOL	worker/garden.js	50	const
+sym	GARDEN_SEASONS	worker/garden.js	51	const
+sym	CROPS	worker/garden.js	54	const
+sym	TIER	worker/garden.js	58	const
+sym	NOSALE	worker/garden.js	60	const
+sym	SIMPLE	worker/garden.js	61	const
+sym	ofTier	worker/garden.js	62	const
+sym	starter	worker/garden.js	63	const
+sym	sellMul	worker/garden.js	64	const
+sym	back	worker/garden.js	65	const
+sym	run	worker/garden.js	67	const
+sym	DAY	worker/garden.js	68	const
+sym	FORMS	worker/garden.js	69	const
+sym	bedsN	worker/garden.js	71	const
+sym	parse	worker/garden.js	73	const
+sym	fnv	worker/garden.js	74	const
+sym	dayOf	worker/garden.js	75	const
+sym	needMs	worker/garden.js	78	const
+sym	sellPct	worker/garden.js	80	const
+sym	grown	worker/garden.js	81	const
+sym	levelOf	worker/garden.js	83	const
+sym	orderOf	worker/garden.js	85	fn
+sym	bugsOf	worker/garden.js	94	fn
+sym	choresOf	worker/garden.js	101	fn
+sym	shiftBeds	worker/garden.js	107	const
+sym	gardenApi	worker/garden.js	119	fn
+sym	seasonOf	worker/garden.js	459	fn
+sym	gardenDrop	worker/garden.js	466	fn
+sym	gardenNews	worker/garden.js	482	fn
 sym	KEY	worker/guides.js	5	const
 sym	GUIDES_ALTER	worker/guides.js	7	const
 sym	SEEN_MAX	worker/guides.js	8	const
@@ -7236,8 +7239,8 @@ doc	Порядок	docs/pinterest-dec2026.md	48	h2
 doc	Статус плана	docs/plan-status.md	1	h1
 doc	Открыто	docs/plan-status.md	6	h2
 doc	Этапы (готовые — одной строкой)	docs/plan-status.md	19	h2
-doc	Решения Алины	docs/plan-status.md	159	h2
-doc	Допущения (по открытым этапам)	docs/plan-status.md	167	h2
+doc	Решения Алины	docs/plan-status.md	160	h2
+doc	Допущения (по открытым этапам)	docs/plan-status.md	168	h2
 doc	Полли-питомец	docs/polly-pet.md	1	h1
 doc	Кратко	docs/polly-pet.md	3	h2
 doc	Оглавление	docs/polly-pet.md	9	h2

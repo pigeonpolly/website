@@ -126,6 +126,19 @@
     compostBoost: [n => `🌿 +${n} h of growth`, n => `🌿 +${n} ч роста`, n => `🌿 +${n} st. augšanas`],
     noCompost: ['No compost: clear leaves or snow by hand', 'Компоста нет: убери листья или снег руками', 'Komposta nav: novāc lapas vai sniegu ar rokām'],
     stats: [(a, b, c) => `Harvests ${a} · bugs today ${b} · cleared ${c}`, (a, b, c) => `Собрано ${a} · жуков сегодня ${b} · убрано ${c}`, (a, b, c) => `Novākts ${a} · vaboļu šodien ${b} · sakopts ${c}`],
+    orderHead: ['📜 Order of the day', '📜 Заказ дня', '📜 Dienas pasūtījums'],
+    orderAsk: ['A neighbour asks for:', 'Сосед просит:', 'Kaimiņš lūdz:'],
+    orderGive: ['Give the order', 'Отдать заказ', 'Nodot pasūtījumu'],
+    orderNo: ['Not enough in the basket yet', 'В корзинке пока не хватает', 'Grozā vēl nepietiek'],
+    orderDone: ['Order delivered ✓', 'Заказ выполнен ✓', 'Pasūtījums izpildīts ✓'],
+    orderGot: [n => `📜 Order done! +${n} 🔘 and a seed`, n => `📜 Заказ выполнен! +${n} 🔘 и семечко`, n => `📜 Pasūtījums izpildīts! +${n} 🔘 un sēkla`],
+    level: [n => `🌱 Farm level ${n}`, n => `🌱 Уровень фермы ${n}`, n => `🌱 Saimniecības līmenis ${n}`],
+    levelUp: [n => `🌱 Level ${n}! A seed is waiting`, n => `🌱 Уровень ${n}! Ждёт семечко`, n => `🌱 Līmenis ${n}! Gaida sēkla`],
+    bagHead: ['🎒 Garden bag', '🎒 Сумка огорода', '🎒 Dārza soma'],
+    bagThings: ['Things:', 'Вещи:', 'Lietas:'],
+    bagEmpty: ['Empty for now.', 'Пока пусто.', 'Pagaidām tukšs.'],
+    bagNote: ['Tap to put back or take away.', 'Нажми — вернуть или убрать.', 'Pieskaries — atgriezt vai novākt.'],
+    toolsMove: ['Move', 'Переставить', 'Pārkārtot'], toolsBag: ['Bag', 'Сумка', 'Soma'], toolsWater: ['Water', 'Полить', 'Laistīt'], toolsHarvest: ['Harvest', 'Собрать', 'Novākt'], toolsClean: ['Clear', 'Убрать', 'Novākt'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
   // растения: названия (порядок — как в лавке), цвета для разных грядок
@@ -378,7 +391,7 @@
   }
 
   // ---------- страница ----------
-  let D = null, sel = -1, busy = false;
+  let D = null, sel = -1, busy = false, bagOpen = false;
   const nick = (new URLSearchParams(location.search).get('nick') || '').replace(/^@/, '');
   async function load() {
     try { D = await api(nick ? '?nick=' + encodeURIComponent(nick) : ''); } catch (e) { D = null; }
@@ -400,7 +413,13 @@
     const o = D.owner;
     app.innerHTML = `<div class="gd-bar"><span class="gd-cap">🥕 ${esc(t('of').replace('{n}', o.nick))}</span><span class="gd-wx"></span><a class="pill-btn gd-home" href="${pre}/bird/?nick=${encodeURIComponent(o.nick)}#room">${t('home')}</a></div>
       <div class="gd-scroll"><div class="gd-stage"><canvas class="gd-cv" width="${W * K}" height="${H * K}" role="img" aria-label="${esc(t('of').replace('{n}', o.nick))}"></canvas><div class="gd-float" aria-live="polite"></div></div></div>
-      ${D.mine ? `<div class="gd-tools"><button type="button" class="cta-btn gd-move-top">${t('move')}</button></div>` : ''}
+      ${D.mine ? `<div class="gd-tools">
+        <button type="button" class="gd-tool" data-tool="move" title="${t('move')}" aria-label="${t('move')}"><span class="gd-tool-ic">✋</span><span class="gd-tool-tx">${t('toolsMove')}</span></button>
+        <button type="button" class="gd-tool" data-tool="bag" title="${t('bagHead')}" aria-label="${t('bagHead')}"><span class="gd-tool-ic">🎒</span><span class="gd-tool-tx">${t('toolsBag')}</span><b class="gd-tool-n" data-n="bag"></b></button>
+        <button type="button" class="gd-tool" data-tool="water" title="${t('waterAll', 0)}" aria-label="${t('toolsWater')}"><span class="gd-tool-ic">💧</span><span class="gd-tool-tx">${t('toolsWater')}</span><b class="gd-tool-n" data-n="water"></b></button>
+        <button type="button" class="gd-tool" data-tool="harvest" title="${t('harvestAll', 0)}" aria-label="${t('toolsHarvest')}"><span class="gd-tool-ic">🧺</span><span class="gd-tool-tx">${t('toolsHarvest')}</span><b class="gd-tool-n" data-n="harvest"></b></button>
+        <button type="button" class="gd-tool" data-tool="clean" title="${t('choresAll', 0)}" aria-label="${t('toolsClean')}"><span class="gd-tool-ic">🧹</span><span class="gd-tool-tx">${t('toolsClean')}</span><b class="gd-tool-n" data-n="clean"></b></button>
+      </div>` : ''}
       <div class="gd-panel"></div>`;
     const cv = app.querySelector('.gd-cv'), g = cv.getContext('2d');
     g.imageSmoothingEnabled = false;
@@ -517,8 +536,14 @@
       if (i >= 0) { sel = i; panel(); const pn = app.querySelector('.gd-sel'); if (pn && pn.getBoundingClientRect().bottom > innerHeight) pn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     });
     cv.addEventListener('pointermove', e => { const p = at(e); if (EDIT) { cv.style.cursor = EDIT.drag ? 'grabbing' : grab(p) ? 'grab' : ''; return; } cv.style.cursor = (p.x >= 18 && p.x <= 29 && p.y >= 34 && p.y <= 55) || (D.mine && (hitChore(p.x, p.y) || hitBug(p.x, p.y) || bedsAt().some(r => p.x >= r.x - 3 && p.x <= r.x + r.w + 3 && p.y >= r.y - 18 && p.y <= r.y + r.h + 3))) ? 'pointer' : ''; });
-    const topMove = app.querySelector('.gd-move-top');
-    if (topMove) topMove.onclick = () => { editMode(true); };
+    app.querySelectorAll('.gd-tool').forEach(b => b.onclick = () => {
+      const k = b.dataset.tool;
+      if (k === 'move') return editMode(true);
+      if (k === 'bag') { const el = document.getElementById('gd-bag'); if (el) { bagOpen = true; if (el.tagName === 'DETAILS') el.open = true; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return; }
+      if (k === 'water') return act('water', { all: true }, r => float('💧 ×' + r.watered));
+      if (k === 'harvest') return act('harvest', { all: true }, r => { const m = t('gotAll', r.count || 0); float(m); toast(m); });
+      if (k === 'clean') return cleanAll();
+    });
   }
   const shown = () => (D.items || []).filter(v => !(D.hide || []).includes(v)); // вещи огорода, которые стоят на сцене
   // перестановка: места грядок и вещей — D.pos с сервера или EDIT.pos, пока хозяин двигает
@@ -528,11 +553,23 @@
   function editMode(on) {
     EDIT = on ? { pos: { ...(D.pos || {}) }, drag: null } : null;
     const cv = app.querySelector('.gd-cv'); if (cv) { cv.style.touchAction = on ? 'none' : ''; cv.classList.toggle('gd-edit', !!on); }
-    const top = app.querySelector('.gd-move-top'); if (top) top.hidden = !!on;
+    const tools = app.querySelector('.gd-tools'); if (tools) tools.hidden = !!on;
     app.classList.toggle('gd-editing', !!on); // на телефоне при перестановке огород — во всю ширину, без прокрутки вбок
     panel();
   }
   function float(msg) { const f = app.querySelector('.gd-float'); if (!f) return; f.textContent = msg; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+  // компактная полоска под огородом: действия и счётчики
+  function syncTools() {
+    if (EDIT) return;
+    const tools = app.querySelector('.gd-tools'); if (!tools) return;
+    const beds = D.beds || [], need = beds.filter(b => b && b.p && !b.today && !b.ready).length, ready = beds.filter(b => b && b.ready).length;
+    const bag = (D.bedbag || 0) + ((D.hide || []).filter(v => window.PPGardenItems && window.PPGardenItems.ITEMS[v]).length);
+    const set = (k, n, show) => { const b = tools.querySelector(`[data-tool="${k}"]`); if (!b) return; b.hidden = !show; const nb = b.querySelector('[data-n]'); if (nb) nb.textContent = n > 0 ? n : ''; if (k === 'water') b.title = t('waterAll', n); if (k === 'harvest') b.title = t('harvestAll', n); if (k === 'clean') b.title = t('choresAll', n * (D.cleanPay || 0)); };
+    set('water', need, need > 0);
+    set('harvest', ready, ready > 0);
+    set('clean', (D.chores || []).length, (D.chores || []).length > 0);
+    set('bag', bag, true);
+  }
   function setButtons(n) { if (n != null && window.PPAccount && window.PPAccount.setButtons) window.PPAccount.setButtons(n); }
   async function act(path, body, ok) {
     if (busy) return; busy = true;
@@ -570,6 +607,7 @@
   function panel() {
     const box = app.querySelector('.gd-panel'); if (!box) return;
     if (!D.mine) { box.innerHTML = `<p class="gd-note">${t('guest')}</p>`; return; }
+    syncTools();
     if (EDIT) { // ✋ перестановка
       const GI = window.PPGardenItems, over = GI ? GI.layout(shown(), D.pos || {}).filter(it => it.over).length : 0;
       box.innerHTML = `<section class="gd-sel gd-move"><h3>${t('move')}</h3><p>${t('moveHint')}</p>${over ? `<p class="gd-note">${t('moveOver', over)}</p>` : ''}
@@ -578,16 +616,16 @@
         const k = b.dataset.mv, pos = EDIT.pos;
         if (k === 'cancel') return editMode(false);
         EDIT = null; const ecv = app.querySelector('.gd-cv'); if (ecv) { ecv.style.touchAction = ''; ecv.classList.remove('gd-edit'); } app.classList.remove('gd-editing');
-        const top = app.querySelector('.gd-move-top'); if (top) top.hidden = false;
+        const tools = app.querySelector('.gd-tools'); if (tools) tools.hidden = false;
         act('move', k === 'reset' ? { reset: true } : { pos }, () => float(t('moveSaved')));
       }; });
       return;
     }
     const beds = D.beds || [], P = D.prices || {};
-    const need = beds.filter(b => b && b.p && !b.today && !b.ready).length;
-    const ready = beds.filter(b => b && b.ready).length;
-    let h = `<div class="gd-row">${need ? `<button type="button" class="cta-btn gd-water-all">${t('waterAll', need)}</button>` : beds.some(Boolean) ? `<span class="gd-ok">${t('watered')}</span>` : ''}${ready ? `<button type="button" class="cta-btn gd-harvest-all">${t('harvestAll', ready)}</button>` : ''}</div>`;
+    let h = beds.some(b => b && b.p) && !beds.some(b => b && b.p && !b.today && !b.ready) ? `<p class="gd-note gd-status">${t('watered')}</p>` : '';
     if (!D.on) h += `<p class="gd-note">${t('off')}</p>`;
+    const lvPct = D.lvlXp ? Math.round(100 * ((D.xp || 0) % D.lvlXp) / D.lvlXp) : 0;
+    h += `<div class="gd-lvl" title="${t('level', D.level || 1)}"><span class="gd-lvl-t">${t('level', D.level || 1)}</span><span class="gd-lvl-b"><i style="width:${lvPct}%"></i></span><span class="gd-lvl-x">${(D.xp || 0) % (D.lvlXp || 50)}/${D.lvlXp || 50}</span></div>`;
     // выбранная грядка
     if (sel >= 0 && sel < beds.length) {
       const b = beds[sel];
@@ -604,11 +642,6 @@
       h += `<div class="gd-forms"><span class="gd-note">${t('form')}</span>${Object.keys(T.forms).map(f => `<button type="button" class="gd-chip gd-form${f === fNow ? ' on' : ''}" data-form="${f}" aria-pressed="${f === fNow}">${T.forms[f][L]}</button>`).join('')}</div>`;
       h += '</section>';
     } else h += `<p class="gd-note">${t('tapBed')}</p>`;
-    // клумбы: сколько есть, докупить, сумка клумб
-    const nB = beds.length, mB = D.bedsMax || nB;
-    h += `<section class="gd-box"><h3>${t('bedsHead')}</h3><p>${t('bedsN', nB, mB)} ${nB >= mB ? t('bedsFull') : ''}</p>${nB < mB ? `<button type="button" class="pill-btn gd-addbed"${(D.bedBtn || 0) > (D.buttons || 0) ? ' disabled' : ''}>${t('bedAdd', D.bedBtn || 0)}</button>` : ''}
-      <p class="gd-note">${t('bedBag', D.bedbag || 0)}</p>${(D.bedbag || 0) > 0 ? `<div class="gd-row"><button type="button" class="cta-btn" data-bed-place>${t('bedPlace')}</button><button type="button" class="pill-btn" data-bed-sell>${t('bedSell', D.bedSell || 0)}</button></div>` : ''}
-      <p class="gd-note">${t('bedsNote')}</p></section>`;
     // жуки
     const nb = (D.bugs || []).length;
     h += `<section class="gd-box"><h3>${t('bugsHead')}</h3><p>${nb ? t('bugsNow', nb) : t('bugsNone')} ${D.bugsGot ? t('bugsGot', D.bugsGot) : ''} ${nb ? '' : D.bugsLater ? t('bugsLater') : D.bugsGot ? t('bugsDone') : ''}</p><p class="gd-note">${t('bugsRule', D.bugBtn || 0)}</p></section>`;
@@ -616,6 +649,13 @@
     const crop = Object.keys(CROP).filter(k => D.crop[k] > 0);
     const sellTotal = crop.reduce((a, k) => a + (P[k] ? P[k].sell : 0) * D.crop[k], 0);
     h += `<section class="gd-box"><h3>${t('basket')}</h3>${crop.length ? `<div class="gd-list">${crop.map(k => `<div class="gd-item">${pic(k)}<span>${esc(hname(k))} ×${D.crop[k]}</span><button type="button" class="pill-btn" data-sell="${k}">${t('sell', (P[k] ? P[k].sell : 0) * D.crop[k])}</button></div>`).join('')}</div>${sellTotal ? `<button type="button" class="cta-btn" data-sell-all>${t('sellAll', sellTotal)}</button>` : ''}` : `<p class="gd-note">${t('basket0')}</p>`}</section>`;
+    // заказ дня: что просит сосед и что за это дадут
+    if (D.order) {
+      const ord = D.order;
+      h += `<section class="gd-box gd-order"><h3>${t('orderHead')}</h3><p class="gd-order-line">${t('orderAsk')} ${ord.items.map(x => `<span class="gd-order-it">${pic(x.p)} ${esc(cname(x.p))} ×${x.n}</span>`).join('')}</p><p class="gd-note">+${ord.reward} 🔘 · 🌱</p>`;
+      h += ord.done ? `<p class="gd-ok">${t('orderDone')}</p>` : `<button type="button" class="cta-btn" data-order${ord.can ? '' : ' disabled'}>${ord.can ? t('orderGive') : t('orderNo')}</button>`;
+      h += `</section>`;
+    }
     // семена
     const seeds = Object.keys(CROP).filter(k => D.seeds[k] > 0);
     h += `<section class="gd-box"><h3>${t('seeds')}</h3>${seeds.length ? `<div class="gd-chips">${seeds.map(k => `<span class="gd-chip gd-chip-s">${pic(k)}<span>${esc(cname(k))}</span><b>×${D.seeds[k]}</b></span>`).join('')}</div>` : `<p class="gd-note">${t('seeds0')}</p>`}
@@ -631,14 +671,19 @@
     else if (winter || D.season === 'autumn') h += `<p class="gd-note">${t('choresClean')}</p>`;
     else h += `<p class="gd-note">${t('choresOther')}</p>`;
     h += `<p class="gd-note">${t('compost', D.compost || 0)}</p></section>`;
-    // вещи огорода: спрятать / вернуть
+    // сумка огорода: клумбы и вещи — одним компактным разделом
     const GI = window.PPGardenItems, its = (D.items || []).filter(v => GI && GI.ITEMS[v]);
     const overN = GI ? GI.layout(shown(), D.pos || {}).filter(it => it.over).length : 0; // не влезло — ждут перестановки
-    h += `<section class="gd-box"><h3>${t('itemsHead')}</h3>${its.length ? `<div class="gd-chips gd-things">${its.map(v => `<button type="button" class="gd-chip${(D.hide || []).includes(v) ? ' off' : ''}" data-thing="${esc(v)}" aria-pressed="${!(D.hide || []).includes(v)}"><span class="gd-thing-ic" data-ic="${esc(v)}"></span><span>${esc(GI.name(v, L))}</span></button>`).join('')}</div><p class="gd-note">${t('itemsNote')}</p>${overN ? `<p class="gd-note gd-over">${t('moveOver', overN)}</p>` : ''}` : `<p class="gd-note">${t('items0')}</p>`}
-      <a class="pill-btn" href="${pre}/shop/#room:garden">${t('itemsShop')}</a></section>`;
+    const nB = beds.length, mB = D.bedsMax || nB, bagN = D.bedbag || 0;
+    h += `<details class="gd-box gd-bag" id="gd-bag"${bagOpen ? ' open' : ''}><summary><span>${t('bagHead')}</span><small>${t('bedsN', nB, mB)}${bagN ? ' · ' + t('bedBag', bagN) : ''}</small></summary>
+      <div class="gd-line"><span class="gd-note">${bagN ? t('bedBag', bagN) : t('bedsN', nB, mB)}</span><span class="gd-mini-row">${nB < mB ? `<button type="button" class="gd-mini gd-addbed" title="${t('bedAdd', D.bedBtn || 0)}" aria-label="${t('bedAdd', D.bedBtn || 0)}"${(D.bedBtn || 0) > (D.buttons || 0) ? ' disabled' : ''}>➕</button>` : ''}${bagN ? `<button type="button" class="gd-mini" data-bed-place title="${t('bedPlace')}" aria-label="${t('bedPlace')}">↩</button><button type="button" class="gd-mini" data-bed-sell title="${t('bedSell', D.bedSell || 0)}" aria-label="${t('bedSell', D.bedSell || 0)}">💰</button>` : ''}</span></div>
+      ${its.length ? `<div class="gd-chips gd-things">${its.map(v => `<button type="button" class="gd-chip${(D.hide || []).includes(v) ? ' off' : ''}" data-thing="${esc(v)}" aria-pressed="${!(D.hide || []).includes(v)}"><span class="gd-thing-ic" data-ic="${esc(v)}"></span><span>${esc(GI.name(v, L))}</span></button>`).join('')}</div>` : `<p class="gd-note">${t('items0')}</p>`}
+      ${overN ? `<p class="gd-note gd-over">${t('moveOver', overN)}</p>` : ''}
+      <div class="gd-line"><a class="pill-btn" href="${pre}/shop/#room:garden">${t('itemsShop')}</a><span class="gd-note">${t('bagNote')}</span></div></details>`;
     h += `<p class="gd-note gd-stats">${t('stats', D.harvests || 0, D.bugsGot || 0, D.cleaned || 0)}</p>`;
     h += `<p class="gd-note gd-how">${t('how')}</p>`;
     box.innerHTML = h;
+    const bagEl = box.querySelector('#gd-bag'); if (bagEl) { bagEl.open = bagOpen; bagEl.addEventListener('toggle', () => { bagOpen = bagEl.open; }); }
     const on = (sel2, f) => box.querySelectorAll(sel2).forEach(b => { b.onclick = () => f(b); });
     const boost = r => r.boost > 0 ? ' 🍵 +' + r.boost + ['h', 'ч', 'h'][L] : ''; // блюдо с кухни «быстрее растёт» (этап 89)
     on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered + boost(r))));
@@ -656,6 +701,7 @@
     on('[data-sell-all]', () => act('sell', { all: true }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));
     on('[data-sell]', b => act('sell', { crop: b.dataset.sell }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
+    on('[data-order]', () => act('order', {}, r => { const m = t('orderGot', r.got || 0); float(m); toast(m); }));
     on('.gd-shop-btn', shop);
     box.querySelectorAll('[data-ic]').forEach(e => e.appendChild(GI.icon(e.dataset.ic, 28)));
     on('[data-thing]', b => act('hide', { item: b.dataset.thing, on: !(D.hide || []).includes(b.dataset.thing) }));

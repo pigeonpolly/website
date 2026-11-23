@@ -25,7 +25,8 @@ export const GARDEN_ALTER = ["ALTER TABLE garden ADD COLUMN found TEXT DEFAULT '
   "ALTER TABLE garden ADD COLUMN rare_day TEXT DEFAULT ''", "ALTER TABLE garden ADD COLUMN magic_day TEXT DEFAULT ''", "ALTER TABLE garden ADD COLUMN water_days TEXT DEFAULT '[]'", "ALTER TABLE garden ADD COLUMN hide TEXT DEFAULT '[]'", "ALTER TABLE garden ADD COLUMN pos TEXT DEFAULT '{}'",
   'ALTER TABLE garden ADD COLUMN extra INTEGER DEFAULT 0', "ALTER TABLE garden ADD COLUMN forms TEXT DEFAULT '{}'",
   'ALTER TABLE garden ADD COLUMN bedbag INTEGER DEFAULT 0', 'ALTER TABLE garden ADD COLUMN removed INTEGER DEFAULT 0', 'ALTER TABLE garden ADD COLUMN compost INTEGER DEFAULT 0', 'ALTER TABLE garden ADD COLUMN cleaned INTEGER DEFAULT 0',
-  "ALTER TABLE garden ADD COLUMN chore_day TEXT DEFAULT ''", "ALTER TABLE garden ADD COLUMN chore_got TEXT DEFAULT '[]'"]; // extra — докупленные клумбы, forms — {b0: 'round'} формы, bedbag/removed — клумбы в сумке и убранные, compost/cleaned — уборка
+  "ALTER TABLE garden ADD COLUMN chore_day TEXT DEFAULT ''", "ALTER TABLE garden ADD COLUMN chore_got TEXT DEFAULT '[]'",
+  'ALTER TABLE garden ADD COLUMN xp INTEGER DEFAULT 0', 'ALTER TABLE garden ADD COLUMN lvl INTEGER DEFAULT 1', "ALTER TABLE garden ADD COLUMN order_day TEXT DEFAULT ''"]; // extra — докупленные клумбы, forms — {b0: 'round'} формы, bedbag/removed — клумбы в сумке и убранные, compost/cleaned — уборка, xp/lvl — опыт фермы, order_day — заказ дня выполнен
 export const GARDEN_RULES = {
   gardenOn: true, gardenBeds: 6, gardenWetH: 24, // грядок; сколько часов земля мокрая после полива (рост идёт только по мокрой)
   gardenBedsMax: 10, gardenBedBtn: 60, // клумб всего не больше N (с докупленными); цена одной докупленной клумбы 🔘
@@ -40,10 +41,12 @@ export const GARDEN_RULES = {
   gardenTreeAgainPct: 30, // выросшее дерево остаётся и плодоносит снова через N % своего срока роста; первый урожай — 100/N плодов, дальше по одному
   gardenSeason: 'auto', // погода и вид: auto — по календарю (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень)
   gardenCleanOn: true, gardenCleanPiles: 3, gardenCleanPay: 1, gardenCleanBtn: 2, gardenCompostH: 6, // уборка листьев/снега и компост
+  gardenLvlXp: 50, // опыт фермы: сколько XP на новый уровень
+  gardenOrderPct: 150, // заказ дня: пуговки — % от цены урожая в заказе
 };
 export const GARDEN_RANGE = { gardenDropPct: [0, 100], gardenDropDay: [0, 20], gardenRareDays: [1, 30], gardenMagicDays: [1, 30], gardenRareMul: [1, 20], gardenMagicMul: [1, 20], gardenTreeSeedMul: [1, 20], gardenTreeSellMul: [0.5, 20], gardenTreeAgainPct: [5, 100], gardenBeds: [1, 12], gardenBedsMax: [1, 12], gardenBedBtn: [0, 10000], gardenBedSell: [0, 100], gardenWetH: [1, 72], gardenSeedPct: [0, 100], gardenSellPct: [0, 100], gardenStarter: [0, 20], gardenBugMax: [0, 10], gardenBugChance: [0, 100], gardenBugBtn: [0, 100],
-  gardenCleanPiles: [0, 10], gardenCleanPay: [0, 100], gardenCleanBtn: [0, 100], gardenCompostH: [1, 48] };
-export const GARDEN_INT = ['gardenBedsMax', 'gardenBedBtn', 'gardenBedSell', 'gardenTreeAgainPct', 'gardenDropDay', 'gardenRareDays', 'gardenMagicDays', 'gardenBeds', 'gardenWetH', 'gardenStarter', 'gardenBugMax', 'gardenBugChance', 'gardenBugBtn', 'gardenCleanPiles', 'gardenCleanPay', 'gardenCleanBtn', 'gardenCompostH'];
+  gardenCleanPiles: [0, 10], gardenCleanPay: [0, 100], gardenCleanBtn: [0, 100], gardenCompostH: [1, 48], gardenLvlXp: [10, 500], gardenOrderPct: [100, 500] };
+export const GARDEN_INT = ['gardenBedsMax', 'gardenBedBtn', 'gardenBedSell', 'gardenTreeAgainPct', 'gardenDropDay', 'gardenRareDays', 'gardenMagicDays', 'gardenBeds', 'gardenWetH', 'gardenStarter', 'gardenBugMax', 'gardenBugChance', 'gardenBugBtn', 'gardenCleanPiles', 'gardenCleanPay', 'gardenCleanBtn', 'gardenCompostH', 'gardenLvlXp', 'gardenOrderPct'];
 export const GARDEN_BOOL = ['gardenOn', 'gardenCleanOn'];
 export const GARDEN_SEASONS = ['auto', 'autumn', 'winter', 'spring', 'summer'];
 
@@ -76,6 +79,17 @@ export const needMs = (b, R) => !b || !CROPS[b.p] ? 0 : CROPS[b.p] * DAY * (b.m 
 // цена одного плода: у дерева — за срок «снова плодоносит», у остальных — за весь срок роста
 const sellPct = (R, k) => R.gardenSellPct * CROPS[k] * sellMul(R, k) * (TIER[k] === 'tree' ? Math.max(5, R.gardenTreeAgainPct || 30) / 100 : 1);
 export const grown = (b, now, wetH) => !b ? 0 : (b.g || 0) + (b.w ? Math.max(0, Math.min(now - b.w, wetH * HOUR)) : 0);
+// опыт фермы: уровень от накопленного XP (gardenLvlXp — сколько на уровень)
+export const levelOf = (xp, R) => 1 + Math.floor(Math.max(0, Number(xp) || 0) / Math.max(10, R.gardenLvlXp || 50));
+// заказ дня: два простых растения из корзинки, цена — по урожаю, награда — % от неё
+export function orderOf(uid, day, R) {
+  const h = fnv(uid + ':' + day + ':order'), list = ['radish', 'lettuce', 'carrot', 'tulip'];
+  const a = list[h % list.length];
+  let b = list[(h >>> 5) % list.length]; if (b === a) b = list[(h >>> 9) % list.length]; if (b === a) b = a === 'radish' ? 'lettuce' : 'radish';
+  const items = [{ p: a, n: 1 + (h >>> 12) % 2 }, { p: b, n: 1 + (h >>> 16) % 2 }];
+  const value = items.reduce((sum, x) => sum + sellPct(R, x.p) * x.n, 0);
+  return { day, items, value, seed: list[(h >>> 20) % list.length] };
+}
 // жуки дня: [{i, at, bed}] — сколько и когда вылезают, одинаково при каждом запросе (от птички и дня)
 export function bugsOf(uid, day, R) {
   const h = fnv(uid + ':' + day + ':bugs');
@@ -144,11 +158,14 @@ export async function gardenApi(req, env, url, h) {
   const state = async (u, s) => {
     const today = h.rigaDay(), all = bugsOf(u.id, today, R), season = seasonOf(R, today), items = await itemsOf(u.id), hide = parse(s.row.hide, []);
     const chows = choresOf(u.id, today, R, season), got = s.row.chore_day === today ? parse(s.row.chore_got, []) : [];
+    const ord = orderOf(u.id, today, R), order = { ...ord, done: s.row.order_day === today, reward: h.btnOf(ord.value * (R.gardenOrderPct || 150) / 100, unit), can: ord.items.every(x => (s.crop[x.p] || 0) >= x.n) };
+    const xp = Number(s.row.xp) || 0, level = levelOf(xp, R), lvlXp = Math.max(10, R.gardenLvlXp || 50);
     return { on: R.gardenOn, beds: s.beds.map(b => view(b, today)), seeds: s.seeds, crop: s.crop, prices: prices(), bugs: bugsView(u.id, s.got, s.beds.length), forms: parse(s.row.forms, {}), bedsMax: Math.max(R.gardenBeds, R.gardenBedsMax || 10), bedBtn: R.gardenBedBtn, bedSell: R.gardenBedSell, bedbag: s.row.bedbag || 0,
       bugsGot: s.got.length, bugsLater: all.some(b => b.at > now), bugBtn: R.gardenBugBtn, wetH: R.gardenWetH, season, today,
       harvests: s.row.harvests || 0, buttons: u.buttons || 0, items, hide, pos: parse(s.row.pos, {}),
       compost: s.row.compost || 0, cleaned: s.row.cleaned || 0, chores: chows.filter(c => !got.includes(c.i)), choresAll: chows.length,
-      cleanOn: !!R.gardenCleanOn, cleanPay: R.gardenCleanPay, cleanBtn: R.gardenCleanBtn, compostH: R.gardenCompostH };
+      cleanOn: !!R.gardenCleanOn, cleanPay: R.gardenCleanPay, cleanBtn: R.gardenCleanBtn, compostH: R.gardenCompostH,
+      xp, level, lvlXp, levelLeft: lvlXp - xp % lvlXp, order };
   };
   if (m === 'GET' && p === '/api/garden') {
     const me = await h.currentUser(req, env), nick = (url.searchParams.get('nick') || '').replace(/^@/, '');
@@ -163,7 +180,16 @@ export async function gardenApi(req, env, url, h) {
       return json({ on: R.gardenOn, owner, mine, beds, season, today, prices: prices(), items: (await itemsOf(u.id)).filter(v => !hide.includes(v)), pos: parse(r && r.pos, {}), forms: parse(r && r.forms, {}),
         chores: chows.filter(c => !got.includes(c.i)), choresAll: chows.length, cleanOn: !!R.gardenCleanOn, cleanPay: R.gardenCleanPay, cleanBtn: R.gardenCleanBtn, bedSell: R.gardenBedSell });
     }
-    const s = await rowOf(u.id), week = await weekly(u.id, s), found = parse(s.row.found, []);
+    const s = await rowOf(u.id), week = await weekly(u.id, s);
+    let found = parse(s.row.found, []);
+    const lv = levelOf(s.row.xp || 0, R), cur = Math.max(1, Number(s.row.lvl) || 1);
+    if (lv > cur) { // новый уровень фермы — семечко за каждый (не больше 10 за заход)
+      const steps = Math.min(10, lv - cur), seeds = { ...s.seeds }, gains = [];
+      for (let i = 0; i < steps; i++) { const p = SIMPLE[fnv(u.id + ':lvl:' + (cur + i)) % SIMPLE.length]; seeds[p] = (seeds[p] || 0) + 1; gains.push({ p, src: 'level', at: now }); }
+      const nf = [...found, ...gains].slice(-10);
+      const q = await env.DB.prepare('UPDATE garden SET seeds = ?, found = ?, lvl = ? WHERE user_id = ? AND COALESCE(lvl, 1) = ?').bind(JSON.stringify(seeds), JSON.stringify(nf), cur + steps, u.id, cur).run();
+      if (q.meta.changes) { s.seeds = seeds; s.row.found = JSON.stringify(nf); s.row.lvl = cur + steps; found = nf; }
+    }
     if (found.length) await env.DB.prepare("UPDATE garden SET found = '[]' WHERE user_id = ?").bind(u.id).run(); // новость «🌱» прочитана: птичка в огороде
     return json({ ...(await state(u, s)), owner, mine, week, found });
   }
@@ -180,6 +206,12 @@ export async function gardenApi(req, env, url, h) {
     const q = await env.DB.prepare(`UPDATE garden SET ${keys.map(k => k + ' = ?').join(', ')}${extra} WHERE user_id = ? AND beds = ? AND seeds = ? AND crop = ?`).bind(...vals, u.id, r0.beds, r0.seeds, r0.crop).run();
     if (!q.meta.changes) fail(409, 'busy');
   };
+  // опыт фермы: действия дают XP, уровень считается при заходе (подарок — семечко)
+  const addXp = (n) => {
+    if (!(n > 0)) return null;
+    const q = env.DB.prepare('UPDATE garden SET xp = COALESCE(xp, 0) + ? WHERE user_id = ?').bind(n, u.id).run();
+    return q && typeof q.catch === 'function' ? q.catch(() => {}) : q;
+  };
   const out = async (more = {}) => { const fresh = await env.DB.prepare('SELECT buttons FROM users WHERE id = ?').bind(u.id).first(); return json({ ok: true, ...more, ...(await state({ ...u, buttons: (fresh || {}).buttons || 0 }, await rowOf(u.id))) }); };
   if (p === '/api/garden/plant') {
     bedOk();
@@ -190,6 +222,7 @@ export async function gardenApi(req, env, url, h) {
     s.beds[i] = { p: k, t: now, g: 0, w: 0 };
     s.seeds[k]--; if (!s.seeds[k]) delete s.seeds[k];
     await save({ beds: s.beds, seeds: s.seeds });
+    await addXp(2);
     return out();
   }
   if (p === '/api/garden/water') { // одну грядку (bed) или все (all: true) — каждую раз в сутки по Риге
@@ -204,6 +237,7 @@ export async function gardenApi(req, env, url, h) {
     if (!n) fail(409, 'watered');
     const wd = parse(r0.water_days, []); if (!wd.includes(today)) wd.push(today); // дни с поливом — для волшебного семечка
     await save({ beds: s.beds, water_days: wd.slice(-40) });
+    await addXp(n);
     return out({ watered: n, boost: boost / HOUR });
   }
   if (p === '/api/garden/harvest') {
@@ -217,6 +251,7 @@ export async function gardenApi(req, env, url, h) {
       });
       if (!got.length) fail(409, 'nothing');
       await save({ beds: s.beds, crop: s.crop }, `, harvests = COALESCE(harvests, 0) + ${got.length}`);
+      await addXp(5 * got.length);
       return out({ harvested: got, count: got.length });
     }
     bedOk();
@@ -227,6 +262,7 @@ export async function gardenApi(req, env, url, h) {
     s.beds[i] = tree ? { p: x.p, t: x.t, g: 0, w: 0, m: 1 } : null; // дерево остаётся и плодоносит снова
     s.crop[x.p] = (s.crop[x.p] || 0) + n;
     await save({ beds: s.beds, crop: s.crop }, ', harvests = COALESCE(harvests, 0) + 1');
+    await addXp(5);
     return out({ harvested: x.p, n });
   }
   if (p === '/api/garden/dig') { // выкопать растение или дерево — грядка свободна, урожая нет
@@ -234,6 +270,7 @@ export async function gardenApi(req, env, url, h) {
     if (!s.beds[i]) fail(409, 'empty');
     s.beds[i] = null;
     await save({ beds: s.beds });
+    await addXp(1);
     return out();
   }
   if (p === '/api/garden/sell') { // весь урожай одного вида (или n штук), all: true — всю корзинку
@@ -246,6 +283,7 @@ export async function gardenApi(req, env, url, h) {
       s.crop = {};
       await save({ crop: s.crop });
       const got = total > 0 ? await h.award(u.id, 'gsell', 'all:' + now + ':' + h.randomHex(4), total) : 0;
+      await addXp(2);
       return out({ got });
     }
     const k = String(b.crop || ''), have = s.crop[k] || 0, n = Math.min(have, Math.max(1, Math.floor(Number(b.n) || have)));
@@ -255,6 +293,7 @@ export async function gardenApi(req, env, url, h) {
     s.crop[k] = have - n; if (!s.crop[k]) delete s.crop[k];
     await save({ crop: s.crop });
     const got = each > 0 ? await h.award(u.id, 'gsell', k + ':' + now + ':' + h.randomHex(4), each * n) : 0;
+    await addXp(1);
     return out({ got });
   }
   if (p === '/api/garden/hide') { // спрятать вещь огорода (on: true) или вернуть на место
@@ -320,6 +359,7 @@ export async function gardenApi(req, env, url, h) {
       const q = await env.DB.prepare('UPDATE garden SET chore_day = ?, chore_got = ?, cleaned = COALESCE(cleaned, 0) + ? WHERE user_id = ? AND beds = ? AND seeds = ? AND crop = ?')
         .bind(today, JSON.stringify(got), left.length, u.id, r0.beds, r0.seeds, r0.crop).run();
       if (!q.meta.changes) fail(409, 'busy');
+      await addXp(1);
       return out({ cleaned: left.length, paid: cost, bonus: 0 });
     }
     const ch = chows.find(c => c.i === Math.floor(Number(b.i)));
@@ -331,6 +371,7 @@ export async function gardenApi(req, env, url, h) {
     if (!q.meta.changes) fail(409, 'busy');
     const allDone = chows.every(c => got.includes(c.i));
     const bonus = allDone && R.gardenOn && R.gardenCleanBtn > 0 ? await h.award(u.id, 'gclean', today, R.gardenCleanBtn) : 0;
+    await addXp(2);
     return out({ cleaned: 1, compost: 1, bonus, choresLeft: chows.length - got.length });
   }
   if (p === '/api/garden/compost') { // компост: +gardenCompostH ч роста грядке
@@ -344,6 +385,7 @@ export async function gardenApi(req, env, url, h) {
     const q = await env.DB.prepare('UPDATE garden SET beds = ?, compost = COALESCE(compost, 0) - 1 WHERE user_id = ? AND beds = ? AND seeds = ? AND crop = ? AND COALESCE(compost, 0) > 0')
       .bind(JSON.stringify(s.beds), u.id, r0.beds, r0.seeds, r0.crop).run();
     if (!q.meta.changes) fail(409, 'busy');
+    await addXp(1);
     return out({ boost: R.gardenCompostH });
   }
   if (p === '/api/garden/addbed') { // докупить клумбу: пуговки сразу, клумба — пустая, в конце
@@ -360,6 +402,7 @@ export async function gardenApi(req, env, url, h) {
       if (cost > 0) await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(cost, u.id).run();
       fail(409, 'busy');
     }
+    await addXp(5);
     return out({ added: 1 });
   }
   if (p === '/api/garden/form') { // форма клумбы: rect (обычная) — по умолчанию
@@ -369,6 +412,20 @@ export async function gardenApi(req, env, url, h) {
     if (f === 'rect') delete forms['b' + i]; else forms['b' + i] = f;
     await env.DB.prepare('UPDATE garden SET forms = ? WHERE user_id = ?').bind(JSON.stringify(forms), u.id).run();
     return out();
+  }
+  if (p === '/api/garden/order') { // заказ дня: отдать урожай из корзинки — пуговки и семечко
+    if (!R.gardenOn) fail(403, 'off');
+    const today = h.rigaDay();
+    if (r0.order_day === today) fail(409, 'orderdone');
+    const ord = orderOf(u.id, today, R);
+    if (!ord.items.every(x => (s.crop[x.p] || 0) >= x.n)) fail(409, 'ordnofruit');
+    for (const x of ord.items) { s.crop[x.p] -= x.n; if (!s.crop[x.p]) delete s.crop[x.p]; }
+    s.seeds[ord.seed] = (s.seeds[ord.seed] || 0) + 1;
+    const reward = h.btnOf(ord.value * (R.gardenOrderPct || 150) / 100, unit);
+    await save({ crop: s.crop, seeds: s.seeds, order_day: today });
+    const got = reward > 0 ? await h.award(u.id, 'gorder', today, reward) : 0;
+    await addXp(10);
+    return out({ got, seed: ord.seed });
   }
   if (p === '/api/garden/buy') { // семена простых растений — за пуговки (здесь и в магазине); редкие и волшебные не продаются
     const k = String(b.seed || ''), n = Math.max(1, Math.min(20, Math.floor(Number(b.n) || 1)));
@@ -392,6 +449,7 @@ export async function gardenApi(req, env, url, h) {
       .bind(today, JSON.stringify(got), u.id, r0.bug_day || '', r0.bug_got || '[]').run();
     if (!q.meta.changes) fail(409, 'busy');
     const btn = R.gardenOn && R.gardenBugBtn > 0 ? await h.award(u.id, 'gbug', today + ':' + bug.i, R.gardenBugBtn) : 0;
+    await addXp(2);
     return out({ got: btn });
   }
   return null;
