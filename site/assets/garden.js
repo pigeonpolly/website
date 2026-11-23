@@ -96,6 +96,36 @@
     bedAdd: [n => `➕ Buy a bed for ${n} 🔘`, n => `➕ Докупить клумбу за ${n} 🔘`, n => `➕ Nopirkt dobi par ${n} 🔘`],
     bedAdded: ['🟫 New bed!', '🟫 Новая клумба!', '🟫 Jauna dobe!'],
     bedsNote: ['Tap a bed to change its shape. Move beds with “✋ Move things”.', 'Нажми на клумбу — можно сменить форму. Передвинуть — «✋ Переставить».', 'Pieskaries dobei — var mainīt formu. Pārvietot — «✋ Pārkārtot».'],
+    toBag: ['To the bag', 'В сумку', 'Uz somu'],
+    bedBag: [n => `Beds in the bag: ${n}`, n => `Клумб в сумке: ${n}`, n => `Dobes somā: ${n}`],
+    bedPlace: ['Place a bed', 'Поставить клумбу', 'Novietot dobi'],
+    bedSell: [n => `Sell a bed for ${n} 🔘`, n => `Продать клумбу за ${n} 🔘`, n => `Pārdot dobi par ${n} 🔘`],
+    bedSellAsk: [n => `Sell one bed for ${n} 🔘?`, n => `Продать одну клумбу за ${n} 🔘?`, n => `Pārdot vienu dobi par ${n} 🔘?`],
+    lastBed: ['At least one bed must stay', 'Хотя бы одна клумба должна остаться', 'Vismaz viena dobe jāpaliek'],
+    bedPlanted: ['Harvest or dig it up first', 'Сначала собери урожай или выкопай', 'Vispirms novāc ražu vai izrok'],
+    noBed: ['No beds in the bag', 'В сумке нет клумб', 'Somā nav dobju'],
+    bedRemoved: ['🟫 Bed in the bag', '🟫 Клумба в сумке', '🟫 Dobe somā'],
+    bedPlaced: ['🟫 Bed placed', '🟫 Клумба поставлена', '🟫 Dobe novietota'],
+    bedSold: [n => `🟫 Sold! +${n} 🔘`, n => `🟫 Продано! +${n} 🔘`, n => `🟫 Pārdots! +${n} 🔘`],
+    harvestAll: [n => `🧺 Harvest all (${n})`, n => `🧺 Собрать всё (${n})`, n => `🧺 Novākt visu (${n})`],
+    gotAll: [n => `🧺 Harvested: ${n}`, n => `🧺 Собрано: ${n}`, n => `🧺 Novākts: ${n}`],
+    sellAll: [n => `💰 Sell all for ${n} 🔘`, n => `💰 Продать всё за ${n} 🔘`, n => `💰 Pārdot visu par ${n} 🔘`],
+    nothingReady: ['Nothing is ready yet', 'Пока ничего не поспело', 'Vēl nekas nav gatavs'],
+    choresLeaves: ['🍂 Leaves', '🍂 Листья', '🍂 Lapas'], choresSnow: ['❄️ Snow', '❄️ Сугробы', '❄️ Sniegs'],
+    choresNow: [n => `Leaf piles on the grass: ${n}. Tap one to clear it.`, n => `Куч листьев на траве: ${n}. Нажми на кучу — уберёшь.`, n => `Lapu kaudzes zālē: ${n}. Pieskaries kaudzei — novāksi.`],
+    choresNowSnow: [n => `Snowdrifts in the garden: ${n}. Tap one to clear it.`, n => `Сугробов в огороде: ${n}. Нажми на сугроб — уберёшь.`, n => `Sniega kupenas dārzā: ${n}. Pieskaries kupenai — novāksi.`],
+    choresAll: [n => `🧹 Clear all for ${n} 🔘`, n => `🧹 Убрать всё за ${n} 🔘`, n => `🧹 Novākt visu par ${n} 🔘`],
+    choresClean: ['Everything is tidy for today ✓', 'Сегодня всё убрано ✓', 'Šodien viss novākts ✓'],
+    choresOther: ['Leaves and snow are cleared in autumn and winter.', 'Листья и снег убирают осенью и зимой.', 'Lapas un sniegu novāc rudenī un ziemā.'],
+    choresNote: [n => `By hand: one compost per pile; all piles — +${n} 🔘. Paying clears them without compost.`, n => `Руками: за каждую кучу — компост; за все кучи — +${n} 🔘. За пуговки — без компоста.`, n => `Ar rokām: par katru kaudzi — komposts; par visām — +${n} 🔘. Par pogām — bez komposta.`],
+    choresBonus: [n => `All clear! +${n} 🔘`, n => `Всё убрано! +${n} 🔘`, n => `Viss novākts! +${n} 🔘`],
+    paidClean: [n => `🧹 Cleared · −${n} 🔘`, n => `🧹 Убрано · −${n} 🔘`, n => `🧹 Novākts · −${n} 🔘`],
+    compost: [n => `🌿 Compost: ${n}`, n => `🌿 Компост: ${n}`, n => `🌿 Komposts: ${n}`],
+    compostGot: ['🌿 Compost!', '🌿 Компост!', '🌿 Komposts!'],
+    compostBtn: [n => `🌿 Fertilise (+${n} h)`, n => `🌿 Удобрить (+${n} ч)`, n => `🌿 Mēslot (+${n} st.)`],
+    compostBoost: [n => `🌿 +${n} h of growth`, n => `🌿 +${n} ч роста`, n => `🌿 +${n} st. augšanas`],
+    noCompost: ['No compost: clear leaves or snow by hand', 'Компоста нет: убери листья или снег руками', 'Komposta nav: novāc lapas vai sniegu ar rokām'],
+    stats: [(a, b, c) => `Harvests ${a} · bugs today ${b} · cleared ${c}`, (a, b, c) => `Собрано ${a} · жуков сегодня ${b} · убрано ${c}`, (a, b, c) => `Novākts ${a} · vaboļu šodien ${b} · sakopts ${c}`],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
   // растения: названия (порядок — как в лавке), цвета для разных грядок
@@ -121,7 +151,7 @@
   const hname = k => HARV[k] ? HARV[k][L] : cname(k); // урожай: у дерева — плоды
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const api = (path, body) => fetch('/api/garden' + path, body ? { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : { credentials: 'same-origin' })
-    .then(r => r.ok ? r.json() : Promise.reject(r.status));
+    .then(r => r.ok ? r.json() : r.json().catch(() => ({})).then(j => Promise.reject({ status: r.status, code: j.error || '' })));
   const toast = m => window.PPToast ? window.PPToast(m) : null;
   const dur = ms => { const mi = Math.ceil(ms / 6e4), d = Math.floor(mi / 1440), h = Math.floor(mi % 1440 / 60), m = mi % 60; return d ? `${d} ${t('d')} ${h} ${t('h')}` : h ? `${h} ${t('h')} ${m} ${t('m')}` : `${m} ${t('m')}`; };
   const fnv = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -319,6 +349,12 @@
     R(g, x, y - 3, .5, 3, '#2B1A51'); if (red) { R(g, x - 1.5, y - 1.5, 1, 1, '#2B1A51'); R(g, x + .5, y - .5, 1, 1, '#2B1A51'); }
     R(g, x - 2 + wig, y + 1, 1, .5, '#2B1A51'); R(g, x + wig, y + 1, 1, .5, '#2B1A51');
   }
+  // уборка: куча листьев или сугроб на траве (осень/зима)
+  function drawChore(g, c, now) {
+    const y = c.y + Math.sin(now / 600 + c.i) * .5;
+    if (c.kind === 'snow') { R(g, c.x - 6, y + 1, 13, 3, '#FFFFFF'); R(g, c.x - 5, y - 1, 10, 2, '#F4F8FC'); R(g, c.x - 3, y - 3, 5, 2, '#FFFFFF'); R(g, c.x + 4, y + 2, 2, 1, '#DCE8F4'); R(g, c.x - 6, y + 3, 13, 1, '#DCE8F4'); }
+    else { R(g, c.x - 6, y + 1, 13, 3, '#8A4A22'); R(g, c.x - 5, y - 1, 9, 2, '#D2502A'); R(g, c.x + 1, y - 3, 5, 2, '#E8771C'); R(g, c.x - 2, y, 5, 1, '#F2A93B'); R(g, c.x - 4, y - 3, 2, 1, '#B5652A'); }
+  }
   // иконка растения для панели (выросшее, 16×16 × 3)
   const icons = {};
   function icon(p) {
@@ -364,6 +400,7 @@
     const o = D.owner;
     app.innerHTML = `<div class="gd-bar"><span class="gd-cap">🥕 ${esc(t('of').replace('{n}', o.nick))}</span><span class="gd-wx"></span><a class="pill-btn gd-home" href="${pre}/bird/?nick=${encodeURIComponent(o.nick)}#room">${t('home')}</a></div>
       <div class="gd-scroll"><div class="gd-stage"><canvas class="gd-cv" width="${W * K}" height="${H * K}" role="img" aria-label="${esc(t('of').replace('{n}', o.nick))}"></canvas><div class="gd-float" aria-live="polite"></div></div></div>
+      ${D.mine ? `<div class="gd-tools"><button type="button" class="cta-btn gd-move-top">${t('move')}</button></div>` : ''}
       <div class="gd-panel"></div>`;
     const cv = app.querySelector('.gd-cv'), g = cv.getContext('2d');
     g.imageSmoothingEnabled = false;
@@ -377,6 +414,7 @@
     const lanes = () => { const rs = bedsAt(); return [57, ...new Set(rs.map(r => Math.min(H - 2, r.y + r.h + 4)))]; };
     scene = { cv, g, bug: null };
     const hitBug = (x, y) => (D.bugs || []).find(b => { const p = bugPos(b); return Math.abs(p.x - x) < 6 && Math.abs(p.y - y) < 6; });
+    const hitChore = (x, y) => (D.chores || []).find(c => Math.abs(c.x - x) < 7 && Math.abs(c.y - y) < 6);
     const bugPos = b => { const r = bedsAt()[b.bed] || { x: 60, y: 70, w: 40, h: 14 }; return { x: r.x + 3 + (r.w - 6) * b.x / 100, y: r.y + r.h / 2 + 1 }; };
     let last = 0;
     function frame(now) {
@@ -422,6 +460,7 @@
         if (D.mine && !EDIT && b && !b.today && !b.ready) { const x = r.x + r.w - 2, y = r.y - 4 + Math.round(Math.sin(now / 300 + i)); R(g, x - 1, y, 4, 4, '#5FB8F0'); R(g, x, y - 1, 2, 1, '#5FB8F0'); R(g, x + .5, y - 2, 1, 1, '#5FB8F0'); R(g, x, y + 1, 1, 1, '#BFE6FA'); } // капля на углу грядки: полей сегодня
         if (EDIT) { g.strokeStyle = EDIT.drag && EDIT.drag.key === 'b' + i ? '#F0A987' : 'rgba(255,255,255,.75)'; g.lineWidth = .5; g.strokeRect(r.x - 2.5, r.y - 2.5, r.w + 5, r.h + 5); }
       }]));
+      if (!EDIT) (D.chores || []).forEach(c => L2.push([c.y + 4, .5, () => drawChore(g, c, now)]));
       L2.push([bird.y, 2, drawB]);
       L2.sort((a, b) => a[0] - b[0] || a[1] - b[1]).forEach(x => x[2]());
       (D.bugs || []).forEach(b => { const p = bugPos(b), mv = Math.sin(now / 700 + b.i) * 2; drawBug(g, p.x + mv, p.y, now, b.i); });
@@ -470,12 +509,16 @@
       const p = at(e);
       if (p.x >= 18 && p.x <= 29 && p.y >= 34 && p.y <= 55) { location.href = app.querySelector('.gd-home').href; return; } // дверь домика — обратно в дом
       if (!D.mine) return;
+      const ch = hitChore(p.x, p.y);
+      if (ch) { cleanPile(ch); return; }
       const bug = hitBug(p.x, p.y);
       if (bug) { catchBug(bug); return; }
       const i = bedsAt().findIndex(r => p.x >= r.x - 3 && p.x <= r.x + r.w + 3 && p.y >= r.y - 18 && p.y <= r.y + r.h + 3);
       if (i >= 0) { sel = i; panel(); const pn = app.querySelector('.gd-sel'); if (pn && pn.getBoundingClientRect().bottom > innerHeight) pn.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     });
-    cv.addEventListener('pointermove', e => { const p = at(e); if (EDIT) { cv.style.cursor = EDIT.drag ? 'grabbing' : grab(p) ? 'grab' : ''; return; } cv.style.cursor = (p.x >= 18 && p.x <= 29 && p.y >= 34 && p.y <= 55) || (D.mine && (hitBug(p.x, p.y) || bedsAt().some(r => p.x >= r.x - 3 && p.x <= r.x + r.w + 3 && p.y >= r.y - 18 && p.y <= r.y + r.h + 3))) ? 'pointer' : ''; });
+    cv.addEventListener('pointermove', e => { const p = at(e); if (EDIT) { cv.style.cursor = EDIT.drag ? 'grabbing' : grab(p) ? 'grab' : ''; return; } cv.style.cursor = (p.x >= 18 && p.x <= 29 && p.y >= 34 && p.y <= 55) || (D.mine && (hitChore(p.x, p.y) || hitBug(p.x, p.y) || bedsAt().some(r => p.x >= r.x - 3 && p.x <= r.x + r.w + 3 && p.y >= r.y - 18 && p.y <= r.y + r.h + 3))) ? 'pointer' : ''; });
+    const topMove = app.querySelector('.gd-move-top');
+    if (topMove) topMove.onclick = () => { editMode(true); };
   }
   const shown = () => (D.items || []).filter(v => !(D.hide || []).includes(v)); // вещи огорода, которые стоят на сцене
   // перестановка: места грядок и вещей — D.pos с сервера или EDIT.pos, пока хозяин двигает
@@ -485,6 +528,7 @@
   function editMode(on) {
     EDIT = on ? { pos: { ...(D.pos || {}) }, drag: null } : null;
     const cv = app.querySelector('.gd-cv'); if (cv) { cv.style.touchAction = on ? 'none' : ''; cv.classList.toggle('gd-edit', !!on); }
+    const top = app.querySelector('.gd-move-top'); if (top) top.hidden = !!on;
     app.classList.toggle('gd-editing', !!on); // на телефоне при перестановке огород — во всю ширину, без прокрутки вбок
     panel();
   }
@@ -493,10 +537,34 @@
   async function act(path, body, ok) {
     if (busy) return; busy = true;
     try { const r = await api('/' + path, body); D = { ...D, ...r }; setButtons(r.buttons); ok && ok(r); }
-    catch (e) { if (e === 402) toast(t('poor')); else if (e === 409) { await load(); } else toast(t('oops')); }
+    catch (e) {
+      const st = e && e.status || e, code = e && e.code;
+      const msg = { planted: 'bedPlanted', last: 'lastBed', nobed: 'noBed', nocompost: 'noCompost', nochores: 'choresClean', done: 'choresClean', nocrop: 'basket0', nothing: 'nothingReady', ready: 'ready', empty: 'empty' }[code];
+      if (st === 402) toast(t('poor'));
+      else if (st === 403) toast(t('off'));
+      else if (st === 409) { if (msg) toast(t(msg)); else await load(); }
+      else toast(t('oops'));
+    }
     busy = false; panel();
   }
   function catchBug(b) { D.bugs = D.bugs.filter(x => x !== b); act('bug', { i: b.i }, r => { const m = r.got ? t('caught', r.got) : t('caught0'); float(m); toast(m); }); }
+  function cleanPile(c) { act('clean', { i: c.i }, r => { const m = r.bonus ? t('choresBonus', r.bonus) : t('compostGot'); float(m); toast(m); }); }
+  function cleanAll() {
+    const n = (D.chores || []).length, cost = n * (D.cleanPay || 0);
+    if (!n || (cost > 0 && !confirm(t('choresAll', cost)))) return;
+    act('clean', { all: true }, r => { const m = t('paidClean', r.paid || 0); float(m); toast(m); });
+  }
+  function removeBed() {
+    act('bed', { act: 'remove', bed: sel }, () => { sel = -1; float(t('bedRemoved')); toast(t('bedRemoved')); });
+  }
+  function placeBed() {
+    act('bed', { act: 'place' }, () => { sel = D.beds.length - 1; float(t('bedPlaced')); toast(t('bedPlaced')); });
+  }
+  function sellBed() {
+    const n = D.bedSell || 0;
+    if (!confirm(t('bedSellAsk', n))) return;
+    act('bed', { act: 'sell', n: 1 }, r => { const m = t('bedSold', r.got || 0); float(m); toast(m); });
+  }
 
   // панель под сценой: выбранная грядка, корзинка, семена, жуки
   function panel() {
@@ -509,14 +577,16 @@
       box.querySelectorAll('[data-mv]').forEach(b => { b.onclick = () => {
         const k = b.dataset.mv, pos = EDIT.pos;
         if (k === 'cancel') return editMode(false);
-        EDIT = null; app.querySelector('.gd-cv').style.touchAction = ''; app.classList.remove('gd-editing');
+        EDIT = null; const ecv = app.querySelector('.gd-cv'); if (ecv) { ecv.style.touchAction = ''; ecv.classList.remove('gd-edit'); } app.classList.remove('gd-editing');
+        const top = app.querySelector('.gd-move-top'); if (top) top.hidden = false;
         act('move', k === 'reset' ? { reset: true } : { pos }, () => float(t('moveSaved')));
       }; });
       return;
     }
     const beds = D.beds || [], P = D.prices || {};
-    const need = beds.filter(b => b && !b.today && !b.ready).length;
-    let h = `<div class="gd-row">${need ? `<button type="button" class="cta-btn gd-water-all">${t('waterAll', need)}</button>` : beds.some(Boolean) ? `<span class="gd-ok">${t('watered')}</span>` : ''}</div>`;
+    const need = beds.filter(b => b && b.p && !b.today && !b.ready).length;
+    const ready = beds.filter(b => b && b.ready).length;
+    let h = `<div class="gd-row">${need ? `<button type="button" class="cta-btn gd-water-all">${t('waterAll', need)}</button>` : beds.some(Boolean) ? `<span class="gd-ok">${t('watered')}</span>` : ''}${ready ? `<button type="button" class="cta-btn gd-harvest-all">${t('harvestAll', ready)}</button>` : ''}</div>`;
     if (!D.on) h += `<p class="gd-note">${t('off')}</p>`;
     // выбранная грядка
     if (sel >= 0 && sel < beds.length) {
@@ -525,23 +595,27 @@
       if (!b) {
         const have = Object.keys(CROP).filter(k => D.seeds[k] > 0);
         h += `<p>${t('empty')}</p>` + (have.length ? `<div class="gd-chips">${have.map(k => `<button type="button" class="gd-chip" data-plant="${k}">${pic(k)}<span>${esc(cname(k))}</span><b>×${D.seeds[k]}</b></button>`).join('')}</div>` : `<p class="gd-note">${t('noSeeds')}</p>`);
+        h += `<div class="gd-row"><button type="button" class="pill-btn" data-bed-remove>${t('toBag')}</button></div>`;
       } else {
         const st = b.ready ? (isTree(b.p) ? t('treeReady') : t('ready')) : b.m ? [t('treeGrown', dur(b.left)), b.today ? t('wetToday') : b.wet ? t('wetYet') : t('dry')].join(' · ') : [t('left', dur(b.left)), b.today ? t('wetToday') : b.k === 0 && !b.wet ? t('seedNew') : b.wet ? t('wetYet') : t('dry')].join(' · ');
-        h += `<div class="gd-info">${pic(b.p)}<p>${st}</p></div><div class="gd-row">${b.ready ? `<button type="button" class="cta-btn" data-harvest>${t('harvest')}</button>` : !b.today ? `<button type="button" class="cta-btn" data-water>${t('water')}</button>` : ''}<button type="button" class="pill-btn gd-dig" data-dig>${t('dig')}</button></div>`;
+        h += `<div class="gd-info">${pic(b.p)}<p>${st}</p></div><div class="gd-row">${b.ready ? `<button type="button" class="cta-btn" data-harvest>${t('harvest')}</button>` : `${!b.today ? `<button type="button" class="cta-btn" data-water>${t('water')}</button>` : ''}${(D.compost || 0) > 0 ? `<button type="button" class="pill-btn" data-compost>${t('compostBtn', D.compostH)}</button>` : ''}`}<button type="button" class="pill-btn gd-dig" data-dig>${t('dig')}</button></div>`;
       }
       const fNow = (D.forms || {})['b' + sel] || 'rect';
       h += `<div class="gd-forms"><span class="gd-note">${t('form')}</span>${Object.keys(T.forms).map(f => `<button type="button" class="gd-chip gd-form${f === fNow ? ' on' : ''}" data-form="${f}" aria-pressed="${f === fNow}">${T.forms[f][L]}</button>`).join('')}</div>`;
       h += '</section>';
     } else h += `<p class="gd-note">${t('tapBed')}</p>`;
-    // клумбы: сколько есть, докупить
+    // клумбы: сколько есть, докупить, сумка клумб
     const nB = beds.length, mB = D.bedsMax || nB;
-    h += `<section class="gd-box"><h3>${t('bedsHead')}</h3><p>${t('bedsN', nB, mB)} ${nB >= mB ? t('bedsFull') : ''}</p>${nB < mB ? `<button type="button" class="pill-btn gd-addbed"${(D.bedBtn || 0) > (D.buttons || 0) ? ' disabled' : ''}>${t('bedAdd', D.bedBtn || 0)}</button>` : ''}<p class="gd-note">${t('bedsNote')}</p></section>`;
+    h += `<section class="gd-box"><h3>${t('bedsHead')}</h3><p>${t('bedsN', nB, mB)} ${nB >= mB ? t('bedsFull') : ''}</p>${nB < mB ? `<button type="button" class="pill-btn gd-addbed"${(D.bedBtn || 0) > (D.buttons || 0) ? ' disabled' : ''}>${t('bedAdd', D.bedBtn || 0)}</button>` : ''}
+      <p class="gd-note">${t('bedBag', D.bedbag || 0)}</p>${(D.bedbag || 0) > 0 ? `<div class="gd-row"><button type="button" class="cta-btn" data-bed-place>${t('bedPlace')}</button><button type="button" class="pill-btn" data-bed-sell>${t('bedSell', D.bedSell || 0)}</button></div>` : ''}
+      <p class="gd-note">${t('bedsNote')}</p></section>`;
     // жуки
     const nb = (D.bugs || []).length;
     h += `<section class="gd-box"><h3>${t('bugsHead')}</h3><p>${nb ? t('bugsNow', nb) : t('bugsNone')} ${D.bugsGot ? t('bugsGot', D.bugsGot) : ''} ${nb ? '' : D.bugsLater ? t('bugsLater') : D.bugsGot ? t('bugsDone') : ''}</p><p class="gd-note">${t('bugsRule', D.bugBtn || 0)}</p></section>`;
     // корзинка
     const crop = Object.keys(CROP).filter(k => D.crop[k] > 0);
-    h += `<section class="gd-box"><h3>${t('basket')}</h3>${crop.length ? `<div class="gd-list">${crop.map(k => `<div class="gd-item">${pic(k)}<span>${esc(hname(k))} ×${D.crop[k]}</span><button type="button" class="pill-btn" data-sell="${k}">${t('sell', (P[k] ? P[k].sell : 0) * D.crop[k])}</button></div>`).join('')}</div>` : `<p class="gd-note">${t('basket0')}</p>`}</section>`;
+    const sellTotal = crop.reduce((a, k) => a + (P[k] ? P[k].sell : 0) * D.crop[k], 0);
+    h += `<section class="gd-box"><h3>${t('basket')}</h3>${crop.length ? `<div class="gd-list">${crop.map(k => `<div class="gd-item">${pic(k)}<span>${esc(hname(k))} ×${D.crop[k]}</span><button type="button" class="pill-btn" data-sell="${k}">${t('sell', (P[k] ? P[k].sell : 0) * D.crop[k])}</button></div>`).join('')}</div>${sellTotal ? `<button type="button" class="cta-btn" data-sell-all>${t('sellAll', sellTotal)}</button>` : ''}` : `<p class="gd-note">${t('basket0')}</p>`}</section>`;
     // семена
     const seeds = Object.keys(CROP).filter(k => D.seeds[k] > 0);
     h += `<section class="gd-box"><h3>${t('seeds')}</h3>${seeds.length ? `<div class="gd-chips">${seeds.map(k => `<span class="gd-chip gd-chip-s">${pic(k)}<span>${esc(cname(k))}</span><b>×${D.seeds[k]}</b></span>`).join('')}</div>` : `<p class="gd-note">${t('seeds0')}</p>`}
@@ -549,11 +623,20 @@
     // особые семена: серии до редкого и волшебного
     const wk = D.week || {}, line = (k, w) => w ? `<li>${t(k, w.n, w.need)}${w.got ? ' ' + t('gotSeed', esc(cname(w.got))) : ''}<span class="gd-bar-p"><i style="width:${Math.round(100 * w.n / Math.max(1, w.need))}%"></i></span></li>` : '';
     h += `<section class="gd-box"><h3>${t('specialHead')}</h3><ul class="gd-week">${line('rare', wk.rare)}${line('magic', wk.magic)}</ul><p class="gd-note">${t('specialNote')}</p></section>`;
+    // уборка: листья осенью, сугробы зимой
+    const ch = D.chores || [], winter = D.season === 'winter';
+    h += `<section class="gd-box"><h3>${winter ? t('choresSnow') : t('choresLeaves')}</h3>`;
+    if (!D.cleanOn) h += `<p class="gd-note">${t('choresOther')}</p>`;
+    else if (ch.length) h += `<p>${winter ? t('choresNowSnow', ch.length) : t('choresNow', ch.length)}</p><p class="gd-note">${t('choresNote', D.cleanBtn || 0)}</p><button type="button" class="pill-btn" data-clean-all>${t('choresAll', ch.length * (D.cleanPay || 0))}</button>`;
+    else if (winter || D.season === 'autumn') h += `<p class="gd-note">${t('choresClean')}</p>`;
+    else h += `<p class="gd-note">${t('choresOther')}</p>`;
+    h += `<p class="gd-note">${t('compost', D.compost || 0)}</p></section>`;
     // вещи огорода: спрятать / вернуть
     const GI = window.PPGardenItems, its = (D.items || []).filter(v => GI && GI.ITEMS[v]);
     const overN = GI ? GI.layout(shown(), D.pos || {}).filter(it => it.over).length : 0; // не влезло — ждут перестановки
     h += `<section class="gd-box"><h3>${t('itemsHead')}</h3>${its.length ? `<div class="gd-chips gd-things">${its.map(v => `<button type="button" class="gd-chip${(D.hide || []).includes(v) ? ' off' : ''}" data-thing="${esc(v)}" aria-pressed="${!(D.hide || []).includes(v)}"><span class="gd-thing-ic" data-ic="${esc(v)}"></span><span>${esc(GI.name(v, L))}</span></button>`).join('')}</div><p class="gd-note">${t('itemsNote')}</p>${overN ? `<p class="gd-note gd-over">${t('moveOver', overN)}</p>` : ''}` : `<p class="gd-note">${t('items0')}</p>`}
-      <a class="pill-btn" href="${pre}/shop/#room:garden">${t('itemsShop')}</a> <button type="button" class="pill-btn gd-move-btn">${t('move')}</button></section>`;
+      <a class="pill-btn" href="${pre}/shop/#room:garden">${t('itemsShop')}</a></section>`;
+    h += `<p class="gd-note gd-stats">${t('stats', D.harvests || 0, D.bugsGot || 0, D.cleaned || 0)}</p>`;
     h += `<p class="gd-note gd-how">${t('how')}</p>`;
     box.innerHTML = h;
     const on = (sel2, f) => box.querySelectorAll(sel2).forEach(b => { b.onclick = () => f(b); });
@@ -564,7 +647,13 @@
     on('[data-form]', b => act('form', { bed: sel, form: b.dataset.form }));
     on('.gd-addbed', () => act('addbed', {}, () => { sel = D.beds.length - 1; float(t('bedAdded')); }));
     on('[data-dig]', () => { if (confirm(t('digAsk'))) act('dig', { bed: sel }, () => float('🪓')); });
-    on('.gd-move-btn', () => { editMode(true); const st = app.querySelector('.gd-stage'); if (st && st.getBoundingClientRect().top < 0) st.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    on('[data-bed-remove]', removeBed);
+    on('[data-bed-place]', placeBed);
+    on('[data-bed-sell]', sellBed);
+    on('[data-compost]', () => act('compost', { bed: sel }, r => float(t('compostBoost', r.boost))));
+    on('[data-clean-all]', cleanAll);
+    on('[data-harvest-all]', () => act('harvest', { all: true }, r => { const m = t('gotAll', r.count || 0); float(m); toast(m); }));
+    on('[data-sell-all]', () => act('sell', { all: true }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));
     on('[data-sell]', b => act('sell', { crop: b.dataset.sell }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
     on('.gd-shop-btn', shop);

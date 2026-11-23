@@ -5064,6 +5064,11 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .gd-wx { font: 14px var(--sans); opacity: .8; flex: 1; }
 .gd-home { padding: 8px 14px; font-size: 14px; }
 .gd-stage { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #504A46, 0 14px 30px rgba(0, 0, 0, .3); background: var(--pp-ink,#2B1A51); }
+.gd-stage:focus { outline: none; }
+.gd-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; max-width: 900px; margin: 0 auto; }
+.gd-move-top { padding: 8px 14px; font-size: 14px; }
+.gd-move-top[hidden] { display: none; }
+.gd-stats { margin-top: 2px; }
 .gd-cv { display: block; width: 100%; height: auto; aspect-ratio: 240 / 150; image-rendering: pixelated; touch-action: manipulation; }
 .gd-float { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(28, 26, 24, .88); color: #fff; font: 600 15px var(--sans); opacity: 0; pointer-events: none; white-space: nowrap; }
 .gd-float.on { animation: gd-float 1.8s ease; }
