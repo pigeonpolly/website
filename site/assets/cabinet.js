@@ -186,6 +186,9 @@
     show(cur);
     brewReq.then(d => { if (d && d.on && window.PPBrewRoom) brewTab(d, !asked, e.detail.pr); });
   });
+  // части игры регистрируют себя сами: window.PPBrewUI[ключ] = (api, data) => …  (котёл — cauldron, книга — book, шкаф — shelf, сумка — bag,
+  // карта — map, игры — games, комнаты — door, стая — flock); нет своей — запасное поведение ниже. Так части не правят cabinet.js.
+  const brewOn = def => Object.fromEntries(Object.keys(def).map(k => [k, api => { const f = window.PPBrewUI && window.PPBrewUI[k]; if (f) return f(api, window.PPBrew && window.PPBrew.data); if (def[k]) def[k](api); }]));
   function brewTab(d, open, pr) {
     TABS.unshift('brew');
     const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.cab = 'brew'; b.textContent = t('brew');
@@ -199,9 +202,14 @@
     const me = d.me;
     const api = window.PPBrewRoom.mount(box, { id: me.id, avatar: (pr && pr.avatar) || null, cat: me.cats ? { id: 10 } : null,
       state: { level: me.level, xp: me.xp, need: me.need, slots: me.slots, shelf: [], cauldron: { dirt: Math.min(10, me.dirt || 0) } },
-      on: { cauldron: soon, book: soon, shelf: soon, bag: soon,
-        door: () => show('bird'), games: () => { location.href = pre2 + '/games/'; }, map: () => { location.href = pre2 + '/wobbleland/'; }, flock: () => { location.href = pre2 + '/flock/'; } } });
-    window.PPBrew = { api, data: d };
+      on: brewOn({ cauldron: soon, book: soon, shelf: soon, bag: soon, window: null, bird: null,
+        door: () => show('bird'), games: () => { location.href = pre2 + '/games/'; }, map: () => { location.href = pre2 + '/wobbleland/'; }, flock: () => { location.href = pre2 + '/flock/'; } }) });
+    // шкаф: вид бутылочки — PPBrewUI.look(строка шкафа) из части «Котёл», пока её нет — цвет и форма по хэшу рецепта
+    const look = r => (window.PPBrewUI && window.PPBrewUI.look) ? window.PPBrewUI.look(r) : (() => { let hh = 0; for (const ch of r.recipe) hh = (hh * 31 + ch.charCodeAt(0)) >>> 0; return { color: ['#E07B5A', '#7FA3E8', '#C98AD8', '#6FBF73', '#F2C230', '#EE7DB0', '#5FC8C0', '#B8452E', '#8E7BE0', '#A8D05A', '#F08A24', '#4A7BD8'][hh % 12], shape: r.rarity >= 5 ? 3 : hh % 3 }; })();
+    const toState = x => ({ level: x.me.level, xp: x.me.xp, need: x.me.need, slots: x.me.slots, shelf: (x.shelf || []).map(r => Object.assign({ n: r.n, rare: r.rarity }, look(r))), cauldron: { dirt: Math.min(10, x.me.dirt || 0) } });
+    window.PPBrew = { api, data: d, toState,
+      reload: () => fetch('/api/brew', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(x => { if (x && x.on) { window.PPBrew.data = x; api.setState(toState(x)); } return x; }) };
+    api.setState(toState(d));
     if (open || cur === 'brew') show('brew');
   }
 })();
