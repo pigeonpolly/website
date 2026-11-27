@@ -114,4 +114,4 @@
 - Уровень слова — `tools/norsk_level.py слово` (по `words` учебника /norsk/); нет в учебнике — «~уровень».
 - Страница FB «Balodis Pollijs ceļā uz Norvēģiju», пишет Полли от первого лица; образец — пост про rumpetroll / å være på bærtur.
 - Картинки — карточки со словами без маскота (Алина 27.11: нарисованный кодом Полли не подошёл): `node tools/norsk/cards.js N` по `tools/norsk/cards.json` → site/images/norsk-lv/card-NNN.jpg 1080×1350; виды word, literal, quiz, list, art (рисунок из palettes.json со словами), phrase; образцы cards-sample.json, sample-*.jpg.
-
+- 27.11: №1–10 (первая пачка): типы — смешные слова 2, угадай 2, праздники 3 (адвент 29.11, Рождество, Люсия 13.12), зима/быт 3, грамматика 1; в Notion добавлены праздники «Адвент», «Люсия». Тексты — tools/norsk/posts-2611.json.

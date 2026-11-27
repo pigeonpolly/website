@@ -1,1 +1,201 @@
-[]
+[
+ {
+  "n": 1,
+  "kind": "literal",
+  "no": "flaggermus",
+  "parts": [
+   [
+    "flagre",
+    "plivināties"
+   ],
+   [
+    "mus",
+    "pele"
+   ]
+  ],
+  "lit": "„plivinošā pele”",
+  "real": "sikspārnis",
+  "lvl": "~B1"
+ },
+ {
+  "n": 2,
+  "kind": "word",
+  "no": "et lys",
+  "pr": "līs",
+  "lv": "svece; gaisma",
+  "ex": "Nå tenner vi det første lys.",
+  "exlv": "Tagad mēs iededzam pirmo sveci.",
+  "lvl": "~A1"
+ },
+ {
+  "n": 3,
+  "kind": "quiz",
+  "no": "en matpakke",
+  "pr": "mātpakke",
+  "opts": [
+   "maizītes līdzi pusdienām",
+   "paciņa no pārtikas veikala",
+   "kurjera atvests ēdiens"
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 4,
+  "kind": "list",
+  "t": "Ziemas vārdi, kas noderēs jau rīt",
+  "items": [
+   [
+    "snø",
+    "snē",
+    "sniegs"
+   ],
+   [
+    "kald",
+    "kall",
+    "auksts"
+   ],
+   [
+    "ei lue",
+    "lūe",
+    "cepure"
+   ],
+   [
+    "votter",
+    "votter",
+    "dūraiņi"
+   ],
+   [
+    "glatt",
+    "glatt",
+    "slidens"
+   ]
+  ],
+  "lvl": "A1–A2"
+ },
+ {
+  "n": 5,
+  "kind": "literal",
+  "no": "et fjernsyn",
+  "parts": [
+   [
+    "fjern",
+    "tāls"
+   ],
+   [
+    "syn",
+    "redze"
+   ]
+  ],
+  "lit": "„tālredze”",
+  "real": "televizors",
+  "lvl": "~A2"
+ },
+ {
+  "n": 6,
+  "kind": "art",
+  "pal": 7,
+  "t": "God jul!",
+  "lv": "Priecīgus Ziemassvētkus!",
+  "w": [
+   [
+    "et juletre",
+    "jūletrē",
+    "Ziemassvētku egle",
+    19,
+    45
+   ],
+   [
+    "en hest",
+    "hest",
+    "zirgs",
+    7,
+    31
+   ],
+   [
+    "en fisk",
+    "fisk",
+    "zivs",
+    65,
+    92
+   ],
+   [
+    "en gave",
+    "gāve",
+    "dāvana",
+    10,
+    89,
+    "dn"
+   ]
+  ],
+  "lvl": "~A1"
+ },
+ {
+  "n": 7,
+  "kind": "quiz",
+  "no": "en lussekatt",
+  "pr": "lussekatt",
+  "opts": [
+   "safrāna bulciņa",
+   "kaķis, kas staigā ar sveci",
+   "Lūcijas dienas cepure"
+  ],
+  "lvl": "~B1"
+ },
+ {
+  "n": 8,
+  "kind": "phrase",
+  "no": "Det finnes ikke dårlig vær, bare dårlige klær.",
+  "pr": "de finnes ikke dōrli vēr, bāre dōrlie klēr",
+  "lv": "Nav slikta laika — ir tikai slikts apģērbs.",
+  "note": "Norvēģi to saka katru reizi, kad tu sūdzies par lietu vai sniegu.",
+  "lvl": "A2"
+ },
+ {
+  "n": 9,
+  "kind": "word",
+  "no": "huset",
+  "pr": "hūse",
+  "lv": "(tā) māja",
+  "ex": "et hus → huset",
+  "exlv": "Artikuls norvēģiem stāv vārda beigās: en katt → katten, ei bok → boka.",
+  "lvl": "A1"
+ },
+ {
+  "n": 10,
+  "kind": "art",
+  "pal": 47,
+  "t": "Lesekroken",
+  "lv": "Lasīšanas stūrītis",
+  "w": [
+   [
+    "bøker",
+    "bēker",
+    "grāmatas",
+    25,
+    29
+   ],
+   [
+    "en lenestol",
+    "lēnestūl",
+    "atpūtas krēsls",
+    38,
+    68
+   ],
+   [
+    "en katt",
+    "katt",
+    "kaķis",
+    70,
+    78
+   ],
+   [
+    "et teppe",
+    "teppe",
+    "paklājs",
+    40,
+    85
+   ]
+  ],
+  "lvl": "A1–A2"
+ }
+]
