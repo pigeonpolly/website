@@ -35,6 +35,7 @@
 | «Нарисуй мне» | docs/requests.md |
 | Меню, шапка, главная | docs/site.md |
 | Продвижение, рост посетителей; контент-завод Pinterest+FB (скилл `social-content-factory`) | docs/growth.md |
+| Посты про норвежский на латышском с Полли, уровни слов (скилл `norsk-lv-posts`, Notion «🇳🇴 Norsk») | docs/growth.md → Norsk LV |
 | ArtPill — «таблетка рисования» для ИИ | docs/artpill.md |
 | A1 English Pack: курс английского A1, кот Оскар, скилл `a1-pack` | docs/a1-pack.md, a1-pack/SCHEMA.md |
 | Убранное: от чего отказались, хвосты, маркеры | docs/retired.md |

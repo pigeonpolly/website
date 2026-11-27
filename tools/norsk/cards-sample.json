@@ -1,0 +1,122 @@
+[
+ {
+  "n": 901,
+  "kind": "literal",
+  "no": "rumpetroll",
+  "parts": [
+   [
+    "rumpe",
+    "dibens, aste"
+   ],
+   [
+    "troll",
+    "trollis"
+   ]
+  ],
+  "lit": "„dupša trollis”",
+  "real": "kurkulis",
+  "lvl": "~B1",
+  "pal": 53
+ },
+ {
+  "n": 902,
+  "kind": "quiz",
+  "no": "å være på bærtur",
+  "pr": "o vēre po bērtūr",
+  "opts": [
+   "iet lasīt ogas",
+   "apjukt, runāt muļķības",
+   "būt atvaļinājumā"
+  ],
+  "lvl": "~B2",
+  "pal": 20,
+  "theme": 8
+ },
+ {
+  "n": 903,
+  "kind": "word",
+  "no": "et lys",
+  "pr": "līs",
+  "lv": "svece; gaisma",
+  "ex": "Vi tenner et lys hver søndag i advent.",
+  "exlv": "Katru Adventes svētdienu mēs iededzam sveci.",
+  "lvl": "A1",
+  "pal": 7
+ },
+ {
+  "n": 904,
+  "kind": "list",
+  "t": "5 vārdi tumšajam laikam",
+  "items": [
+   [
+    "et lys",
+    "līs",
+    "svece, gaisma"
+   ],
+   [
+    "koselig",
+    "kūseli",
+    "omulīgs"
+   ],
+   [
+    "ei lue",
+    "lūe",
+    "cepure"
+   ],
+   [
+    "en kanelbolle",
+    "kanēlbolle",
+    "kanēļmaizīte"
+   ],
+   [
+    "mørketid",
+    "mērketīd",
+    "tumšais laiks"
+   ]
+  ],
+  "lvl": "A1–B1",
+  "pal": 47,
+  "theme": 7
+ },
+ {
+  "n": 905,
+  "kind": "art",
+  "pal": 83,
+  "t": "Katt i lysene",
+  "lv": "Kaķis lampiņās",
+  "w": [
+   [
+    "en katt",
+    "katt",
+    "kaķis",
+    41,
+    42
+   ],
+   [
+    "ei lyslenke",
+    "līslenke",
+    "lampiņu virtene",
+    58,
+    22
+   ],
+   [
+    "en pote",
+    "pūte",
+    "ķepa",
+    52,
+    48
+   ]
+  ],
+  "lvl": "A2"
+ },
+ {
+  "n": 906,
+  "kind": "phrase",
+  "no": "Det finnes ikke dårlig vær, bare dårlige klær.",
+  "pr": "de finnes ikke dōrli vēr, bāre dōrlie klēr",
+  "lv": "Nav slikta laika — ir tikai slikts apģērbs.",
+  "note": "Norvēģi to saka katru reizi, kad tu sūdzies par lietu vai sniegu.",
+  "lvl": "A2",
+  "pal": 64
+ }
+]
