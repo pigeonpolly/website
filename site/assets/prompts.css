@@ -1,32 +1,121 @@
-/* /prompts/ — печатный список тем месяца: 30 карточек, чекбоксы, печать */
+/* /prompts/ — лист тем месяца: 5 видов (квадратики, кружочки, цветочки, номера, сетка месяца), цвета тем вкл/выкл, печать в том же виде */
 
 .pr .hd5 { max-width: 760px; }
-.pr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 22px; }
+.pr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 14px; }
 .pr-bar b { font-family: var(--serif, Fraunces, serif); font-size: 1.35rem; letter-spacing: .01em; text-transform: capitalize; }
 .pr-nav { min-width: 46px; padding: 6px 12px; }
 .pr-save { margin-left: auto; background: #C4552D; border-color: #C4552D; color: #fff; }
 .pr-save:hover { background: #A8451F; border-color: #A8451F; }
 .pr-print { padding: 6px 12px; }
-.pr-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.pr-d { display: flex; align-items: baseline; gap: 10px; background: var(--paper, #FFFDF8); color: var(--ink, #2A2620); border: 1px solid rgba(42,38,32,.14); border-radius: 12px; padding: 12px 14px; }
-.pr-d .pr-n { font-family: var(--serif, Fraunces, serif); font-weight: 700; font-size: 1.05rem; min-width: 1.6em; color: #C4552D; }
-.pr-d .pr-t { flex: 1; line-height: 1.25; }
-.pr-d .pr-time { font-size: .8rem; opacity: .6; white-space: nowrap; }
-.pr-d .pr-box { width: 15px; height: 15px; border: 1.5px solid rgba(42,38,32,.45); border-radius: 3px; flex: none; }
-.pr-d.pr-x .pr-box { border-color: #C4552D; }
 .pr-wait { opacity: .6; }
 .pr-note { max-width: 640px; margin: 18px 0 6px; opacity: .75; font-size: .95rem; }
 .pr-more { margin-top: 18px; }
 
-@media (max-width: 900px) { .pr-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* выбор вида и цветов */
+.pr-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0 0 18px; }
+.pr-styles { display: flex; flex-wrap: wrap; gap: 6px; }
+.pr-st { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: .92rem; color: #2A2620; background: #FFFDF8; border: 1.5px solid rgba(42,38,32,.18); border-radius: 999px; padding: 6px 13px 6px 9px; cursor: pointer; }
+.pr-st:hover { border-color: #C4552D; }
+.pr-st.on { background: #2A2620; border-color: #2A2620; color: #FFFDF8; }
+.pr-ic { display: inline-grid; place-items: center; width: 20px; height: 20px; font-size: 15px; line-height: 1; color: #C4552D; }
+.pr-st.on .pr-ic { color: #F0A987; }
+.pr-ic svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.6; }
+.pr-ic svg .pr-fc { fill: none; stroke: none; }
+.pr-ic-num { font-family: var(--serif, Fraunces, serif); font-weight: 700; font-size: 14px; }
+.pr-tog { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: .95rem; user-select: none; }
+.pr-tog input { position: absolute; opacity: 0; pointer-events: none; }
+.pr-knob { width: 38px; height: 22px; border-radius: 999px; background: rgba(42,38,32,.22); position: relative; transition: background .15s; flex: none; }
+.pr-knob::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.pr-tog input:checked + .pr-knob { background: #4CA37A; }
+.pr-tog input:checked + .pr-knob::after { transform: translateX(16px); }
+.pr-tog input:focus-visible + .pr-knob { outline: 2px solid #C4552D; outline-offset: 2px; }
 
-/* печать: только список, три колонки, без шапки и подвала */
+/* лист — как бумага */
+.pr-sheet { width: 100%; box-sizing: border-box; --ink: #2A2620; --rust: #C4552D; --soft: #8A6A58; --paper: #FFFDF8; color: var(--ink); background: var(--paper); border-radius: 18px; padding: clamp(18px, 3.4vw, 40px); box-shadow: 0 1px 0 rgba(42,38,32,.06), 0 12px 32px -14px rgba(42,38,32,.28); border: 1px solid rgba(42,38,32,.08); }
+.pr-sh-hd { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 16px; margin-bottom: 14px; border-bottom: 2px dotted rgba(196,85,45,.4); }
+.pr-kick { display: block; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+.pr-sh-hd h3 { margin: 0; font-family: var(--serif, Fraunces, serif); font-weight: 700; font-size: clamp(1.7rem, 3.4vw, 2.6rem); line-height: 1.05; color: var(--ink); }
+.pr-dabs { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 45%; }
+.pr-dabs i { width: 18px; height: 18px; border-radius: 50% 46% 52% 44%; border: 1px solid rgba(42,38,32,.18); }
+.pr-sh-ft { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(42,38,32,.1); font-size: .85rem; color: var(--soft); }
+.pr-sh-ft span:last-child { color: var(--rust); font-weight: 700; }
+
+/* цвета дня */
+.pr-sw { display: inline-flex; gap: 3px; flex: none; align-items: center; }
+.pr-sw i { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(42,38,32,.22); }
+.pr-sw6 { display: inline-grid; grid-template-columns: repeat(3, 9px); gap: 2px; }
+.pr-sw6 i { width: 9px; height: 9px; }
+.pr-nocol .pr-sw, .pr-nocol .pr-dabs { display: none; }
+
+/* списки: две колонки сверху вниз */
+.pr-list { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows, 16), auto); grid-template-columns: 1fr 1fr; column-gap: 36px; }
+.pr-d { display: flex; align-items: center; gap: 10px; padding: 8px 2px; border-bottom: 1px solid rgba(42,38,32,.08); min-height: 46px; break-inside: avoid; }
+.pr-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pr-t { line-height: 1.25; }
+.pr-meta { font-size: .74rem; color: var(--soft); margin-top: 1px; }
+.pr-n { font-family: var(--serif, Fraunces, serif); font-weight: 700; color: var(--rust); }
+.pr-mk { flex: none; }
+.pr-s-box .pr-mk { width: 17px; height: 17px; border: 1.7px solid rgba(42,38,32,.5); border-radius: 4px; }
+.pr-s-box .pr-n { min-width: 1.6em; font-size: 1.05rem; }
+.pr-s-circle .pr-mk { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--rust); display: grid; place-items: center; font-family: var(--serif, Fraunces, serif); font-weight: 700; font-size: .92rem; color: var(--rust); }
+.pr-s-flower .pr-mk { width: 38px; height: 38px; position: relative; display: grid; place-items: center; }
+.pr-s-flower .pr-mk svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: var(--paper); stroke: var(--rust); stroke-width: 1.6; }
+.pr-s-flower .pr-mk svg .pr-fc { stroke: none; }
+.pr-s-flower .pr-mk b { position: relative; font-family: var(--serif, Fraunces, serif); font-size: .82rem; color: var(--rust); }
+.pr-s-num .pr-n { font-size: 1.45rem; min-width: 1.7em; letter-spacing: -.02em; }
+.pr-s-num .pr-d { border-bottom-style: dashed; }
+
+/* сетка месяца */
+.pr-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.pr-wh { text-align: center; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); padding-bottom: 2px; }
+.pr-c { display: flex; flex-direction: column; gap: 4px; min-height: 104px; padding: 8px 9px; border: 1px solid rgba(42,38,32,.14); border-radius: 10px; background: var(--paper); font-size: .84rem; }
+.pr-cal > :nth-child(7n+6), .pr-cal > :nth-child(7n) { background: #FBF3E8; }
+.pr-cal > .pr-wh { background: none; }
+.pr-c0 { border-style: dashed; border-color: rgba(42,38,32,.07); background: transparent !important; }
+.pr-ct { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.pr-ct .pr-n { font-size: 1.15rem; }
+.pr-wd { display: none; }
+.pr-c .pr-t { flex: 1; line-height: 1.2; }
+.pr-c .pr-sw i { width: 10px; height: 10px; }
+.pr-c .pr-sw6 { grid-template-columns: repeat(3, 7px); }
+.pr-c .pr-sw6 i { width: 7px; height: 7px; }
+.pr-cb { display: flex; align-items: center; justify-content: space-between; }
+.pr-cb .pr-time { font-size: .7rem; color: var(--soft); }
+.pr-cb .pr-mk { width: 14px; height: 14px; border: 1.5px solid rgba(42,38,32,.4); border-radius: 50%; }
+
+@media (max-width: 760px) {
+  .pr-list { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: 1fr; }
+  .pr-save { margin-left: 0; }
+  /* сетка на телефоне — столбиком, с днём недели */
+  .pr-cal { grid-template-columns: 1fr; gap: 6px; }
+  .pr-wh, .pr-c0 { display: none; }
+  .pr-c { min-height: 0; flex-direction: row; align-items: center; gap: 10px; }
+  .pr-ct { flex: none; width: 92px; justify-content: flex-start; gap: 6px; }
+  .pr-wd { display: inline; font-size: .72rem; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .pr-ct .pr-sw { margin-left: auto; }
+  .pr-cb { gap: 8px; }
+}
+
+/* печать: только лист, на одну страницу А4, в выбранном виде и с цветами, если они включены */
 @media print {
   html, body { background: #fff !important; }
-  .hd2, .hd3, footer, .pr-bar, .pr-more, .pr-note, .crumbs, .skip, .polly-tab { display: none !important; }
-  .pr .hd5 p { display: none; }
-  .pr-g { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .pr-d { break-inside: avoid; border-color: #ccc; padding: 8px 10px; }
-  .pr-d .pr-time { display: none; }
-  @page { margin: 14mm; }
+  .hd2, .hd3, footer, .pr-bar, .pr-opts, .pr-more, .pr-note, .crumbs, .skip, .polly-tab, .polly-prop, .polly-pet, .polly-ground, .pr .hd5 { display: none !important; }
+  .pr, .pr .w { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  .pr-sheet { box-shadow: none; border: 1.5px solid #C4552D; border-radius: 14px; padding: 6mm 7mm; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-sh-hd { padding-bottom: 3mm; margin-bottom: 2mm; }
+  .pr-sh-hd h3 { font-size: 22pt; }
+  .pr-kick { font-size: 7pt; }
+  .pr-list { grid-auto-flow: column; grid-template-rows: repeat(var(--rows, 16), auto); grid-template-columns: 1fr 1fr; column-gap: 9mm; }
+  .pr-d { min-height: 0; padding: 1.1mm 0; gap: 2.4mm; }
+  .pr-meta { font-size: 7pt; }
+  .pr-s-circle .pr-mk { width: 7mm; height: 7mm; font-size: 8.5pt; }
+  .pr-s-flower .pr-mk { width: 8mm; height: 8mm; }
+  .pr-s-num .pr-n { font-size: 15pt; }
+  .pr-cal { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1.6mm; }
+  .pr-wh { display: block; }
+  .pr-c0 { display: block; }
+  .pr-c { flex-direction: column; align-items: stretch; min-height: 17mm; padding: 1.3mm 1.8mm; font-size: 8pt; gap: 1mm; break-inside: avoid; }
+  .pr-ct { width: auto; justify-content: space-between; }
+  .pr-wd { display: none; }
+  .pr-sh-ft { margin-top: 3mm; padding-top: 2mm; font-size: 8.5pt; }
 }
