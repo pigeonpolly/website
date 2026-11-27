@@ -100,13 +100,13 @@
     return `<span class="chadm-mstrip" aria-hidden="true">${f.c.map((n, j) => n ? `<i style="flex:${n};background:${D.colors[j].hex}"></i>` : '').join('')}</span>${f.none.length ? `<b class="chadm-mnone">${f.none.length}</b>` : ''}`; };
   function monthPalette() {
     const f = famStat(ym); if (!f.list.length) return '<section class="chadm-pal-m"><b>🎨 Цвета месяца</b><p class="be-note">В днях месяца пока нет цветов.</p></section>';
-    const cnt = {}; f.list.forEach(k => { cnt[k] = (cnt[k] || 0) + 1; });
-    const order = allSorted().filter(k => cnt[k]), top = Object.keys(cnt).map(Number).sort((a, b) => cnt[b] - cnt[a]).slice(0, 8);
+    // всё — по базовым цветам: оттенки, уже стоящие в днях, засчитываются своему базовому (toBase)
+    const fams = f.c.map((n, j) => j).filter(j => f.c[j]), top = fams.slice().sort((a, b) => f.c[b] - f.c[a]);
     return `<section class="chadm-pal-m"><b>🎨 Цвета месяца</b> <small>${f.list.length} цвет. в ${D.days.filter(d => !d.extra && d.colors.length).length} днях (без ЭКСТРА)</small>
-      <div class="chadm-pstrip">${order.map(k => `<i style="flex:${cnt[k]};background:${D.colors[k].hex}" title="${esc(D.colors[k].n[1])}: ${cnt[k]}"></i>`).join('')}</div>
-      <p class="chadm-ptop"><span>Чаще всего:</span>${top.map(k => `<span><i style="background:${D.colors[k].hex}"></i>${esc(D.colors[k].n[1])} ${cnt[k]}</span>`).join('')}</p>
+      <div class="chadm-pstrip">${fams.map(j => `<i style="flex:${f.c[j]};background:${D.colors[j].hex}" title="${esc(famName(j))}: ${f.c[j]}"></i>`).join('')}</div>
+      <p class="chadm-ptop"><span>Чаще всего:</span>${top.slice(0, 5).map(j => `<span><i style="background:${D.colors[j].hex}"></i>${esc(famName(j))} ${f.c[j]}</span>`).join('')}</p>
       <div class="chadm-fams">${f.c.map((n, j) => `<span class="${!n ? 'none' : f.few.includes(j) ? 'few' : ''}"><i style="background:${D.colors[j].hex}"></i>${esc(famName(j))} <b>${n || 'нет'}</b>${f.few.includes(j) ? ' · мало' : ''}</span>`).join('')}</div>
-      <p class="be-note">Семья — базовый цвет (оттенки считаются своим базовым). «Мало» — меньше 40 % от среднего на цвет. У кнопок месяцев — та же полоска, красное число — сколько цветов нет совсем.</p></section>`;
+      <p class="be-note">Считаются базовые цвета: каждый оттенок засчитывается своему базовому. «Мало» — меньше 40 % от среднего на цвет. У кнопок месяцев — та же полоска, красное число — сколько цветов нет совсем.</p></section>`;
   }
   // ---------- 🏅 тематики с датами «с — по» (неделя, 10 дней, месяц, 100 дней…): бейдж «тема + год» за рисунок каждый день ----------
   const dOf = k => new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8));
@@ -378,9 +378,6 @@
     for (let j = 0; j < D.base; j++) { const y = lab(D.colors[j].hex), dd = (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2; if (dd < bd) { bd = dd; best = j; } }
     return best;
   }
-  // все цвета (базовые, moreColors, круг) для «🎨 Все цвета»: сначала нейтральные от светлых к тёмным, потом по тону, внутри — от светлых
-  const allSorted = () => D.colors.map((c, k) => { const [h, sat, l] = hslOf(c.hex); return { k, h, sat, l }; })
-    .sort((a, b) => (a.sat < .18) !== (b.sat < .18) ? (a.sat < .18 ? -1 : 1) : a.sat < .18 ? b.l - a.l : Math.round(((a.h + 15) % 360) / 20) - Math.round(((b.h + 15) % 360) / 20) || b.l - a.l).map(x => x.k);
   // «🎨 Все цвета» таблицей: столбцы — 24 тона круга (жёлтый → … → янтарный), строки — бледный, светлый, чистый, тёмный, глубокий;
   // ниже — остальные: нейтральные от светлых к тёмным, потом цветные по тону
   function allChart() {
