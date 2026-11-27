@@ -22,6 +22,7 @@
 | Птичка: вход, профиль, комната, подарки | docs/bird.md |
 | Пуговки, магазин, цены, правила | docs/shop.md |
 | Игры | docs/games.md |
+| Кабинет зельевара — главная игра птички (/bird/, флаг brewOn): котёл, шкаф, карта ᚹ, биржа зелий, стиль PPPix | docs/brew.md |
 | Комнаты, квесты | docs/rooms.md |
 | Детектив Титос /titos/: дела, кофе. Новое дело — всегда с вещью-наградой и картинкой места происшествия (важные улики — приколоть, мелочи — узнать); перед пушем — titos_check.py и tools/titos_clicks.py (все улики нажимаются) | docs/titos.md, docs/titos-cast.md, content/titos/index.md |
 | Wobbleland | docs/wobbleland.md |

@@ -1,0 +1,43 @@
+/* Кабинет зельевара (docs/brew.md): сцена brew-room.js и окна игры. Пиксельный стиль: без сглаживания, рамки «ступенькой». */
+.brw { position: relative; width: 100%; max-width: 1152px; margin: 0 auto; aspect-ratio: 384 / 216; background: #2A1B2E; border-radius: 6px; overflow: hidden;
+  box-shadow: 0 0 0 3px #2A1B2E, 0 0 0 6px #8C5A3C, 0 0 0 9px #2A1B2E, 0 10px 24px rgba(42, 27, 46, .35); user-select: none; -webkit-user-select: none; }
+.brw-sc { width: 100%; height: 100%; }
+.brw-cv { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: manipulation; }
+.brw-hud { position: absolute; inset: 0; pointer-events: none; font-family: 'Karla', system-ui, sans-serif; }
+.brw-hud > * { pointer-events: auto; }
+/* уровень — сверху слева, пергамент с пиксельной рамкой */
+.brw-lv { position: absolute; left: 1.6%; top: 2.5%; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; padding: 6px 10px 6px 6px;
+  background: #F4E6C8; color: #2A1B2E; box-shadow: 0 0 0 2px #2A1B2E, inset 0 -3px 0 #D9BE8E, inset 0 2px 0 #FFF6DA, 3px 3px 0 2px rgba(42, 27, 46, .35); min-width: 150px; }
+.brw-lvn { grid-row: span 3; display: grid; place-items: center; width: 38px; height: 38px; font: 800 20px/1 'Fredoka', 'Karla', sans-serif; color: #FFF3A8; background: #6B2E4E;
+  box-shadow: inset 0 0 0 2px #2A1B2E, inset 3px 3px 0 #8E3B6E, inset -3px -3px 0 #4A1E36; text-shadow: 2px 2px 0 #2A1B2E; }
+.brw-lvt { font: 700 11px/1.1 'Karla', sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+.brw-xp { display: block; height: 8px; background: #3A2430; box-shadow: 0 0 0 2px #2A1B2E; margin: 3px 0 2px; }
+.brw-xp em { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, #8FD06A 0 6px, #6FB04A 6px 8px); box-shadow: inset 0 2px 0 #C8F09A; transition: width .6s steps(12); }
+.brw-xpt { font: 700 10px/1 'Karla', sans-serif; opacity: .75; }
+/* кнопки справа снизу вверх: ᚹ · 🔘 · 🚪 · 🐾 */
+.brw-side { position: absolute; right: 1.4%; bottom: 3%; display: flex; flex-direction: column; gap: 8px; }
+.brw-b { width: 46px; height: 46px; display: grid; place-items: center; border: 0; padding: 0; cursor: pointer; background: #F4E6C8;
+  box-shadow: 0 0 0 2px #2A1B2E, inset 0 -4px 0 #D9BE8E, inset 0 3px 0 #FFF6DA, 3px 3px 0 2px rgba(42, 27, 46, .4); transition: transform .08s steps(2); }
+.brw-b:hover { transform: translateY(-2px); }
+.brw-b:active { transform: translateY(2px); box-shadow: 0 0 0 2px #2A1B2E, inset 0 4px 0 #D9BE8E; }
+.brw-b:focus-visible { outline: 3px solid #E9C14A; outline-offset: 3px; }
+.brw-b canvas { width: 30px; height: auto; image-rendering: pixelated; }
+.brw-b-map { background: #8E8597; box-shadow: 0 0 0 2px #2A1B2E, inset 0 -4px 0 #5E566B, inset 0 3px 0 #B3AAB8, 3px 3px 0 2px rgba(42, 27, 46, .4); }
+.brw-b-map canvas { display: none; }
+.brw-b-map::before { content: 'ᚹ'; font: 700 26px/1 'Noto Sans Runic', 'Segoe UI Historic', serif; color: #F4F0FA; text-shadow: 2px 2px 0 #2A1B2E, 0 0 8px #9BE0F0; }
+.brw-say { position: absolute; max-width: 40%; padding: 6px 10px; background: #FFFDF6; color: #2A1B2E; font: 700 13px/1.25 'Karla', sans-serif; box-shadow: 0 0 0 2px #2A1B2E, 3px 3px 0 2px rgba(42, 27, 46, .3); }
+.brw-say::after { content: ''; position: absolute; left: 22px; bottom: -8px; border: 5px solid transparent; border-top-color: #2A1B2E; }
+@media (max-width: 760px) {
+  /* телефон: сцена во всю высоту, листается вбок пальцем; камера следит за птичкой */
+  .brw { border-radius: 0; box-shadow: 0 0 0 3px #2A1B2E; aspect-ratio: auto; height: min(62vh, 400px); }
+  .brw-sc { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .brw-sc::-webkit-scrollbar { display: none; }
+  .brw-cv { width: auto; height: 100%; aspect-ratio: 384 / 216; }
+  .brw-lv { min-width: 0; padding: 3px 6px 3px 3px; column-gap: 5px; }
+  .brw-lvn { width: 26px; height: 26px; font-size: 14px; }
+  .brw-lvt { font-size: 9px; } .brw-xpt { display: none; } .brw-xp { height: 5px; width: 60px; }
+  .brw-side { gap: 4px; right: 1%; bottom: 2%; }
+  .brw-b { width: 40px; height: 40px; } .brw-b canvas { width: 26px; } .brw-b-map::before { font-size: 22px; }
+  .brw-side { gap: 6px; }
+  .brw-say { font-size: 11px; max-width: 55%; }
+}

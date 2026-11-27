@@ -33,6 +33,7 @@ import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpil
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT, inkOn, INK_YEAR } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { trainApi, TRAIN_TABLES, TRAIN_ALTER, TRAIN_RULES, TRAIN_RANGE, TRAIN_INT, TRAIN_BADGES, TRAIN_COND, TRAIN_ITEMS } from './train.js'; // «Поезд Полли» (docs/games.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
+import { brewApi, BREW_TABLES, BREW_RULES, BREW_RANGE, BREW_INT } from './brew.js'; // кабинет зельевара — главная игра птички (docs/brew.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
 import { runesApi } from './runes.js'; // 🔮 Руны в кабинете — только админ (docs/admin.md «Руны»)
@@ -696,6 +697,7 @@ async function ensureSchemaRun(env) {
     ...TRAIN_TABLES.map(sql => prep(sql)), // «Поезд Полли»: train_runs (worker/train.js)
     ...PAN_TABLES.map(sql => prep(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...GARDEN_TABLES.map(sql => prep(sql)), // огород: garden (worker/garden.js)
+    ...BREW_TABLES.map(sql => prep(sql)), // кабинет зельевара: brew_state, brew_book, brew_shelf, brew_market (worker/brew.js)
     ...ABOUT_CHAT_TABLES.map(sql => prep(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
     ...POLL_TABLES.map(sql => prep(sql)), // опросы: polls, poll_votes, poll_ideas (worker/polls.js)
     ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
@@ -852,6 +854,7 @@ const RULE_DEFAULTS = {
   ...SCHOOL_RULES, // «Школа Полли»: 🔘 за диплом (worker/school.js)
   ...ACHAT_RULES, // чат /about-me/: 🔘 за ступени 25/50/75 % (worker/about-chat.js)
   ...TRAIN_RULES, // «Поезд Полли»: пуговки за станцию, рекорд, вещь, улучшения (worker/train.js)
+  ...BREW_RULES, // кабинет зельевара: флаг brewOn, опыт, шкаф, мойка котла (worker/brew.js)
   ...PAN_RULES, // «Блинная Полли»: пуговки за уровень, рекорд, вещь, мытьё сковородки (worker/pancakes.js)
   ...TITOS_RULES, // детектив Титос: кофе, пуговки за уровень (worker/titos.js)
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
@@ -859,7 +862,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], tarotHour: [1, 168], tarotReset: [0, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...KITCHEN_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...POSTCARD_RANGE, ...AVIS_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], tarotHour: [1, 168], tarotReset: [0, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...BREW_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...KITCHEN_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...POSTCARD_RANGE, ...AVIS_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -876,7 +879,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', 'avisOn', ...GARDEN_BOOL, ...KITCHEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'tarotHour', 'tarotReset', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...KITCHEN_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...POSTCARD_INT, ...AVIS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'tarotHour', 'tarotReset', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...KITCHEN_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...POSTCARD_INT, ...AVIS_INT, ...Object.keys(CH_RANGE), ...BREW_INT]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1802,6 +1805,7 @@ async function route(req, env, url) {
   if (p.startsWith('/api/wl-mail') || p === '/api/admin/wl-holiday') { const r = await wlMailApi(req, env, url, wlHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
+  if (p === '/api/brew' || p.startsWith('/api/brew/')) { const r = await brewApi(req, env, url, { json, fail, currentUser, needUser, isAdmin: u => isAdmin(u, env), rules: () => RULES, now, invOf, season: seasonNow }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p === '/api/train' || p.startsWith('/api/train/')) { const r = await trainApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'train', uid, n),

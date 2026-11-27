@@ -10,6 +10,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/auth.js` (24K) — Вход с паролем (этап 12): регистрация, вход по почте или нику, смена и сброс пароля, «выйт: FUNNELS, ADVENT_DAY_MAX, DUMMY, ITER, AUTH_ALTER, AUTH_TABLES, rows, failAll, hashPw, ipKey, lockedAny, normEmail
 - `worker/avis.js` (83K) — «Morgenavis» — личная утренняя газета на норвежском для Алины (/norsk/avis/, docs/site.md : PICK, READ, FEEDS, LEVELS, SEC, TRC, wrap, article, tag, feed, decode, state
 - `worker/blog.js` (109K) — блог: страницы /blog/, /api/blog/*, редактор, перевод Gemini, копии: SITE, TAGMAP, LANGS, TOP, GLOSSARY, PREFIX, blogUrl, rows, tagLabel, loadTags, stripTags, tagsOf
+- `worker/brew.js` (7K) — Кабинет зельевара — главная игра птички (docs/brew.md): BREW_INT, BREW_RANGE, BREW_RULES, BREW_TABLES, brewVisible, kindsOf, levelOf, slotsOf, stateOf, brewApi
 - `worker/cards.js` (48K) — Коллекционные карточки за пуговки (docs/cards.md): каждая — в одном экземпляре на весь сай: DAY, RARITY, DESC, SEL, TRADE_N, CARD_ALTER, listOut, sets, tradeDays, round5, statsOf, asset
 - `worker/challenge-days.js` (34K) — План тем челленджа в D1 (этап 3, docs/challenge.md «Подбор тем»): таблица challenge_days, : BLANK_FROM, FIRST, BANK_TAGS, COLS, ITEMS, LAST, rigaToday, toRow, bankSync, daysIn, ensureMonth, pad
 - `worker/challenge-plan.js` (27K) — Подбор тем челленджа (этап 3, docs/challenge.md «Подбор тем»): план месяца по правилам.: RELAX, BW_GROUPS, MIN_DE, WORD_DAYS, BDAY, CH_DEFAULTS, dayNum, rngFor, hueGap, keyOfNum, pickW, poolOf
@@ -18,17 +19,17 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/english.js` (5K) — Личный учебник английского A1–C2 (/english/, docs/site.md «Учебник английского»): открыт А: ENGLISH_NICKS, LOCKED, MAX, ENGLISH_TABLES, page, englishOk, englishApi
 - `worker/flock-news.js` (10K) — Новости стаи (этап 13 Г, docs/flock.md): /flock/news/ и 3 строки на главной.: KEEP, BIRD_KINDS, REF, FLOCK_NEWS_ALTER, FLOCK_NEWS_TABLES, note, rigaDayOf, flockEvent, flockNewsCron, roomEvent, flockNewsApi
 - `worker/flock.js` (10K) — «Все птички» (/flock/) и пёрышки комнат (этап 13 Б+В, docs/flock.md).: BIRD, PER, COLS, SORTS, FLOCK_ALTER, FLOCK_TABLES, ownerOf, stateOf, featherNews, flockApi
-- `worker/garden.js` (31K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, деревья, с: CROPS, TIER, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, needMs, bedsN, shiftBeds, bugsOf, choresOf, bedOk
+- `worker/garden.js` (42K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: TIER, CROPS, SIMPLE, FORMS, NOSALE, DAY, out, addXp, fnv, bedOk, needMs, grown
 - `worker/guides.js` (15K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, SEEN_MAX, BASE, HOWTO_MAX, GUIDES_ALTER, cut, out, bImg, hwDrop, hwFiles, hwUrl, langsOf
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
-- `worker/index.js` (320K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, LEGEND, url, prep, healthErr, award, run, btnOf
+- `worker/index.js` (321K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, LEGEND, url, prep, healthErr, award, run, btnOf
 - `worker/kitchen.js` (10K) — Кухня птички: книга рецептов (этап 89, docs/bird.md «Кухня: книга рецептов»): RECIPES, DISH_GAMES, LATE, HOUR, PERFECT, KITCHEN_BOOL, recipes, rowOf, state, settle, cropOf, effectOf
 - `worker/mail-html.js` (10K) — Оформление писем: из обычного текста письма — HTML в стиле сайта (sendMail в worker/auth.j: SITE, SERIF, URL_RE, ACC, BTN, KICK, button, langOf, seasonOf, short, mailHtml
 - `worker/mail.js` (25K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
 - `worker/mixing.js` (3K) — «Смешивание цветов» /color-mixing/ (docs/palettes.md «Смешивание цветов»): «Мои краски», в: MEDIA, LINE, MIXING_TABLES, clean, mixingApi
 - `worker/nederlands-page.js` (1016K) — Собрано tools/nederlands_page.py из content/nederlands/ — руками не править.: NEDERLANDS_HTML
 - `worker/nederlands.js` (8K) — Личный учебник нидерландского A1–C2 (/nederlands/, docs/site.md «Учебник нидерландского») : AUDIO, LOCKED, MAX, NEDERLANDS_NICKS, TTS_VOICE, TTS_MODELS, tts, page, wav, nederlandsOk, nederlandsApi
-- `worker/norsk-page.js` (953K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
+- `worker/norsk-page.js` (1279K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
 - `worker/norsk.js` (8K) — Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — : AUDIO, LOCKED, MAX, NORSK_NICKS, TTS_VOICE, TTS_MODELS, tts, page, wav, norskOk, norskApi
 - `worker/notebook.js` (5K) — 📒 Блокнот в учебниках (/study/, /english/, /norsk/, /nederlands/; docs/site.md «Блокнот в : BOOKS, NOTEBOOK_TABLES, cleanPage, metaOf, notebookApi
 - `worker/notes.js` (11K) — 📣 Рассылка (10.11.2026, docs/bird.md «Рассылка»): сообщение от Алины на 3 языках (+ файл д: NOTE_FILE_MAX, LANGS, SITE, NOTE_ALTER, NOTE_TABLES, audWhere, fileOut, pickL, audIds, audRange, noteHistory, noteNews
@@ -60,18 +61,21 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/about-admin.js` (6K) — Кабинет → «📮 Вопросы из чата» (admin.js открывает PPAboutAdmin.mount(main)): вопросы, кото: PPAboutAdmin, ERR, LANG, TABS, mount
 - `site/assets/about-desk.js` (52K) — «Стол Алины» на /about-me/ (docs/site.md): пиксельная картинка site/images/about/desk.webp: PAGE, SKIN, PAINT, rnd, box
 - `site/assets/account.js` (43K) — вход в шапке, меню аккаунта, обязательный ник, `html.is-admin`: PPDevH, PPWhoP, PPWho, ALINA_MAIL, IN_APP
-- `site/assets/admin.js` (230K) — кабинет /admin/ (все разделы): PPGiftDialog, PPAud, BADGE_COND, ADMIN_GROUPS, ADMIN_SECTIONS
+- `site/assets/admin.js` (235K) — кабинет /admin/ (все разделы): PPGiftDialog, PPAud, BADGE_COND, ADMIN_GROUPS, ADMIN_SECTIONS
 - `site/assets/advent-admin.js` (32K) — кабинет → 🎄 Адвент: план окошек: PPAdventAdmin, FILE_MAX, ADV_SP, fthumb, advSet
 - `site/assets/advent.js` (20K) — адвент /advent/: отсчёт, окошки: FIR, LATE, HOUSES, inside, win
 - `site/assets/artpill-claude.js` (50K) — «Art-Pill by Polly»: скетчбук Claude — страницы с первой по последнюю (docs/artpill.md): PP_ARTPILL_CLAUDE, FIRST, SECOND, THIRD
 - `site/assets/artpill.js` (40K) — «Art-Pill by Polly» (/art-pill/, docs/artpill.md): версии таблетки, «почему это не просто : VERSIONS, img, pic, openBook, reader
 - `site/assets/backup.js` (14K) — резервные копии (кабинет): PPBackup, FOLDER, README, SITE, backup
 - `site/assets/bird-card.js` (14K) — карточка «Моя птичка» (сторис) и ссылка /flock/?bird=: PPBirdCard, GOLD, CSS, RING, rnd
-- `site/assets/birds.js` (57K) — птички: внешность из id, спрайты, вещи и подарки (`PPBirds`): PPBirds, SPECIAL_HATS, HATS, HD_ITEMS, avatar
-- `site/assets/blog-editor.js` (138K) — редактор блога /blog-editor/: LANGS, ERR, FN_RE, dashboard, pad2
+- `site/assets/birds.js` (57K) — птички: внешность из id, спрайты, вещи и подарки (`PPBirds`): PPBirds, SPECIAL_HATS, HD_ITEMS, HATS, hdHat
+- `site/assets/blog-editor.js` (139K) — редактор блога /blog-editor/: LANGS, ERR, FN_RE, dashboard, pad2
 - `site/assets/blog.js` (13K) — блог для посетителя: лайк, комментарии, кнопки админа: login, adminTools, load, openFn, gButton
+- `site/assets/brew-bird.js` (16K) — Крупная детальная птичка пользователя для кабинета зельевара (docs/brew.md): PPBrewBird, PUPIL, paste, blush, eye
+- `site/assets/brew-pix.js` (7K) — Пиксельный набор кабинета зельевара (docs/brew.md): общая палитра нового стиля, сетка «пик: PPPix, INK, DIG, BAYER, mix
+- `site/assets/brew-room.js` (31K) — Кабинет зельевара — главный экран игры птички (docs/brew.md): PPBrewRoom, SLOT, bag, cauldron, glow
 - `site/assets/broadcast-admin.js` (14K) — Кабинет → «📢 Рассылка» (admin.js открывает PPBroadcast.mount(main)): «кому» (все / новые /: PPAud, PPBroadcast, ERR, AUD, KEY
-- `site/assets/cabinet.js` (17K) — : PPCab, BOOK, TABS, HASH, sec
+- `site/assets/cabinet.js` (19K) — : PPCab, PPBrew, TABS, BOOK, HASH
 - `site/assets/can-do.js` (5K) — Что можно с вещью (этап 7, docs/cards.md «Что можно с вещью»): одна функция и для браузера: TITOS, BOXES, LEGEND, canDo
 - `site/assets/cards-admin.js` (18K) — Кабинет → «🃏 Карточки» (admin.js открывает PPCardsAdmin.mount(main)): список, новая карточ: PPCardsAdmin, LANGS, RAR, ERR, missing
 - `site/assets/cards-ui.js` (49K) — Коллекционные карточки (docs/cards.md): плитка, окно карточки и раздел «🃏 Карточки» на рын: PPCards, PER, RAR, NEED, trade
@@ -95,8 +99,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/flock.js` (142K) — стая: сцена canvas, локации, действия, предметы: PPFlockDebug, TREE, EVENTS, ORN_C, rnd
 - `site/assets/freebies.js` (11K) — freebies/ (docs/freebies.md): календари и заставки из site/assets/freebies.json (tools/pin: MON
 - `site/assets/games-hub.js` (2K) — Хаб «Играть» (/games/, этап 14 В): вошедшим — готовность на карточках из GET /api/today («: set, dur
-- `site/assets/garden-items.js` (13K) — Вещи для огорода (этап 23, docs/bird.md «Огород»): вид подарка garden — в магазине, сумке,: PPGardenItems, ITEMS, LEG, ORDER, layout
-- `site/assets/garden.js` (57K) — Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 240×150 (: PPGardenPlants, CROP, NIGHT_ON, TALL, float, drawChore, editMode, placeBed, cleanAll
+- `site/assets/garden-items.js` (21K) — Вещи для огорода (этап 23, docs/bird.md «Огород»): вид подарка garden — в магазине, сумке,: PPGardenItems, ITEMS, LEG, ORDER, layout
+- `site/assets/garden.js` (83K) — Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 240×150 (: PPGardenPlants, EDIT, CROP, POS, act
 - `site/assets/guides-admin.js` (14K) — Кабинет → «🎬 Видео и книги» (admin.js открывает PPGuidesAdmin.mount(main)): добавить видео: PPGuidesAdmin, ERR, form, jpeg, mount
 - `site/assets/hatch.js` (9K) — Вылупление (этап 14, docs/site.md «Главная»): пиксельное яйцо, трещины и птичка из скорлуп: PPHatch, EGG, KEY, SPOTS, step
 - `site/assets/ideas-admin.js` (9K) — Кабинет → «💡 Темы для блога» (admin.js открывает PPIdeasAdmin.mount(main)): кнопка — сайт : PPIdeasAdmin, ERR, fmt, mount, text
@@ -117,13 +121,13 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/posts-admin.js` (32K) — Кабинет → «🖼 Пины» (admin.js открывает PPPostsAdmin.mount(main); раньше тут был генератор : PPPostsAdmin, TYPES, DEF, DESIGNS, photo
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
 - `site/assets/potions.js` (57K) — игра «Зельеварня» /potions/: лабиринт, котёл, рецепты: DIRS, HUD, play, overlay, brew
-- `site/assets/prompts.js` (5K) — prompts/ — темы месяца (GET /api/challenge/month): карточки, картинка 1080×1350 для телефо: before, shift, makeImage, wrap, load
+- `site/assets/prompts.js` (19K) — prompts/ — темы месяца (GET /api/challenge/month): лист в 5 видах (квадратики, кружочки, ц: INK, FLOWER, FOOT, before, colorsOf
 - `site/assets/pw-rules.js` (2K) — Правила пароля — одни для сервера (worker/index.js) и браузера (account.js): от 8 символов: COMMON, norm, check
 - `site/assets/quest-polly.js` (15K) — задачи в офисе Полли: ORDER, HOTS, KEY, openMail, done
-- `site/assets/quest-titos.js` (33K) — дела детектива Титоса: LANG, HOTS, OLD, openClue, openBoard
+- `site/assets/quest-titos.js` (34K) — дела детектива Титоса: LANG, HOTS, OLD, openClue, openBoard
 - `site/assets/rain.js` (27K) — игра «Пуговичный дождь» /rain/: SKIES, COLORS, MISS, pop, showOverlay
 - `site/assets/requests.js` (32K) — «Нарисуй мне» /requests/: HID, lists, pollyPick, saveImg, translateRest
-- `site/assets/room.js` (391K) — комната птички: каталог мебели, расстановка, поведение (`PPRoom`): PPRoom, OUT, FURN, ICE, rbox
+- `site/assets/room.js` (407K) — комната птички: каталог мебели, расстановка, поведение (`PPRoom`): PPRoom, OUT, FURN, ICE, rbox
 - `site/assets/rooms-data.js` (5K) — зоны комнат (build.py): ROOMS
 - `site/assets/rooms.js` (39K) — пиксельные комнаты (офис Полли, Титос): зоны, реплики, эффекты (`ROOM`): ROOM, API, IDX, pct, setEvening
 - `site/assets/runes-admin.js` (16K) — Кабинет → «🔮 Руны» (только админ; admin.js открывает PPRunesAdmin.mount(main)): PPRunesAdmin, KEY, CSS, grid, isGod
@@ -194,9 +198,11 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/english_book.py` (3K) — Книга для учебника английского (/english/, docs/site.md «Учебник английского»): «Alice's A: ROOT
 - `tools/english_check.js` (10K) — Проверка учебника английского: node tools/english_check.js [страница.html]: TYPES, fmtCheck, solve
 - `tools/english_page.py` (2K) — Учебник английского /english/ (worker/english.js): content/english/shell.html + уроки cont: ROOT, notebook
+- `tools/fb/fb_cover.js` (7K) — Обложка страницы Facebook 1640×624 (зимняя): тёмный фон, слева — значок, «Paint small, joy: ROOT
 - `tools/fb/fb_giftmix.js` (59K) — Посты Facebook EN №165–224 (Алина 21.11.2026): 165–194 — «Отправить подарок» (/postcards/)
 - `tools/fb/fb_no.js` (5K) — Карточки «Learning Norwegian» для постов Facebook EN (Алина 21.11.2026: посты про норвежск: ROOT, DATA, CSS
 - `tools/fb/fb_pal.js` (5K) — Карточки-палитры для постов Facebook на латышском (Алина 16.11.2026: «реально палитры, а н: ROOT, KEYS, CSS
+- `tools/fb/fb_site5.js` (1K) — Посты Facebook EN №225–274 к пинам №1671–1720 (Алина 22.11.2026): картинка поста — сам пин
 - `tools/game_covers.py` (21K) — Пиксельные заставки карточек хаба /games/ → site/images/games/*.png.: ROOT, POLLY, POLLY_FLY, polly, advent
 - `tools/i18n_add.py` (3K) — Дописывает переводы EN → RU, LV в content/i18n/ru.json и lv.json.: LANGS, I18N, ROOT, en_html, load_pack
 - `tools/import_uploads.py` (4K) — раскладывает загрузки из GitHub по галереям: ROOT, EXT, PREFIX, convert, slug
@@ -205,9 +211,16 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/nederlands_check.js` (11K) — Проверка учебника нидерландского (копия tools/english_check.js): node tools/nederlands_che: TYPES, fmtCheck, solve
 - `tools/nederlands_page.py` (3K) — Учебник нидерландского /nederlands/ (worker/nederlands.js): content/nederlands/shell.html : ROOT, keys, notebook
 - `tools/news_shots.js` (10K) — Снимки для новостей блога (скилл .claude/skills/site-news): только картинка сцены (canvas): page
+- `tools/norsk/cards.js` (13K) — Карточки для постов «Balodis Pollijs ceļā uz Norvēģiju» (скилл norsk-lv-posts): ROOT, OUT, THEMES, art, kick
 - `tools/norsk_check.js` (11K) — Проверка учебника норвежского (копия tools/english_check.js): node tools/norsk_check.js [с: TYPES, fmtCheck, solve
+- `tools/norsk_gender/make.py` (2K) — Слова в картинках для учебника /norsk/ (docs/site.md «Учебник норвежского»): python3 tools
+- `tools/norsk_gender/tr.py` (13K) — : FRONT, OVR, tr0
+- `tools/norsk_gender/tr_extra.py` (12K) — Транскрипция слов второй подборки (служебные и частые — по словарю, остальное по правилам : PRES, pres
+- `tools/norsk_gender/words.py` (23K) — Существительные A1–A2 (букмол): TOPICS
+- `tools/norsk_gender/words_other.py` (26K) — Не-существительные A1–A2 (букмол) для второго PDF: TOPICS
+- `tools/norsk_level.py` (2K) — Уровень норвежского слова по учебнику /norsk/ (content/norsk/a1…c2.js, поле words).: ART, ROOT, norm, load
 - `tools/norsk_page.py` (4K) — Учебник норвежского /norsk/ (worker/norsk.js): content/norsk/shell.html + extra.js + уроки: ROOT, keys, notebook
-- `tools/og_cards.js` (28K) — Картинки превью ссылок 1200×630 (og:image) для разделов сайта на EN/RU/LV → site/images/og: ACC, ROOT, COPY, fileUrl, html
+- `tools/og_cards.js` (31K) — Картинки превью ссылок 1200×630 (og:image) для разделов сайта на EN/RU/LV → site/images/og: ACC, ROOT, COPY, fileUrl, html
 - `tools/ornaments/make.py` (24K) — Вырезные ёлочные украшения с пиксельной Полли (20.11.2026, docs/coloring.md «Ёлочные украш: HERE, BALL_COLS, FILES, cut, fold
 - `tools/ornaments/render.js` (953B) — PDF и картинки листов: node tools/ornaments/render.js (после make.py) → out/<id>.pdf, out/
 - `tools/paint_brands.js` (15K) — Бренды красок для /color-mixing/ (docs/palettes.md, «Смешивание цветов → Бренды»).: LIB, ROOT, EST, dsLab, fromHex
@@ -252,12 +265,24 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/pins/pins8-data.js` (17K) — Данные пинов №347–376 для tools/pins/pins8.js: фото работ Алины (site/images/photos/, с её
 - `tools/pins/pins8.js` (9K) — Пины из фото Алины (Google Диск, 13.11) + приманки на бесплатные уроки — №347–376: ROOT, CSS, PINS, crop, site
 - `tools/pins/pins9.js` (12K) — Новые форматы пинов (14.11.2026): №377 — бесплатная раскраска для печати, №378 — видео-пин: KEYS, FONTS, SITE, coloring, newPage
+- `tools/pins/scf2611-data.js` (52K) — Данные карточек №1–30 контент-завода scf2611 (Алина 27.11.2026): BOARDS
+- `tools/pins/scf2611.js` (10K) — Контент-завод №1–30 (Алина 27.11.2026, скилл social-content-factory): декабрь–январь, utm_: ROOT, CARDS, CAMP, crop, file
+- `tools/pins/scf2611b-data.js` (86K) — Данные карточек №31–90 контент-завода scf2611b (Алина 27.11.2026: 30 палитр + 30 разных сп: PAL
+- `tools/pins/scf2611b.js` (12K) — Контент-завод №31–90 (Алина 27.11.2026: «30 палитр и 30 тем для рисования, разные списки»): ROOT, CARDS, CAMP, crop, head
+- `tools/pins/scf2611b_pal.py` (4K) — Палитры для контент-завода №31–60 (scf2611b): цвета — из site/assets/palettes.json (+ extr: PICK, eight, pick
+- `tools/pins/scf2611k-data.js` (30K) — Данные карточек №91–110: книга «172 Color Palettes» на Ko-fi (Алина 27.11.2026): BOOK, LINK, PAL, mix
+- `tools/pins/scf2611k.js` (13K) — Контент-завод №91–110 (Алина 27.11.2026): книга «172 Color Palettes» на Ko-fi (D.LINK): ROOT, CARDS, FONTS, crop, head
+- `tools/pins/site5-data.js` (104K) — Данные пинов №1671–1720 и постов Facebook EN №225–274 (tools/pins/site5.js, tools/fb/fb_si: PCH, TOP, walk, crest, WLd
+- `tools/pins/site5.js` (16K) — Пины №1671–1720 (Алина 22.11.2026): по 10 — Воббленд, открытки, тулы для художников, игры : PINS, PALS, ROOT, hfs, foot
+- `tools/pins/site5_shots.js` (3K) — Кадры страниц сайта для пинов «Сайт: Воббленд, открытки, тулы, игры, темы» (tools/pins/sit
 - `tools/pins/thanks26-more.js` (27K) — Пины Thanksgiving №1414–1460 (Алина 21.11.2026: «сделай в сумме 50 пинов»): POV, PALS, FMT, head, add
 - `tools/pins/thanks26.js` (10K) — Пины Thanksgiving №1411–1460 (Алина 21.11.2026: «пин на трендовую тему — Thanksgiving», ск: PAL, PINS, ROOT, img, foot
 - `tools/pins/videos-data.js` (31K) — Данные 50 видео-пинов №379–428 (14.11.2026) для tools/pins/videos.js: tour, bird, pal
 - `tools/pins/videos.js` (9K) — Видео-пины 9:16 (1080×1920, 30 к/с) — движок для tools/pins/videos-data.js (№379–428): MOVE, PAL, ROOT, clamp01, cam
 - `tools/pins/wc_swatch.py` (7K) — Пин «акварельная палитра»: мазки-имитация акварели + арт, без текста, мини-лого PP справа : LOGO, ROOT, PAL, noise, blur
 - `tools/pins/wcpal_data.py` (5K) — Данные 100 пинов «акварельная палитра» №1310–1409 → tools/pins/wcpal.json (заголовок, опис: T_TITLE, ROOT, T_DESC, mood
+- `tools/pins/workbook27-data.js` (23K) — Пины №1721–1730 и посты Facebook EN №275–284 (Алина 23.11.2026): «Goal Workbook 2027» — PD: TOP
+- `tools/pins/workbook27.js` (12K) — Пины №1721–1730 (Алина 23.11.2026): Goal Workbook 2027 → /advent/ (utm_campaign=workbook27: PINS, ROOT, FONTS, foot, crop
 - `tools/polly_px.py` (2K) — 
 - `tools/polly_sprite.py` (5K) — Новая Полли (20.11.2026): слои спрайта для site/assets/polly.js (PCOL, PL): OUT, beret, full, groucho, legs_a
 - `tools/postcard_gifs.py` (3K) — Анимированные картинки открыток для писем: site/images/postcards/<id>.gif (docs/postcards.: ROOT, OUT
@@ -266,7 +291,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/rooms/office.py` (20K) — рисует кабинет Полли (день/вечер, зоны): OUT, HOT, hot, polly, scene
 - `tools/rooms/props.py` (4K) — спрайты пасхалок комнат: OUT, _out, portrait, canvas
 - `tools/rooms/scenes.py` (19K) — Места происшествия дел Титоса: пиксельные картинки 384×216 (×3) + места для клика в conten: ROOT, SCALE, SPRITES, emo, outline
-- `tools/rooms/scenes_cases.py` (44K) — Места происшествия дел Титоса — по функции на дело (рисует tools/rooms/scenes.py, там же п: room, park, snailsquare, webcafe, carrotbar
+- `tools/rooms/scenes_cases.py` (80K) — Места происшествия дел Титоса — по функции на дело (рисует tools/rooms/scenes.py, там же п: room, park, snailsquare, webcafe, fairtent
 - `tools/rooms/shift.py` (30K) — «Смена с Полли» (/shift/, этап 29, docs/rooms.md): детальный кабинет 480x270 + передний сл: FLOOR_Y, BACK_HANG, OUT, wing, add
 - `tools/school_cover.js` (3K) — Обложка карточки «Школа Полли» на /learn/ (курс, не видео): арт «Полли рисует акварелью у : ROOT
 - `tools/sec.py` (2K) — Печатает один раздел docs-файла.: HEAD, section, headings, find
@@ -291,11 +316,11 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/wobbleland/residents.py` (25K) — Жители Воббленда из коллекционных карточек (этап 8, для дел Титоса).: CONTENT, ROOT, OUT, token, slug
 - `tools/wobbleland/sprites.py` (3K) — мелкие спрайты карты: INK, make
 
-## Маршруты worker/index.js (184)
+## Маршруты worker/index.js (186)
 
 _без `/api`; `f` — возвращает f(); `~f` — код в `route()`, главная вызываемая f; — — только SQL_
 
-/admin/pin-text → pinTextApi · /blog/admin/courier → courierApi · /blog/* → blogApi · /pw/* → — · /funnel → — · /admin/pw-reset → — · /admin/funnels → ~authApi · /flock/news → — · /news-off → — · /admin/flock-notes → ~flockNewsApi · /wl-mail* → — · /admin/wl-holiday → ~wlMailApi · /birds → — · /feathers → — · /feather → ~flockApi · /top → ~topApi · /pancakes → — · /pancakes/* → ~pancakesApi · /train → — · /train/* → ~trainApi · /garden → — · /garden/* → ~gardenApi · /admin/runes → ~runesApi · /admin/tarot → ~tarotApi · /poll → — · /poll/vote → — · /admin/polls → ~pollsApi · /admin/guides → — · /v2/guides → — · /v2/seen → — · /v2/howto/* → ~guidesApi · /admin/ideas → — · /admin/ideas/write → ~ideasApi · /note/* → — · /admin/notes* → ~notesApi · /admin/notes/send → ~mailCron · /mail/* → — · /admin/mail* → ~mailApi · /study → ~studyApi · /english → — · /english/access → ~englishApi · /postcards/* → ~postcardsApi · /mixing → ~mixingApi · /notebook → ~notebookApi · /avis → — · /avis/* → ~avisApi · /norsk → — · /norsk/access → — · /norsk/tts → ~norskApi · /nederlands → — · /nederlands/access → — · /nederlands/tts → ~nederlandsApi · /artpill → — · /artpill/* → ~artpillApi · /school → — · /school/* → — · /admin/school → — · /admin/school/check → ~schoolApi · /about-chat → — · /about-chat/* → — · /admin/about-asks → ~aboutChatApi · POST /admin/pause → pauseApi · /admin/analytics → ~tableApi · /admin/week → ~weekApi · /room/visit → — · /room/visitors → — · /room/leave → ~visitsApi · /kitchen → — · /kitchen/* → ~kitchenApi · /shift → — · /shift/* → ~shiftApi · /titos* → — · /admin/titos* → ~titosApi · /tarot/reset → ~cardsApi · /cards* → — · /admin/cards* → ~cardsApi · /challenge/* → — · /admin/challenge* → ~challengeApi · POST /admin/translate → ~translateTo · POST /dev/migrate → migrateToR2 · POST /dev/cleanup → cleanupInactive · GET /profile → ~doorsOf · POST /birdcard → — · GET /birdcard → — · GET /stats → — · GET /flock → ~avatarOf · POST /subscribe → — · POST /unsubscribe → — · POST /hit → hit · POST /admin/links → — · POST /office/done → — · POST /room → ~roomEvent · POST /box0 → ~roomItems · POST /box0/seen → — · GET /rooms → ~roomOf · GET /game → ~gamePrices · POST /game/start → — · POST /game/level → ~rainItem · GET /potion → ~comboSeason · POST /potion/level → ~mazeItems · POST /potion/done → ~potDay · POST /potion/eye → — · GET /potion/bag → ~hintOk · POST /potion/hint → ~hintOk · POST /potion/give → ~invOf · POST /potion/revive → ~cleanRoom · POST /potion/seen → — · POST /potion/brew → ~potionOf · GET /requests → ~anonCode · POST /requests/tr → ~reqFill · POST /requests → ~anonCode · POST /requests/like → ~visitor · POST /admin/requests/answer → ~reqReward · POST /admin/requests/closed → — · POST /admin/requests/hide → — · GET /advent → ~adventAdv · POST /advent/open → ~inkOn · POST /admin/advent → ~adventFileDrop · POST /admin/advent/file → ~adventPut · POST /admin/advent/file/edit → ~advFileUsed · GET /palettes → ~extraQueue · GET /extra-palettes.js → ~extraQueue · POST /admin/art → ~artEntry · GET /sketchbook → sketchCfg · POST /admin/sketchbook → ~sketchCfg · POST /admin/art/hide → — · POST /admin/art/delete → ~extraQueue · GET /admin/users → ~tagColors · POST /admin/tag-color → ~tagColors · POST /admin/tags → — · /admin/blocks → — · /admin/subscribers → — · GET /flock/find → — · GET /admin/sec → ~secLocked · POST /admin/pin/verify → ~pinHash · POST /admin/pin/set → ~pinHash · POST /admin/recovery/new → ~loadSec · POST /recover → ~rcNorm · GET /whoami → ~englishOk · GET /v2/yt → — · GET /v2/vip → ~guideOut · GET /news → ~newsOf · GET /news/history → ~newsHistory · GET /config → ~mailOn · POST /login → ~funnelStep · POST /logout → ~sessionCookie · GET /today → dayCard · GET /me → ~adventAsk · GET /shop → ~stockNew · GET /new → ~catalog · POST /shop/buy → ~legMax · POST /admin/shop/cats → ~cleanRules · POST /admin/shop/reprice → ~gameUnit · POST /admin/shop/restock → ~ensurePrices · /admin/shop → ~shopRow · POST /gift/give → ~cleanRoom · POST /gift/sell → ~toShop · POST /salary/seen → — · POST /admin/salary → ~audWhere · POST /admin/tax → — · POST /admin/buttons-backfill → ~backfillButtons · POST /admin/buttons → — · POST /gift → ~avatarOf · POST /avatar → ~avatarOf · GET /admin/gifts → — · POST /admin/gift-all → ~audWhere · POST /admin/gift → ~okItem · GET /nick/random → ~freeNick · POST /nick → ~welcomeOf · POST /upload → ~monthThemeBadges · POST /delete-post → ~imgDelete · GET /wall → — · GET /top → ~utcToday · GET /export → ~artpillExport · POST /delete-account → ~artpillDrop · POST /admin/pick → ~addBadge · POST /admin/shop/autorestock → ~autoRestock · /admin/inbox → — · /admin/inbox/seen → ~autopilot · GET /admin/autopilot → ~autopilot · /admin/rules → ~welcomeCheap · POST /admin/ai → — · POST /admin/hide → — · POST /admin/ban → —
+/admin/pin-text → pinTextApi · /blog/admin/courier → courierApi · /blog/* → blogApi · /pw/* → — · /funnel → — · /admin/pw-reset → — · /admin/funnels → ~authApi · /flock/news → — · /news-off → — · /admin/flock-notes → ~flockNewsApi · /wl-mail* → — · /admin/wl-holiday → ~wlMailApi · /birds → — · /feathers → — · /feather → ~flockApi · /top → ~topApi · /brew → — · /brew/* → ~brewApi · /pancakes → — · /pancakes/* → ~pancakesApi · /train → — · /train/* → ~trainApi · /garden → — · /garden/* → ~gardenApi · /admin/runes → ~runesApi · /admin/tarot → ~tarotApi · /poll → — · /poll/vote → — · /admin/polls → ~pollsApi · /admin/guides → — · /v2/guides → — · /v2/seen → — · /v2/howto/* → ~guidesApi · /admin/ideas → — · /admin/ideas/write → ~ideasApi · /note/* → — · /admin/notes* → ~notesApi · /admin/notes/send → ~mailCron · /mail/* → — · /admin/mail* → ~mailApi · /study → ~studyApi · /english → — · /english/access → ~englishApi · /postcards/* → ~postcardsApi · /mixing → ~mixingApi · /notebook → ~notebookApi · /avis → — · /avis/* → ~avisApi · /norsk → — · /norsk/access → — · /norsk/tts → ~norskApi · /nederlands → — · /nederlands/access → — · /nederlands/tts → ~nederlandsApi · /artpill → — · /artpill/* → ~artpillApi · /school → — · /school/* → — · /admin/school → — · /admin/school/check → ~schoolApi · /about-chat → — · /about-chat/* → — · /admin/about-asks → ~aboutChatApi · POST /admin/pause → pauseApi · /admin/analytics → ~tableApi · /admin/week → ~weekApi · /room/visit → — · /room/visitors → — · /room/leave → ~visitsApi · /kitchen → — · /kitchen/* → ~kitchenApi · /shift → — · /shift/* → ~shiftApi · /titos* → — · /admin/titos* → ~titosApi · /tarot/reset → ~cardsApi · /cards* → — · /admin/cards* → ~cardsApi · /challenge/* → — · /admin/challenge* → ~challengeApi · POST /admin/translate → ~translateTo · POST /dev/migrate → migrateToR2 · POST /dev/cleanup → cleanupInactive · GET /profile → ~doorsOf · POST /birdcard → — · GET /birdcard → — · GET /stats → — · GET /flock → ~avatarOf · POST /subscribe → — · POST /unsubscribe → — · POST /hit → hit · POST /admin/links → — · POST /office/done → — · POST /room → ~roomEvent · POST /box0 → ~roomItems · POST /box0/seen → — · GET /rooms → ~roomOf · GET /game → ~gamePrices · POST /game/start → — · POST /game/level → ~rainItem · GET /potion → ~comboSeason · POST /potion/level → ~mazeItems · POST /potion/done → ~potDay · POST /potion/eye → — · GET /potion/bag → ~hintOk · POST /potion/hint → ~hintOk · POST /potion/give → ~invOf · POST /potion/revive → ~cleanRoom · POST /potion/seen → — · POST /potion/brew → ~potionOf · GET /requests → ~anonCode · POST /requests/tr → ~reqFill · POST /requests → ~anonCode · POST /requests/like → ~visitor · POST /admin/requests/answer → ~reqReward · POST /admin/requests/closed → — · POST /admin/requests/hide → — · GET /advent → ~adventAdv · POST /advent/open → ~inkOn · POST /admin/advent → ~adventFileDrop · POST /admin/advent/file → ~adventPut · POST /admin/advent/file/edit → ~advFileUsed · GET /palettes → ~extraQueue · GET /extra-palettes.js → ~extraQueue · POST /admin/art → ~artEntry · GET /sketchbook → sketchCfg · POST /admin/sketchbook → ~sketchCfg · POST /admin/art/hide → — · POST /admin/art/delete → ~extraQueue · GET /admin/users → ~tagColors · POST /admin/tag-color → ~tagColors · POST /admin/tags → — · /admin/blocks → — · /admin/subscribers → — · GET /flock/find → — · GET /admin/sec → ~secLocked · POST /admin/pin/verify → ~pinHash · POST /admin/pin/set → ~pinHash · POST /admin/recovery/new → ~loadSec · POST /recover → ~rcNorm · GET /whoami → ~englishOk · GET /v2/yt → — · GET /v2/vip → ~guideOut · GET /news → ~newsOf · GET /news/history → ~newsHistory · GET /config → ~mailOn · POST /login → ~funnelStep · POST /logout → ~sessionCookie · GET /today → dayCard · GET /me → ~adventAsk · GET /shop → ~stockNew · GET /new → ~catalog · POST /shop/buy → ~legMax · POST /admin/shop/cats → ~cleanRules · POST /admin/shop/reprice → ~gameUnit · POST /admin/shop/restock → ~ensurePrices · /admin/shop → ~shopRow · POST /gift/give → ~cleanRoom · POST /gift/sell → ~toShop · POST /salary/seen → — · POST /admin/salary → ~audWhere · POST /admin/tax → — · POST /admin/buttons-backfill → ~backfillButtons · POST /admin/buttons → — · POST /gift → ~avatarOf · POST /avatar → ~avatarOf · GET /admin/gifts → — · POST /admin/gift-all → ~audWhere · POST /admin/gift → ~okItem · GET /nick/random → ~freeNick · POST /nick → ~welcomeOf · POST /upload → ~monthThemeBadges · POST /delete-post → ~imgDelete · GET /wall → — · GET /top → ~utcToday · GET /export → ~artpillExport · POST /delete-account → ~artpillDrop · POST /admin/pick → ~addBadge · POST /admin/shop/autorestock → ~autoRestock · /admin/inbox → — · /admin/inbox/seen → ~autopilot · GET /admin/autopilot → ~autopilot · /admin/rules → ~welcomeCheap · POST /admin/ai → — · POST /admin/hide → — · POST /admin/ban → —
 
 ## Маршруты worker/blog.js (37)
 
@@ -330,6 +355,8 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 ## Общее
 
 _Сюда следующие этапы дописывают общие сведения о коде._
+
+- 🧪 Пиксельный стиль кабинета зельевара (docs/brew.md): новое рисовать на `PPPix` (site/assets/brew-pix.js: grid/blob/tone/outline/epx, ramp, riga) и птичку — `PPBrewBird.actor` (brew-bird.js); шапки/вещи HD-спрайта для крупных рисунков — `PPBirds.HDX` (только чтение).
 
 - 🎓 Курсы со сдачей фото: worker/school.js `COURSES` (новый курс = запись там, `course` в запросах, страница с PPDiploma из site/assets/diploma.js); проверка — кабинет «🎓 Курсы» (school-admin.js), новость `school` с `x.course` (news.js), карточка — cabinet.js «Дипломы» и v2.js `COURSES` на /learn/.
 

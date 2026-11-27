@@ -506,5 +506,7 @@
   const GIFT_KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'В клюв', 'Knābī']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
     ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
 
-  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, itemIcon, giftPic, LEGEND, GIFT_THEMES, GIFT_KINDS, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
+  // HDX — рисунки вещей HD-спрайта для крупной птички кабинета зельевара (brew-bird.js): только чтение, сами функции не менялись
+  const HDX = { hat: hdHat, shoe: hdShoe, items: HD_ITEMS, special: SPECIAL_HATS, stamp, shade };
+  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, itemIcon, giftPic, LEGEND, GIFT_THEMES, GIFT_KINDS, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX, HDX };
 })();

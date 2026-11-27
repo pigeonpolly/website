@@ -38,19 +38,23 @@
     pdf: ['Books →', 'Книги →', 'Grāmatas →'],
     soon: ['Courses and materials you get will appear here too.', 'Сюда же лягут курсы и материалы, которые у тебя появятся.', 'Šeit parādīsies arī tavi kursi un materiāli.'],
     all: ['✓ Tick all', '✓ Отметить все', '✓ Atzīmēt visus'], none: ['Untick all', 'Снять все', 'Noņemt visus'],
+    brew: ['🧪 Potion study', '🧪 Кабинет зельевара', '🧪 Zāļu kabinets'], soonB: ['Polly is still setting this up — very soon!', 'Полли ещё обустраивает это место — совсем скоро!', 'Pollijs vēl to iekārto — pavisam drīz!'],
     play: ['Games', 'Игры', 'Spēles'], shop: ['Bird market', 'Птичий рынок', 'Putnu tirgus'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
   };
   const t = k => T[k][L];
   const NAMES = [[/pepper|перец|перц/i, ['Pepper sketching', 'Скетч перца', 'Pipara skice']], [/caf[eé]|outdoor|кафе/i, ['Outdoor sketching in a cafe', 'Скетч на выезде: кафе', 'Skices ārpus mājām: kafejnīca']]]; // как в v2.js
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const TABS = ['learn', 'bird', 'mail', 'acc'];
-  const HASH = { learn: 'learn', bird: 'bird', mail: 'mail', settings: 'acc' };
+  const HASH = { learn: 'learn', bird: 'bird', mail: 'mail', settings: 'acc', brew: 'brew' };
+  // 🧪 кабинет зельевара (docs/brew.md): вкладка появляется, только если /api/brew отвечает on (флаг brewOn: пока — только админ)
+  const brewReq = location.search.includes('nick=') ? Promise.resolve(null) : fetch('/api/brew', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
   let cur = null, root = null;
   try { cur = localStorage.getItem('pp-cab'); } catch (e) {}
   const h0 = location.hash.slice(1);
   if (HASH[h0]) cur = HASH[h0];
   if (['room', 'bag', 'album', 'gift'].includes(h0)) cur = 'bird';
-  if (!TABS.includes(cur)) cur = 'learn';
+  const asked = !!HASH[h0] || ['room', 'bag', 'album', 'gift'].includes(h0);
+  if (!TABS.includes(cur) && cur !== 'brew') cur = 'learn';
 
   function show(k) {
     if (!TABS.includes(k)) return;
@@ -180,5 +184,24 @@
     }
     root.querySelectorAll('.cab-tabs [data-cab]').forEach(b => b.onclick = () => { show(b.dataset.cab); history.replaceState(null, '', location.pathname + location.search); });
     show(cur);
+    brewReq.then(d => { if (d && d.on && window.PPBrewRoom) brewTab(d, !asked, e.detail.pr); });
   });
+  function brewTab(d, open, pr) {
+    TABS.unshift('brew');
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.cab = 'brew'; b.textContent = t('brew');
+    b.onclick = () => { show('brew'); history.replaceState(null, '', location.pathname + location.search); };
+    root.querySelector('.cab-tabs').prepend(b);
+    const pane = document.createElement('div'); pane.className = 'cab-pane cab-brew'; pane.dataset.pane = 'brew'; pane.setAttribute('role', 'tabpanel');
+    root.querySelector('.cab-tabs').after(pane);
+    const box = document.createElement('div'); pane.append(box);
+    const pre2 = pre;
+    const soon = api => api.say(t('soonB'));
+    const me = d.me;
+    const api = window.PPBrewRoom.mount(box, { id: me.id, avatar: (pr && pr.avatar) || null, cat: me.cats ? { id: 10 } : null,
+      state: { level: me.level, xp: me.xp, need: me.need, slots: me.slots, shelf: [], cauldron: { dirt: Math.min(10, me.dirt || 0) } },
+      on: { cauldron: soon, book: soon, shelf: soon, bag: soon,
+        door: () => show('bird'), games: () => { location.href = pre2 + '/games/'; }, map: () => { location.href = pre2 + '/wobbleland/'; }, flock: () => { location.href = pre2 + '/flock/'; } } });
+    window.PPBrew = { api, data: d };
+    if (open || cur === 'brew') show('brew');
+  }
 })();
