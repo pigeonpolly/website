@@ -8,6 +8,45 @@
    "notes": "Otrā daļa. Šeit galvenās kļūdas: E, I, A, R, G, J — latviešu ieradums saukt burtus latviski."
   },
   {
+   "type": "story",
+   "title": "Check-*in*",
+   "tag": "Story",
+   "pose": "confused",
+   "messages": [
+    {
+     "who": "note",
+     "text": "Viesnīcas reģistratūra Londonā, 15:00. Oskars atved tūristus no Rīgas."
+    },
+    {
+     "who": "reception",
+     "name": "Receptionist",
+     "text": "Good afternoon! What's your first name, please?"
+    },
+    {
+     "who": "janis",
+     "name": "Jānis",
+     "text": "Jānis. «Jē-ā-en-ī-es.»"
+    },
+    {
+     "who": "reception",
+     "name": "Receptionist",
+     "text": "Thank you. So it's… **G-E-N-I-S**?"
+    },
+    {
+     "who": "janis",
+     "name": "Jānis",
+     "text": "Genis? No!"
+    },
+    {
+     "who": "oscar",
+     "name": "Oscar",
+     "text": "Sorry! It's *J-A-N-I-S*: jay, ay, en, eye, es."
+    }
+   ],
+   "lesson": "Angliski burtiem ir citi nosaukumi: J = /dʒeɪ/, A = /eɪ/, I = /aɪ/. Šodien iemācīsimies visus 26.",
+   "notes": "Tagad studenti jau zina burtu nosaukumus — lai paši atrod kļūdu. Ar → atklāj replikas pa vienai. Pajautā: kāpēc reģistratore uzrakstīja GENIS? Jānis teica burtus latviski. Neskaidro visu uzreiz — tas būs nākamajos slaidos."
+  },
+  {
    "type": "compare",
    "title": "Latviski vs *English*",
    "left": {

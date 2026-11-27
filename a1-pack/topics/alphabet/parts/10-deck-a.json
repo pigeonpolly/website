@@ -4,67 +4,28 @@
    "type": "cover",
    "title": "The *alphabet*",
    "subtitle": "A–Z · spell your name · emails",
-   "text": "Tēma 2 · 180 min",
+   "text": "Tēma 1 · 180 min",
    "pose": "hello",
-   "notes": "Sasveicinies: Hello! Atgādini, ka Oskars ir gids Londonā. Šodien — 4 daļas un tējas pauze vidū."
+   "notes": "Sasveicinies latviski un angliski: Hello! Pastāsti, ka šī ir pirmā tēma: sāksim ar pašiem burtiem. Šodien — 4 daļas un tējas pauze vidū."
   },
   {
    "type": "agenda",
-   "title": "Today",
+   "title": "Šodien · *Today*",
    "items": [
-    "26 letters",
-    "Tricky letters",
-    "Spell your name",
-    "Emails & review"
+    "26 burti · 26 letters",
+    "Burti, kas jūk · Tricky letters",
+    "Vārds pa burtiem · Spell your name",
+    "E-pasts un atkārtojums · Emails & review"
    ],
-   "notes": "1 min. Pasaki, ka beigās katrs varēs pateikt savu vārdu, uzvārdu un e-pastu pa burtiem."
+   "notes": "1 min. Pasaki latviski: vispirms iepazīsim visus 26 burtus un to izrunu, tad mācīsimies pateikt pa burtiem savu vārdu un e-pastu."
   },
   {
    "type": "oscar",
    "kind": "story",
    "pose": "guide",
-   "text": "Sveiks! Šodien mana grupa no Rīgas reģistrējas viesnīcā. Katrs vārds jāpasaka pa burtiem — un angliski burti skan citādi. Pat man dažreiz sajūk!",
-   "en": "Hello again! Today: the alphabet, A to Z.",
-   "notes": "Oskara ievads. Nospied skaļruni — lai studenti dzird britu izrunu un atkārto: the alphabet, A to Z."
-  },
-  {
-   "type": "story",
-   "title": "Check-*in*",
-   "tag": "Story",
-   "pose": "confused",
-   "messages": [
-    {
-     "who": "note",
-     "text": "Viesnīcas reģistratūra Londonā, 15:00. Oskars atved tūristus no Rīgas."
-    },
-    {
-     "who": "reception",
-     "name": "Receptionist",
-     "text": "Good afternoon! What's your first name, please?"
-    },
-    {
-     "who": "janis",
-     "name": "Jānis",
-     "text": "Jānis. «Jē-ā-en-ī-es.»"
-    },
-    {
-     "who": "reception",
-     "name": "Receptionist",
-     "text": "Thank you. So it's… **G-E-N-I-S**?"
-    },
-    {
-     "who": "janis",
-     "name": "Jānis",
-     "text": "Genis? No!"
-    },
-    {
-     "who": "oscar",
-     "name": "Oscar",
-     "text": "Sorry! It's *J-A-N-I-S*: jay, ay, en, eye, es."
-    }
-   ],
-   "lesson": "Angliski burtiem ir citi nosaukumi: J = /dʒeɪ/, A = /eɪ/, I = /aɪ/. Šodien iemācīsimies visus 26.",
-   "notes": "Ar → atklāj replikas pa vienai. Pajautā: kāpēc reģistratore uzrakstīja GENIS? Jānis teica burtus latviski. Neskaidro visu uzreiz — tas būs nākamajos slaidos."
+   "text": "Sveiks! Es esmu Oskars, gids Londonā. Mani tūristi no Rīgas katru dienu saka savu vārdu pa burtiem — viesnīcā, kafejnīcā, pa telefonu. Bet angliski burtus sauc citādi. Sāksim no paša sākuma — no A!",
+   "en": "Hello! I'm Oscar. Today: the alphabet, A to Z.",
+   "notes": "Oskara ievads. Nospied skaļruni — lai studenti dzird britu izrunu un atkārto: Hello! The alphabet, A to Z. Neko vairāk angliski vēl neprasi."
   },
   {
    "type": "section",
@@ -74,13 +35,212 @@
    "notes": "Pāreja uz pirmo daļu."
   },
   {
-   "type": "oscar",
-   "kind": "fact",
+   "type": "text",
+   "title": "Kas ir *alfabēts*?",
    "pose": "book",
-   "side": "right",
-   "text": "Angļu alfabētā ir **26** burti, latviešu — **33**. Patskaņi (*vowels*) ir pieci: A, E, I, O, U. Pārējie — līdzskaņi (*consonants*).",
-   "en": "The alphabet: 26 letters. Vowels: A, E, I, O, U.",
-   "notes": "Salīdzini ar latviešu alfabētu: 33 burti. Angļu alfabētā nav garumzīmju un mīkstinājumu. Jauni vārdi: letter, vowel, consonant."
+   "body": "Angļu alfabētā ir **26** burti (*letters*). Tie izskatās tāpat kā latviešu burti, bet **nosaukumi un izruna ir citi**.",
+   "bullets": [
+    "Latviešu alfabētā — 33 burti, angļu — 26.",
+    "Angļu alfabētā nav garumzīmju un mīkstinājumu: ā, č, ē, ģ, ī, ķ, ļ, ņ, š, ū, ž.",
+    "Jauni burti, kuru latviešu alfabētā nav: **Q, W, X, Y**.",
+    "Patskaņi (*vowels*): **A, E, I, O, U**. Pārējie — līdzskaņi (*consonants*)."
+   ],
+   "note": "letter = burts · vowel = patskanis · consonant = līdzskanis",
+   "notes": "Runā latviski. Uzraksti uz tāfeles abus alfabētus vai parādi latviešu alfabētu. Uzsver: burti pazīstami, bet tos sauc citādi — tieši to šodien mācīsimies. Jauni vārdi: letter, vowel, consonant."
+  },
+  {
+   "type": "big",
+   "kicker": "Visi 26 burti · klausies un atkārto",
+   "text": "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z",
+   "lv": "Nospied skaļruni, klausies un atkārto skaļi.",
+   "pose": "teacher",
+   "notes": "Atskaņo visu alfabētu (skaļrunis) vai nolasi pati lēnām. Studenti tikai klausās. Otrajā reizē — katrs atkārto pats sev. Nesteidzies: tālāk katru burtu apskatīsim atsevišķi."
+  },
+  {
+   "type": "vocab",
+   "title": "Letters *A–G*",
+   "cols": 4,
+   "items": [
+    {
+     "en": "A",
+     "ipa": "/eɪ/",
+     "lv": "«ei» · kā *day*"
+    },
+    {
+     "en": "B",
+     "ipa": "/biː/",
+     "lv": "«bī» · kā *bee* (bite)"
+    },
+    {
+     "en": "C",
+     "ipa": "/siː/",
+     "lv": "«sī» · kā *sea* (jūra)"
+    },
+    {
+     "en": "D",
+     "ipa": "/diː/",
+     "lv": "«dī» · kā *DJ* sākumā"
+    },
+    {
+     "en": "E",
+     "ipa": "/iː/",
+     "lv": "«ī» · kā *tea* (tēja)"
+    },
+    {
+     "en": "F",
+     "ipa": "/ef/",
+     "lv": "«ef» · kā *left* vidū"
+    },
+    {
+     "en": "G",
+     "ipa": "/dʒiː/",
+     "lv": "«džī» · kā *jeans* sākumā"
+    }
+   ],
+   "notes": "Vispirms nospied skaļruni pie katra burta — studenti klausās un atkārto skaļi. Tad klikšķis uz kartītes: latviskā aptuvenā izruna un vārds ar tādu pašu skaņu. Klikšķis uz kartītes — latviskā aptuvenā izruna, skaļrunis — britu izruna. Latviskais pieraksts ir tikai palīgs. Uzmanību: E = «ī», G = «džī»."
+  },
+  {
+   "type": "vocab",
+   "title": "Letters *H–N*",
+   "cols": 4,
+   "items": [
+    {
+     "en": "H",
+     "ipa": "/eɪtʃ/",
+     "lv": "«eič» · nav «h» skaņas sākumā!"
+    },
+    {
+     "en": "I",
+     "ipa": "/aɪ/",
+     "lv": "«ai» · kā *my* (mans)"
+    },
+    {
+     "en": "J",
+     "ipa": "/dʒeɪ/",
+     "lv": "«džei» · kā *day*, ar «dž»"
+    },
+    {
+     "en": "K",
+     "ipa": "/keɪ/",
+     "lv": "«kei» · kā *OK* beigās"
+    },
+    {
+     "en": "L",
+     "ipa": "/el/",
+     "lv": "«el» · kā *tell* beigās"
+    },
+    {
+     "en": "M",
+     "ipa": "/em/",
+     "lv": "«em» · kā *them* beigās"
+    },
+    {
+     "en": "N",
+     "ipa": "/en/",
+     "lv": "«en» · kā *ten* (desmit) beigās"
+    }
+   ],
+   "notes": "Vispirms nospied skaļruni pie katra burta — studenti klausās un atkārto skaļi. Tad klikšķis uz kartītes: latviskā aptuvenā izruna un vārds ar tādu pašu skaņu. H = aitch, bez «h» skaņas sākumā. I = «ai», J = «džei». Lai studenti atkārto katru burtu skaļi."
+  },
+  {
+   "type": "quiz",
+   "question": "___ sounds like *tea*.",
+   "options": [
+    "A",
+    "E",
+    "I"
+   ],
+   "answer": 1,
+   "why": "E = /iː/. A = /eɪ/, I = /aɪ/.",
+   "notes": "Lai katrs pats izvēlas atbildi un pasaka to skaļi, tad klikšķini vai A."
+  },
+  {
+   "type": "vocab",
+   "title": "Letters *O–U*",
+   "cols": 3,
+   "items": [
+    {
+     "en": "O",
+     "ipa": "/əʊ/",
+     "lv": "«ou» · kā *no* (nē)"
+    },
+    {
+     "en": "P",
+     "ipa": "/piː/",
+     "lv": "«pī» · kā *pea* (zirnis)"
+    },
+    {
+     "en": "Q",
+     "ipa": "/kjuː/",
+     "lv": "«kjū» · kā *queue* (rinda)"
+    },
+    {
+     "en": "R",
+     "ipa": "/ɑː/",
+     "lv": "«ā» · kā *car* (mašīna), bez «r»"
+    },
+    {
+     "en": "S",
+     "ipa": "/es/",
+     "lv": "«es» · kā *yes* (jā) beigās"
+    },
+    {
+     "en": "T",
+     "ipa": "/tiː/",
+     "lv": "«tī» · kā *tea* (tēja)"
+    },
+    {
+     "en": "U",
+     "ipa": "/juː/",
+     "lv": "«jū» · kā *you* (tu)"
+    }
+   ],
+   "notes": "Vispirms nospied skaļruni pie katra burta — studenti klausās un atkārto skaļi. Tad klikšķis uz kartītes: latviskā aptuvenā izruna un vārds ar tādu pašu skaņu. R britu angļu valodā — garš «ā», bez «r» skaņas. U = «jū», Q = «kjū»."
+  },
+  {
+   "type": "vocab",
+   "title": "Letters *V–Z*",
+   "cols": 3,
+   "items": [
+    {
+     "en": "V",
+     "ipa": "/viː/",
+     "lv": "«vī» · kā *TV* beigās"
+    },
+    {
+     "en": "W",
+     "ipa": "/ˈdʌbəl juː/",
+     "lv": "«dabl jū» · divi U — *double u*"
+    },
+    {
+     "en": "X",
+     "ipa": "/eks/",
+     "lv": "«eks» · kā *next* vidū"
+    },
+    {
+     "en": "Y",
+     "ipa": "/waɪ/",
+     "lv": "«uai» · kā *why* (kāpēc)"
+    },
+    {
+     "en": "Z",
+     "ipa": "/zed/",
+     "lv": "«zed» · Britānijā — *zed*"
+    }
+   ],
+   "notes": "Vispirms nospied skaļruni pie katra burta — studenti klausās un atkārto skaļi. Tad klikšķis uz kartītes: latviskā aptuvenā izruna un vārds ar tādu pašu skaņu. W = double u. Y skan kā why. Z Britānijā — zed."
+  },
+  {
+   "type": "quiz",
+   "question": "Vowels: A, E, I, O, ___.",
+   "options": [
+    "U",
+    "Y",
+    "W"
+   ],
+   "answer": 0,
+   "why": "Pieci patskaņi: A, E, I, O, **U**.",
+   "notes": "Pēdējais jautājums pirms otrās daļas. Atgādini: vowels — A E I O U, pārējie — consonants."
   },
   {
    "type": "rule",
@@ -129,181 +289,7 @@
     ]
    ],
    "note": "7 skaņas — 26 burti.",
-   "notes": "Burtus vieglāk iegaumēt pēc skaņas, nevis pēc kārtas. Izrunā katru rindu, lai studenti atkārto skaļi. Uzsver: E = /iː/, I = /aɪ/, R = /ɑː/ — tie latviešiem jūk visvairāk."
-  },
-  {
-   "type": "vocab",
-   "title": "Letters *A–G*",
-   "cols": 4,
-   "items": [
-    {
-     "en": "A",
-     "ipa": "/eɪ/",
-     "lv": "«ei»"
-    },
-    {
-     "en": "B",
-     "ipa": "/biː/",
-     "lv": "«bī»"
-    },
-    {
-     "en": "C",
-     "ipa": "/siː/",
-     "lv": "«sī»"
-    },
-    {
-     "en": "D",
-     "ipa": "/diː/",
-     "lv": "«dī»"
-    },
-    {
-     "en": "E",
-     "ipa": "/iː/",
-     "lv": "«ī»"
-    },
-    {
-     "en": "F",
-     "ipa": "/ef/",
-     "lv": "«ef»"
-    },
-    {
-     "en": "G",
-     "ipa": "/dʒiː/",
-     "lv": "«džī»"
-    }
-   ],
-   "notes": "Klikšķis uz kartītes — latviskā aptuvenā izruna, skaļrunis — britu izruna. Latviskais pieraksts ir tikai palīgs. Uzmanību: E = «ī», G = «džī»."
-  },
-  {
-   "type": "vocab",
-   "title": "Letters *H–N*",
-   "cols": 4,
-   "items": [
-    {
-     "en": "H",
-     "ipa": "/eɪtʃ/",
-     "lv": "«eič»"
-    },
-    {
-     "en": "I",
-     "ipa": "/aɪ/",
-     "lv": "«ai»"
-    },
-    {
-     "en": "J",
-     "ipa": "/dʒeɪ/",
-     "lv": "«džei»"
-    },
-    {
-     "en": "K",
-     "ipa": "/keɪ/",
-     "lv": "«kei»"
-    },
-    {
-     "en": "L",
-     "ipa": "/el/",
-     "lv": "«el»"
-    },
-    {
-     "en": "M",
-     "ipa": "/em/",
-     "lv": "«em»"
-    },
-    {
-     "en": "N",
-     "ipa": "/en/",
-     "lv": "«en»"
-    }
-   ],
-   "notes": "H = aitch, bez «h» skaņas sākumā. I = «ai», J = «džei». Lai studenti atkārto katru burtu skaļi."
-  },
-  {
-   "type": "vocab",
-   "title": "Letters *O–U*",
-   "cols": 3,
-   "items": [
-    {
-     "en": "O",
-     "ipa": "/əʊ/",
-     "lv": "«ou»"
-    },
-    {
-     "en": "P",
-     "ipa": "/piː/",
-     "lv": "«pī»"
-    },
-    {
-     "en": "Q",
-     "ipa": "/kjuː/",
-     "lv": "«kjū»"
-    },
-    {
-     "en": "R",
-     "ipa": "/ɑː/",
-     "lv": "«ā»"
-    },
-    {
-     "en": "S",
-     "ipa": "/es/",
-     "lv": "«es»"
-    },
-    {
-     "en": "T",
-     "ipa": "/tiː/",
-     "lv": "«tī»"
-    },
-    {
-     "en": "U",
-     "ipa": "/juː/",
-     "lv": "«jū»"
-    }
-   ],
-   "notes": "R britu angļu valodā — garš «ā», bez «r» skaņas. U = «jū», Q = «kjū»."
-  },
-  {
-   "type": "vocab",
-   "title": "Letters *V–Z*",
-   "cols": 3,
-   "items": [
-    {
-     "en": "V",
-     "ipa": "/viː/",
-     "lv": "«vī»"
-    },
-    {
-     "en": "W",
-     "ipa": "/ˈdʌbəl juː/",
-     "lv": "«dabl jū»"
-    },
-    {
-     "en": "X",
-     "ipa": "/eks/",
-     "lv": "«eks»"
-    },
-    {
-     "en": "Y",
-     "ipa": "/waɪ/",
-     "lv": "«uai»"
-    },
-    {
-     "en": "Z",
-     "ipa": "/zed/",
-     "lv": "«zed»"
-    }
-   ],
-   "notes": "W = double u. Y skan kā why. Z Britānijā — zed."
-  },
-  {
-   "type": "quiz",
-   "question": "___ sounds like *tea*.",
-   "options": [
-    "A",
-    "E",
-    "I"
-   ],
-   "answer": 1,
-   "why": "E = /iː/. A = /eɪ/, I = /aɪ/.",
-   "notes": "Lai katrs pats izvēlas atbildi un pasaka to skaļi, tad klikšķini vai A."
+   "notes": "Tagad, kad visi burti dzirdēti, sagrupē tos pēc skaņas — tā vieglāk iegaumēt. Burtus vieglāk iegaumēt pēc skaņas, nevis pēc kārtas. Izrunā katru rindu, lai studenti atkārto skaļi. Uzsver: E = /iː/, I = /aɪ/, R = /ɑː/ — tie latviešiem jūk visvairāk."
   },
   {
    "type": "oscar",
@@ -313,6 +299,18 @@
    "text": "Mans triks: mācies burtus pēc skaņas. B, C, D, E, G, P, T, V — visi skan kā *tea*. Vari arī klusi nodziedāt alfabēta dziesmu sev.",
    "en": "B, C, D, E, G, P, T, V — like tea!",
    "notes": "Nospied skaļruni. Ja vēlies, atskaņo alfabēta dziesmu — katrs dzied vai runā līdzi pats sev."
+  },
+  {
+   "type": "quiz",
+   "question": "The letter ___ sounds like *why*.",
+   "options": [
+    "I",
+    "Y",
+    "W"
+   ],
+   "answer": 1,
+   "why": "Y = /waɪ/ — kā *why*. I = /aɪ/, W = double u.",
+   "notes": "Pēc atbildes vari pajokot: Y? Why? Abi skan vienādi."
   },
   {
    "type": "examples",
@@ -345,18 +343,6 @@
     }
    ],
    "notes": "Saīsinājumus saka pa burtiem: B-B-C, U-K, T-V. Ar → atklāj tulkojumu, skaļrunis — izruna. Lai studenti atkārto: the BBC, the UK."
-  },
-  {
-   "type": "quiz",
-   "question": "The letter ___ sounds like *why*.",
-   "options": [
-    "I",
-    "Y",
-    "W"
-   ],
-   "answer": 1,
-   "why": "Y = /waɪ/ — kā *why*. I = /aɪ/, W = double u.",
-   "notes": "Pēc atbildes vari pajokot: Y? Why? Abi skan vienādi."
   },
   {
    "type": "facts",
@@ -408,18 +394,6 @@
    ],
    "box": "/eɪ/ A … · /iː/ B … · /e/ F … · /aɪ/ I … · /əʊ/ O · /uː/ Q … · /ɑː/ R",
    "notes": "Individuāls darbs ar taimeri. Pēc tam atver slaidu «Letters by sound» (O — pārskats), lai katrs pats pārbauda."
-  },
-  {
-   "type": "quiz",
-   "question": "Vowels: A, E, I, O, ___.",
-   "options": [
-    "U",
-    "Y",
-    "W"
-   ],
-   "answer": 0,
-   "why": "Pieci patskaņi: A, E, I, O, **U**.",
-   "notes": "Pēdējais jautājums pirms otrās daļas. Atgādini: vowels — A E I O U, pārējie — consonants."
   }
  ]
 }

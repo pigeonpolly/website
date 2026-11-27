@@ -1,6 +1,6 @@
 # Alphabet — plāns (līgums aģentiem)
 
-Tēma 2 · 180 min · tikai prezentācija (tēmas fails NAV vajadzīgs) · krāsa #9A6A12 (sinepju).
+Tēma 1 · 180 min · tikai prezentācija (tēmas fails NAV vajadzīgs) · krāsa #9A6A12 (sinepju).
 Britu angļu, A1, pieaugušie. Oskars — gids Hop & Hat Tours Londonā (sk. OSKARS.md).
 Konteksts: tūristi no Rīgas (Jānis Bērziņš, Līga Ozola) reģistrējas viesnīcā, rezervē ekskursiju pa telefonu, raksta e-pastu. Oskars pats sajauc burtus (E/I, G/J) — un rezervācija ir uz nepareizu vārdu.
 
