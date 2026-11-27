@@ -110,5 +110,5 @@
 - База Notion «🇳🇴 Norsk» (`collection://42234395-245b-80e4-840c-000bbc25bd2d`); образец тона — пост Алины «Полли ищет ягоды и потерялся» в базе.
 - Уровень слова — `tools/norsk_level.py слово` (по `words` учебника /norsk/); нет в учебнике — «~уровень».
 - Страница FB «Balodis Pollijs ceļā uz Norvēģiju», пишет Полли от первого лица; образец — пост про rumpetroll / å være på bærtur.
-- Картинки рисуются кодом (Gemini нет): `tools/norsk/polly-art.js` (Полли по `pp_maskot_v1` — неизменный, позы/лицо/реквизит параметрами; сцены forest, winter, cozy), `node tools/norsk/draw.js N` по `tools/norsk/posts.json` → site/images/norsk-lv/post-NNN.jpg 1920×1080, образцы polly-ref-*.jpg.
+- Картинки — карточки со словами без маскота (Алина 27.11: нарисованный кодом Полли не подошёл): `node tools/norsk/cards.js N` по `tools/norsk/cards.json` → site/images/norsk-lv/card-NNN.jpg 1080×1350; виды word, literal, quiz, list, art (рисунок из palettes.json со словами), phrase; образцы cards-sample.json, sample-*.jpg.
 
