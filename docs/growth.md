@@ -100,3 +100,7 @@
 
 ## Обложка Facebook (22.11.2026)
 - `node tools/fb/fb_cover.js [--safe]` → site/images/fb/facebook-cover.jpg, 1640×624, зимняя: значок, «Paint small, joyful things», что есть на сайте, коллаж рисунков и пиксельных игр, кнопка pigeonpolly.com. Важное — в середине (телефон режет края), низ слева пустой (фото профиля). `--safe` рисует рамки обрезки в _cover-safe.jpg (не коммитить).
+
+## Контент-завод (27.11.2026)
+- Скилл `.claude/skills/social-content-factory`: анкета из 7 вопросов → пачка карточек 1000×1500 (EN; № еле заметно слева внизу, лого v3 под фон справа внизу) → к каждой Pinterest-поля, сторителлинг для Facebook и текст для арт-групп без рекламы → Notion «🐸 ENG Media Contet for Social Media» (`collection://69634395-245b-8362-aa6e-07febe1124f0`), нумерация в этой базе с 1, картинка в теле страницы.
+- Материалы и аналитика — папка Drive `1kLdrtLVj3KvCZVDPfpltE31KykR5lv-u`; Полли рисуем сами (PollyPet.paint / SVG по референсам), Gemini не нужен. Ko-fi — только по ссылкам на продукты от Алины. Новые доски Pinterest — только после её «да».
