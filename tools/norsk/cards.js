@@ -35,7 +35,7 @@ body{background:var(--bg);color:#2B2A33;font-family:Karla,sans-serif;position:re
 .pr{font:500 44px Karla;color:#6B6158;margin-top:26px}
 .lv{font:700 72px/1.1 Karla;color:var(--acc);margin-top:30px}
 .ex{margin-top:70px;padding:34px 40px;background:#fff;border-radius:26px;box-shadow:0 8px 24px rgba(40,30,20,.08)}
-.ex b{display:block;font:600 42px/1.25 Lora;color:#1F2A44}.ex span{display:block;font:500 34px/1.3 Karla;color:#8A7F74;margin-top:12px}
+.ex b{display:block;font:600 42px/1.25 Lora;color:#1F2A44}.ex.note span{margin:0;color:#2B2A33;font-size:32px}.ex span{display:block;font:500 34px/1.3 Karla;color:#8A7F74;margin-top:12px}
 .parts{display:flex;align-items:flex-end;gap:22px;margin-top:50px;flex-wrap:wrap}
 .part{background:#fff;border-radius:24px;padding:22px 30px;box-shadow:0 8px 24px rgba(40,30,20,.08)}
 .part b{display:block;font:600 64px Lora;color:#1F2A44}.part span{display:block;font:500 32px Karla;color:#8A7F74;margin-top:6px}
@@ -51,7 +51,7 @@ body{background:var(--bg);color:#2B2A33;font-family:Karla,sans-serif;position:re
 h1{font:600 84px/1.05 Lora;color:#1F2A44}
 .rows{margin-top:50px;display:flex;flex-direction:column}
 .row{display:grid;grid-template-columns:1.1fr 1fr;align-items:baseline;gap:20px;padding:24px 0;border-top:3px solid var(--line)}
-.row b{font:600 54px Lora;color:#1F2A44}.row b small{font:italic 400 34px Lora;color:#8A7F74;margin-right:6px}
+.dense .rows{margin-top:30px}.dense .row{padding:14px 0}.dense h1{font-size:72px}.row b{font:600 54px Lora;color:#1F2A44}.row b small{font:italic 400 34px Lora;color:#8A7F74;margin-right:6px}
 .row span{font:500 30px Karla;color:#8A7F74}.row span u{display:block;text-decoration:none;font:700 40px Karla;color:var(--acc);margin-bottom:4px}
 .pic{position:absolute;left:50%;transform:translateX(-50%);border-radius:20px;box-shadow:0 10px 30px rgba(40,30,20,.18)}
 .pic img{display:block;width:100%;height:100%;border-radius:20px}
@@ -71,7 +71,7 @@ const THEMES = [
   ['#FBF0D9', '#B5651D'], ['#E4F1F0', '#1F7A7A'], ['#EEE6F3', '#5B3F8A'], ['#00205B', '#FFD36B', 1], ['#BA0C2F', '#FFFFFF', 1],
 ];
 const DARK = `.big,.ex b,.part b,h1,.row b,.abot h2,.ws b,.cta,.real b{color:#fff}.big small,.row b small,.pr,.real,.foot,.lit,.abot h2 em,.ws span,.row span{color:rgba(255,255,255,.72)}
-.ex,.part,.opt{background:rgba(255,255,255,.12);box-shadow:none}.ex span,.part span{color:rgba(255,255,255,.75)}.opt{color:#fff}.opt i{color:#1F2A44}`;
+.ex,.part,.opt{background:rgba(255,255,255,.12);box-shadow:none}.ex span,.part span,.ex.note span{color:rgba(255,255,255,.85)}.opt{color:#fff}.opt i{color:#1F2A44}`;
 function colors(it) {
   const t = THEMES[(it.theme ?? it.n) % THEMES.length];
   return { bg: it.bg || t[0], acc: it.acc || t[1], line: t[2] ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.09)', dark: !!t[2] };
@@ -84,14 +84,14 @@ function body(it, img) {
     case 'word': return `${kick('Vārds dienai')}<div class="mid"><div class="big">${art(esc(it.no))}</div><div class="pr">(izrunā: ${esc(it.pr)})</div><div class="lv">${esc(it.lv)}</div>
       ${it.ex ? `<div class="ex"><b>${esc(it.ex)}</b><span>${esc(it.exlv)}</span></div>` : ''}</div>${foot}`;
     case 'phrase': return `${kick('Izteiciens')}<div class="mid"><div class="big" style="font-size:104px;line-height:1.05">${esc(it.no)}</div><div class="pr">(izrunā: ${esc(it.pr)})</div><div class="lv" style="font-size:60px">${esc(it.lv)}</div>
-      ${it.note ? `<div class="ex"><span style="margin:0;color:#2B2A33">${esc(it.note)}</span></div>` : ''}</div>${foot}`;
+      ${it.note ? `<div class="ex note"><span>${esc(it.note)}</span></div>` : ''}</div>${foot}`;
     case 'literal': return `${kick('Smieklīgi vārdi')}<div class="mid"><div class="big" style="font-size:${it.no.length > 10 ? 120 : 150}px">${esc(it.no)}</div>
       <div class="parts">${it.parts.map(([a, b]) => `<div class="part"><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('<div class="plus">+</div>')}</div>
       <div class="lit">Burtiski:<b>${esc(it.lit)}</b></div><div class="real">Patiesībā: <b>${esc(it.real)}</b></div></div>${foot}`;
     case 'quiz': return `${kick('Uzmini!')}<div class="mid"><div class="q">${esc(it.q || 'Ko tas nozīmē?')}</div><div class="big" style="font-size:${it.no.length > 12 ? 96 : 130}px;line-height:1.05">${art(esc(it.no))}</div>
       ${it.pr ? `<div class="pr">(izrunā: ${esc(it.pr)})</div>` : ''}<div class="opts">${it.opts.map((o, i) => `<div class="opt"><i>${'ABC'[i]}</i>${esc(o)}</div>`).join('')}</div>
       <div class="cta">Raksti atbildi komentāros 👇</div></div>${foot}`;
-    case 'list': return `${kick('Norvēģu valoda')}<div class="mid" style="justify-content:flex-start;top:190px"><h1>${esc(it.t)}</h1><div class="rows">${it.items.map(([no, pr, lv]) => `<div class="row"><b>${art(esc(no))}</b><span><u>${esc(lv)}</u>(izrunā: ${esc(pr)})</span></div>`).join('')}</div></div>${foot}`;
+    case 'list': return `${kick('Norvēģu valoda')}<div class="mid${it.items.length > 5 ? ' dense' : ''}" style="justify-content:flex-start;top:190px"><h1>${esc(it.t)}</h1><div class="rows">${it.items.map(([no, pr, lv]) => `<div class="row"><b>${art(esc(no))}</b><span><u>${esc(lv)}</u>(izrunā: ${esc(pr)})</span></div>`).join('')}</div></div>${foot}`;
     case 'art': {
       const rows = Math.ceil(it.w.length / 2), boxTop = 150, boxH = 1350 - boxTop - (250 + rows * 92);
       let aw = 920, ah = aw * img.h / img.w; if (ah > boxH) { ah = boxH; aw = ah * img.w / img.h; }

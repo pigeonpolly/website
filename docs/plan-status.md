@@ -20,6 +20,7 @@
 
 | Этап | Статус | Что |
 |---|---|---|
+| Norsk LV №11–40 | готово 27.11 | 30 постов, только A1: приветствия, семья, цвета, дни недели, числа, завтрак, кафе, «угадай» (takk for maten, rom, pepperkake, lørdagsgodt, jo, hva heter du), смешные слова (kjøleskap, glad i deg, julenisse, sykehus, vindu, tusen takk), Рождество и Новый год; тексты tools/norsk/posts-2611b.json |
 | Norsk LV №1–10 | готово 27.11 | 10 постов в Notion «🇳🇴 Norsk»: смешные слова (flaggermus, fjernsyn), угадай (matpakke, lussekatt), адвент (lys), зима (5 слов), Рождество на рисунке, «нет плохой погоды», артикль huset, koselig; уровни 50 % A1 / 35 % A2 / 15 % B1 (черновик, Алина не поправила); карточки site/images/norsk-lv/card-001…010.jpg, тексты tools/norsk/posts-2611.json |
 | Скилл «Норвежский на латышском» | готово 27.11 | `norsk-lv-posts`: посты с Pollijs в Notion «🇳🇴 Norsk», анкета с уровнем слов, `tools/norsk_level.py`, пишет Полли от 1-го лица (образец — пост про rumpetroll); картинки — карточки со словами без Полли (tools/norsk/cards.js: word, literal, quiz, list, art, phrase) |
 | Огород и комнаты просторнее, клумбы | готово 24.11 | огород 240×150, комната 240×120, крупнее на экране (телефон — листать вбок); докупить клумбы до 10, 5 форм |

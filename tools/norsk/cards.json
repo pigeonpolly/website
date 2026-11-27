@@ -197,5 +197,591 @@
    ]
   ],
   "lvl": "A1–A2"
+ },
+ {
+  "n": 11,
+  "kind": "word",
+  "no": "Hei hei!",
+  "pr": "hei hei",
+  "lv": "Sveiki! … un arī: Atā!",
+  "ex": "Hei hei! Ha det bra!",
+  "exlv": "Atā! Lai labi klājas!",
+  "lvl": "A1"
+ },
+ {
+  "n": 12,
+  "kind": "quiz",
+  "no": "Takk for maten!",
+  "pr": "takk for māten",
+  "opts": [
+   "paldies par ēdienu",
+   "labu apetīti",
+   "esmu jau paēdis"
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 13,
+  "kind": "list",
+  "t": "Ģimene norvēģiski",
+  "items": [
+   [
+    "ei mor / mamma",
+    "mūr / mamma",
+    "māte, mamma"
+   ],
+   [
+    "en far / pappa",
+    "fār / pappa",
+    "tēvs, tētis"
+   ],
+   [
+    "ei søster",
+    "sēster",
+    "māsa"
+   ],
+   [
+    "en bror",
+    "brūr",
+    "brālis"
+   ],
+   [
+    "et barn",
+    "bārn",
+    "bērns"
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 14,
+  "kind": "literal",
+  "no": "et kjøleskap",
+  "parts": [
+   [
+    "kjøle",
+    "dzesēt"
+   ],
+   [
+    "skap",
+    "skapis"
+   ]
+  ],
+  "lit": "„dzesēšanas skapis”",
+  "real": "ledusskapis",
+  "lvl": "~A1"
+ },
+ {
+  "n": 15,
+  "kind": "art",
+  "pal": 50,
+  "t": "På kafé",
+  "lv": "Kafejnīcā",
+  "w": [
+   [
+    "en kaffemaskin",
+    "kafemašīn",
+    "kafijas automāts",
+    43,
+    42
+   ],
+   [
+    "en lampe",
+    "lampe",
+    "lampa",
+    33,
+    26
+   ],
+   [
+    "en kopp",
+    "kopp",
+    "krūze, tase",
+    52,
+    84
+   ],
+   [
+    "en stol",
+    "stūl",
+    "krēsls",
+    59,
+    67
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 16,
+  "kind": "phrase",
+  "no": "Ha en fin dag!",
+  "pr": "hā en fīn dāg",
+  "lv": "Lai tev jauka diena!",
+  "note": "To saka kasē, pēc sarunas, rakstot īsziņu. Atbildē: „Takk, i like måte!” — Paldies, tev arī!",
+  "lvl": "A1"
+ },
+ {
+  "n": 17,
+  "kind": "literal",
+  "no": "Jeg er glad i deg",
+  "parts": [
+   [
+    "glad",
+    "priecīgs"
+   ],
+   [
+    "i",
+    "iekšā"
+   ],
+   [
+    "deg",
+    "tevi"
+   ]
+  ],
+  "lit": "„Es esmu priecīgs tevī”",
+  "real": "Es tevi mīlu",
+  "lvl": "A1"
+ },
+ {
+  "n": 18,
+  "kind": "quiz",
+  "no": "et rom",
+  "pr": "rum",
+  "opts": [
+   "rums",
+   "istaba",
+   "romāns"
+  ],
+  "lvl": "~A1"
+ },
+ {
+  "n": 19,
+  "kind": "list",
+  "t": "Krāsas norvēģiski",
+  "items": [
+   [
+    "rød",
+    "rē",
+    "sarkans"
+   ],
+   [
+    "blå",
+    "blō",
+    "zils"
+   ],
+   [
+    "gul",
+    "gūl",
+    "dzeltens"
+   ],
+   [
+    "grønn",
+    "grenn",
+    "zaļš"
+   ],
+   [
+    "hvit",
+    "vīt",
+    "balts"
+   ],
+   [
+    "svart",
+    "svart",
+    "melns"
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 20,
+  "kind": "word",
+  "no": "spiser",
+  "pr": "spīser",
+  "lv": "ēdu · ēd · ēdam · ēdat",
+  "ex": "Jeg spiser, du spiser, vi spiser.",
+  "exlv": "Viena forma visiem — bez galotņu mācīšanās!",
+  "lvl": "A1"
+ },
+ {
+  "n": 21,
+  "kind": "list",
+  "t": "Ziemassvētku vārdi",
+  "items": [
+   [
+    "en nisse",
+    "nisse",
+    "rūķis"
+   ],
+   [
+    "ei pepperkake",
+    "pepperkāke",
+    "piparkūka"
+   ],
+   [
+    "en stjerne",
+    "stjēņe",
+    "zvaigzne"
+   ],
+   [
+    "ei julekule",
+    "jūlekūle",
+    "eglītes bumba"
+   ],
+   [
+    "en risgrøt",
+    "rīsgrēt",
+    "rīsu putra"
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 22,
+  "kind": "literal",
+  "no": "en julenisse",
+  "parts": [
+   [
+    "jul",
+    "Ziemassvētki"
+   ],
+   [
+    "nisse",
+    "rūķis"
+   ]
+  ],
+  "lit": "„Ziemassvētku rūķis”",
+  "real": "Ziemassvētku vecītis",
+  "lvl": "~A1"
+ },
+ {
+  "n": 23,
+  "kind": "phrase",
+  "no": "Hvordan har du det?",
+  "pr": "vurdan hār dū de",
+  "lv": "Kā tev klājas?",
+  "note": "Atbilde: „Bra, takk! Og du?” — Labi, paldies! Un tev?",
+  "lvl": "A1"
+ },
+ {
+  "n": 24,
+  "kind": "word",
+  "no": "en kopp",
+  "pr": "kopp",
+  "lv": "krūze, tase",
+  "ex": "En kopp kaffe, takk.",
+  "exlv": "Vienu tasi kafijas, lūdzu.",
+  "lvl": "A1"
+ },
+ {
+  "n": 25,
+  "kind": "quiz",
+  "no": "ei pepperkake",
+  "pr": "pepperkāke",
+  "opts": [
+   "piparkūka",
+   "pipari ar kūku",
+   "piparmētru konfekte"
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 26,
+  "kind": "list",
+  "t": "Dienas ar vikingu stāstu",
+  "items": [
+   [
+    "mandag",
+    "mandag",
+    "pirmdiena"
+   ],
+   [
+    "onsdag",
+    "ūnsdag",
+    "trešdiena"
+   ],
+   [
+    "torsdag",
+    "tōšdag",
+    "ceturtdiena"
+   ],
+   [
+    "fredag",
+    "frēdag",
+    "piektdiena"
+   ],
+   [
+    "lørdag",
+    "lēdag",
+    "sestdiena"
+   ],
+   [
+    "søndag",
+    "sendag",
+    "svētdiena"
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 27,
+  "kind": "quiz",
+  "no": "lørdagsgodt",
+  "pr": "lēdagsgott",
+  "opts": [
+   "sestdienas saldumi",
+   "sestdienas putra",
+   "sestdienas pirts"
+  ],
+  "lvl": "~A1"
+ },
+ {
+  "n": 28,
+  "kind": "art",
+  "pal": 88,
+  "t": "Et glass melk",
+  "lv": "Glāze piena",
+  "w": [
+   [
+    "melk",
+    "melk",
+    "piens",
+    30,
+    46
+   ],
+   [
+    "kjeks",
+    "hjeks",
+    "cepumi",
+    71,
+    68
+   ],
+   [
+    "et glass",
+    "glass",
+    "glāze",
+    15,
+    33
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 29,
+  "kind": "literal",
+  "no": "et sykehus",
+  "parts": [
+   [
+    "syk",
+    "slims"
+   ],
+   [
+    "hus",
+    "māja"
+   ]
+  ],
+  "lit": "„slimo māja”",
+  "real": "slimnīca",
+  "lvl": "~A1"
+ },
+ {
+  "n": 30,
+  "kind": "word",
+  "no": "i morgen",
+  "pr": "i mōrn",
+  "lv": "rīt",
+  "ex": "Vi ses i morgen!",
+  "exlv": "Tiksimies rīt!",
+  "lvl": "A1"
+ },
+ {
+  "n": 31,
+  "kind": "phrase",
+  "no": "Godt nytt år!",
+  "pr": "gott nitt ōr",
+  "lv": "Laimīgu Jauno gadu!",
+  "note": "Pusnaktī — salūts, galdā — kransekake: kūku gredzenu tornis.",
+  "lvl": "A1"
+ },
+ {
+  "n": 32,
+  "kind": "quiz",
+  "no": "Jo!",
+  "pr": "jū",
+  "q": "„Liker du ikke kaffe?” — „Jo!” Ko tas nozīmē?",
+  "opts": [
+   "Jā, man patīk!",
+   "Nē, nepatīk.",
+   "Varbūt."
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 33,
+  "kind": "list",
+  "t": "Norvēģu brokastis",
+  "items": [
+   [
+    "et brød",
+    "brē",
+    "maize"
+   ],
+   [
+    "en ost",
+    "ust",
+    "siers"
+   ],
+   [
+    "et smør",
+    "smēr",
+    "sviests"
+   ],
+   [
+    "et egg",
+    "egg",
+    "ola"
+   ],
+   [
+    "en brunost",
+    "brūnust",
+    "brūnais siers"
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 34,
+  "kind": "literal",
+  "no": "et vindu",
+  "parts": [
+   [
+    "vind",
+    "vējš"
+   ],
+   [
+    "auga",
+    "acs (senāk)"
+   ]
+  ],
+  "lit": "„vēja acs”",
+  "real": "logs",
+  "lvl": "A1"
+ },
+ {
+  "n": 35,
+  "kind": "phrase",
+  "no": "Jeg forstår ikke.",
+  "pr": "jai foštōr ikke",
+  "lv": "Es nesaprotu.",
+  "note": "Un uzreiz glābējs: „Kan du snakke sakte?” — Vai vari runāt lēnām?",
+  "lvl": "A1"
+ },
+ {
+  "n": 36,
+  "kind": "literal",
+  "no": "Tusen takk!",
+  "parts": [
+   [
+    "tusen",
+    "tūkstotis"
+   ],
+   [
+    "takk",
+    "paldies"
+   ]
+  ],
+  "lit": "„Tūkstoš paldies!”",
+  "real": "Liels paldies!",
+  "lvl": "A1"
+ },
+ {
+  "n": 37,
+  "kind": "art",
+  "pal": 12,
+  "t": "Kake i senga",
+  "lv": "Kūka gultā",
+  "w": [
+   [
+    "ei kake",
+    "kāke",
+    "kūka",
+    61,
+    77
+   ],
+   [
+    "et postkort",
+    "postkort",
+    "pastkarte",
+    72,
+    54
+   ],
+   [
+    "en brus",
+    "brūs",
+    "limonāde",
+    9,
+    74
+   ],
+   [
+    "ei seng",
+    "seng",
+    "gulta",
+    43,
+    92
+   ]
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 38,
+  "kind": "word",
+  "no": "hyggelig",
+  "pr": "higgeli",
+  "lv": "patīkami, jauki",
+  "ex": "Hyggelig å hilse på deg!",
+  "exlv": "Prieks iepazīties!",
+  "lvl": "A1"
+ },
+ {
+  "n": 39,
+  "kind": "quiz",
+  "no": "Hva heter du?",
+  "pr": "va hēter dū",
+  "opts": [
+   "Kā tevi sauc?",
+   "Cik tev gadu?",
+   "No kurienes tu esi?"
+  ],
+  "lvl": "A1"
+ },
+ {
+  "n": 40,
+  "kind": "list",
+  "t": "Skaitļi, kas maldina",
+  "items": [
+   [
+    "en",
+    "ēn",
+    "viens"
+   ],
+   [
+    "to",
+    "tū",
+    "divi"
+   ],
+   [
+    "tre",
+    "trē",
+    "trīs"
+   ],
+   [
+    "fire",
+    "fīre",
+    "četri"
+   ],
+   [
+    "fem",
+    "fem",
+    "pieci"
+   ]
+  ],
+  "lvl": "A1"
  }
 ]
