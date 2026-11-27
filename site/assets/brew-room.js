@@ -111,6 +111,7 @@
   // вид за окном: небо по часу, дальний лес и холмы, погода сезона
   function view(c, env, now) {
     const h = env.hour, night = env.night, dusk = env.dusk;
+    c.save(); c.beginPath(); c.rect(WX, WY, WW, WH); c.clip();
     const sky = night ? ['#1B1838', '#2B2652', '#3E3670'] : dusk ? ['#5A4A8A', '#C77A8E', '#F2B27A'] : { winter: ['#9FB6D6', '#C2D2E6', '#E4ECF4'], autumn: ['#8FA9C9', '#B9C7D9', '#E2D9CC'], spring: ['#8CC4EE', '#B6DDF5', '#E3F3FB'], summer: ['#6FB5EE', '#A2D2F6', '#DDF0FC'] }[env.season];
     for (let y = 0; y < WH; y++) R(c, WX, WY + y, WW, 1, sky[Math.min(2, Math.floor(y / WH * 3))]);
     if (night) { const rd = rnd(3); for (let i = 0; i < 18; i++) { const x = WX + rd() * WW | 0, y = WY + rd() * 40 | 0; if ((now / 600 + i) % 7 > .6) P(c, x, y, '#FFF6DA'); } for (let y = -4; y <= 4; y++) for (let x = -4; x <= 4; x++) if (x * x + y * y <= 16 && (x - 2) ** 2 + (y - 1) ** 2 > 9) P(c, WX + 14 + x, WY + 12 + y, '#F4E6A8'); }
@@ -130,6 +131,7 @@
     if (env.season === 'summer' && night) for (let i = 0; i < 6; i++) if ((now / 400 + i * 1.7) % 3 < 1.6) P(c, WX + 6 + (i * 9 + Math.sin(now / 900 + i) * 4 | 0), WY + 44 + (Math.cos(now / 800 + i) * 6 | 0), '#F4F08A');
     // стекло: блик
     c.globalAlpha = .18; for (let k = 0; k < 10; k++) R(c, WX + 4 + k, WY + 6 + k * 2, 2, 2, '#FFFFFF'); c.globalAlpha = 1;
+    c.restore();
   }
 
   // ---------- котёл (живой): огонь, зелье, пузыри, пар ----------
@@ -253,7 +255,7 @@
     ctx.imageSmoothingEnabled = false;
     let st = o.state || {}, env = X.riga(), bgAt = 0, potCv = null, bagCv = bag(), stirUntil = 0, sayT = 0;
     const bird = window.PPBrewBird.actor(o.id, o.avatar, { x: 200, y: 190, dir: -1, noSpoon: true });
-    let cat = o.cat ? window.PPBrewBird.actor(o.cat.id || 10, null, { x: 300, y: 206, dir: -1, speed: 24 }) : null;
+    let cat = o.cat ? window.PPBrewBird.actor(o.cat.id || 10, null, { x: 300, y: 206, dir: -1, speed: 24, hd: true }) : null; // котик меньше птички: рисунок HD-спрайта
     if (cat && o.cat.look) cat.bird.lk && Object.assign(cat.bird.lk, o.cat.look);
     const redraw = () => { env = X.riga(); background(bctx, st, env); cabinet(bctx, st); potCv = cauldron((st.cauldron && st.cauldron.dirt) || 0); bgAt = performance.now(); };
     const api = {

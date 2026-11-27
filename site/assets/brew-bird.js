@@ -185,6 +185,15 @@
       if (eyes === 'open' && now > a.nextBlink) { eyes = 'blink'; if (now > a.nextBlink + 140) a.nextBlink = now + 2200 + Math.random() * 3800; }
       const speed = { walk: 130, flap: 110, stir: 110, happy: 120, idle: 700, sad: 260, think: 700 }[a.pose] || 400;
       const f = Math.floor(now / speed) % (a.pose === 'stir' ? 6 : 4);
+      if (o.hd) { // мелкий рисунок (котик в комнате): кадры HD-спрайта — 0/1 шаг, 2 сидит
+        const k = a.pose === 'walk' ? f % 2 : a.pose === 'idle' && a.eyes === 'closed' ? 2 : 0;
+        a.hdc = a.hdc || []; if (!a.hdc[k]) a.hdc[k] = B().crop(B().spriteHD(b.lk, k));
+        const im = a.hdc[k], jump = a.pose === 'happy' ? -3 : 0;
+        ctx.save(); ctx.fillStyle = 'rgba(42,27,46,.25)'; ctx.fillRect(Math.round(a.x) - 12, Math.round(a.y) - 1, 24, 2);
+        if (a.dir < 0) { ctx.translate(Math.round(a.x) + im.width / 2, Math.round(a.y) - im.height + jump); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); }
+        else ctx.drawImage(im, Math.round(a.x - im.width / 2), Math.round(a.y) - im.height + jump);
+        ctx.restore(); return;
+      }
       const c = b.frame({ noSpoon: !!o.noSpoon, pose: a.pose, f, eyes: a.pose === 'sad' && eyes === 'open' ? 'sad' : eyes, beak: a.pose === 'happy' ? 'open' : 'shut' });
       const ox = 46; // x точки между лапками в кадре
       ctx.save();
@@ -196,7 +205,7 @@
       ctx.restore();
     };
     // попадание по птичке (пиксели сцены)
-    a.hit = (x, y) => Math.abs(x - a.x) < 26 && y < a.y + 4 && y > a.y - 70;
+    a.hit = (x, y) => Math.abs(x - a.x) < (o.hd ? 18 : 26) && y < a.y + 4 && y > a.y - (o.hd ? 40 : 70);
     return a;
   }
 
