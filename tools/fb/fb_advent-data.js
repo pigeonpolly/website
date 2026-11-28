@@ -3,7 +3,7 @@
 module.exports = [
   { h: 'The advent is open!', s: 'Grand opening · 1 December', chips: ['31 windows', 'a file to keep every day', '62 winter things for your bird', '5 golden windows', 'free'], foot: 'Come and open window <em>1</em> with me', t: `The advent is open! Today, on the 1st of December, my little winter street lights up for the first time.
 
-I've been building it for weeks, and I'm so excited to finally show it to you. It's a whole street of 31 windows: a red house with a stepped roof, a cream one, a tall green one, a yellow one, a blue one, and a church in the middle with a golden bird on top. Snow on the sills, smoke from the chimneys, a garland of lights above the roofs.
+I'm so excited to finally show it to you. It's a whole street of 31 windows: a red house with a stepped roof, a cream one, a tall green one, a yellow one, a blue one, and a church in the middle with a golden bird on top. Snow on the sills, smoke from the chimneys, a garland of lights above the roofs.
 
 Here's how it works. Every day one window lights up. You tap it, the shutters swing open, and a little pigeon flies out with what was inside:
 🎁 a file to keep: wallpapers, calendars, palettes, pages to print
