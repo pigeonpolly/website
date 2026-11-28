@@ -48,5 +48,17 @@
 {"key":"details-pumpkin-bus-stop","art":"photos2/pumpkin_stop.jpg","crop":[0,0,1,1],"t":["Pumpkin bus stop","Тыквенная остановка","Ķirbju pietura"],"s":"Осень"},
 {"key":"details-beetle-shell","art":"photos2/beetle.jpg","crop":[0.15,0.3,0.7,0.6],"t":["Beetle shell","Панцирь жука","Vaboles bruņas"],"s":"Лето"},
 {"key":"details-green-apple-head","art":"photos2/apple_creature.jpg","crop":[0.2,0,0.6,0.7],"t":["Green apple head","Голова-яблоко","Zaļā ābola galva"],"s":"Осень"},
-{"key":"details-desert-sunset","art":"photos2/bee_rider.jpg","crop":[0,0,1,0.4],"t":["Desert sunset","Закат в пустыне","Saulriets tuksnesī"],"s":"Лето"}
+{"key":"details-desert-sunset","art":"photos2/bee_rider.jpg","crop":[0,0,1,0.4],"t":["Desert sunset","Закат в пустыне","Saulriets tuksnesī"],"s":"Лето"},
+{"key":"details-cauldron-glow","art":"snail/2024-mr-chew-dnd-edition.jpg","crop":[0.05,0.15,0.45,0.75],"t":["Cauldron glow","Сияние котла","Katla mirdzums"],"s":"Осень"},
+{"key":"details-persimmon-pages","art":"sketchbook/sketchbook-17.jpg","crop":[0.15,0.05,0.7,0.8],"t":["Persimmon pages","Хурма в скетчбуке","Hurma skiču burtnīcā"],"s":"Зима"},
+{"key":"details-cherry-cupcake","art":"photos2/cupcake.jpg","crop":[0.1,0.1,0.8,0.8],"t":["Cherry cupcake","Кекс с вишней","Kēkss ar ķirsi"],"s":"Круглый год"},
+{"key":"details-cereal-splash","art":"photos2/cereal.jpg","crop":[0.05,0.2,0.9,0.6],"t":["Cereal splash","Хлопья с молоком","Pārslas ar pienu"],"s":"Круглый год"},
+{"key":"details-pink-impasto","art":"photos2/impasto_flowers.jpg","crop":[0.1,0.15,0.8,0.7],"t":["Pink impasto bouquet","Розовый букет пастозно","Rozā pastozais pušķis"],"s":"Весна"},
+{"key":"details-toadstool-cottage","art":"photos2/mushroom_house.jpg","crop":[0.05,0.05,0.9,0.7],"t":["Toadstool cottage","Домик-мухомор","Mušmires mājiņa"],"s":"Осень"},
+{"key":"details-jam-toast","art":"photos2/pbj.jpg","crop":[0.0,0.1,1,0.85],"t":["Jam on toast","Тост с джемом","Grauzdiņš ar ievārījumu"],"s":"Круглый год"},
+{"key":"details-rusty-moka","art":"photos2/moka_rust.jpg","crop":[0.15,0.05,0.7,0.9],"t":["Rusty moka pot","Ржавая гейзерная кофеварка","Rūsējis mokas kafijas kanniņa"],"s":"Осень"},
+{"key":"details-bookshop-window","art":"photos2/bookshop.jpg","crop":[0.25,0.32,0.6,0.43],"t":["Bookshop window","Витрина книжного","Grāmatnīcas skatlogs"],"s":"Зима"},
+{"key":"details-frosty-birches","art":"photos2/winter_field.jpg","crop":[0.5,0,0.5,1],"t":["Frosty trees","Деревья в инее","Apsarmojuši koki"],"s":"Зима"},
+{"key":"details-pumpkin-portrait","art":"halloween/halloween-in-blue.jpg","crop":[0.1,0.2,0.8,0.65],"t":["Pumpkin portrait","Портрет тыквы","Ķirbja portrets"],"s":"Осень"},
+{"key":"details-milk-and-cookies","art":"photos2/cookies.jpg","crop":[0,0,1,1],"t":["Milk & cookies","Молоко и печенье","Piens un cepumi"],"s":"Зима"}
 ]
