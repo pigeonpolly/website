@@ -106,6 +106,7 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .hd2 .hr .help-q:hover{background:var(--sheet);border-color:var(--ink)}
 .v2s .hr .hd-cart{color:var(--ink)}
 @media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}.v2s .hd2 .hr .help-q{width:32px;height:32px;font-size:18px}}
+@media (max-width:520px){.v2s .hd2 .hr .help-q{display:none}}
 /* Часть Д: внутри старых страниц — вместо фиолетового графит сезона и его акцент (tools/v2_recolor.py заменил цвета style.css на --pp-*) */
 :root{--pp-accd:#22405F;--pp-ink:#2E2521;--pp-deep:#1F1916;--pp-card:#3A302B;--pp-2:#5C4D44;--pp-acc:#93AFCC}
 html[data-season=winter]{--pp-accd:#9E1B22;--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
