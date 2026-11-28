@@ -114,51 +114,53 @@
     return g.canvas();
   }
 
-  function catFrame(lk, st) {
-    const g = X.grid(W, H), R = X.ramp(lk.fur), Wt = X.ramp('#FBF6EC'), jump = st.pose === 'happy' ? [0, -3, -6, -3][st.f % 4] : 0;
-    const cx = 44, cy = FOOT - 16 + jump + (st.pose === 'idle' ? st.f % 2 : 0);
-    const stripe = (x, y) => lk.pattern === 'stripes' && (x + Math.round(y / 2)) % 6 < 2;
+  function catFrame(lk, st, K = 1) { // K — масштаб (котик-питомец в комнате ≈ .66: тот же рисунок, мельче)
+    const q = v => v * K, g = X.grid(W, H), R = X.ramp(lk.fur), Wt = X.ramp('#FBF6EC'), jump = st.pose === 'happy' ? [0, -3, -6, -3][st.f % 4] * K : 0;
+    const cx = 44, cy = FOOT - q(16) + jump + (st.pose === 'idle' ? st.f % 2 : 0);
+    const stripe = (x, y) => lk.pattern === 'stripes' && (x + Math.round(y / 2)) % Math.max(4, Math.round(6 * K)) < 2;
     // хвост — колышется
-    const sw = Math.sin((st.f || 0) / 3) * 3;
-    for (let i = 0; i < 26; i++) { const tx = cx - 19 - Math.sin(i / 7) * 7 + (i > 14 ? sw * (i - 14) / 10 : 0), ty = cy + 10 - i * 1.1, r = i > 22 ? 1.4 : 2.4; for (let k = -2; k <= 2; k++) if (Math.abs(k) <= r) g.put(tx + k, ty, stripe(Math.round(tx), Math.round(ty * 1.4)) ? R.sh : k < 0 ? R.li : k > 0 ? R.sh : R.base); }
-    g.blob(cx, cy, 20, 15, (t, u, v, x, y) => stripe(x, y) ? R.sh : g.tone(R, t, x, y));
-    if (lk.pattern === 'patches') g.blob(cx + 6, cy + 5, 10, 8, (t, u, v, x, y) => g.tone(Wt, t + .2, x, y));
+    const sw = Math.sin((st.f || 0) / 3) * 3 * K, tn = Math.round(26 * K);
+    for (let i = 0; i < tn; i++) { const tx = cx - q(19) - Math.sin(i / (7 * K)) * q(7) + (i > tn * .55 ? sw * (i - tn * .55) / (10 * K) : 0), ty = cy + q(10) - i * 1.1, r = i > tn * .85 ? 1 : K < .8 ? 1.6 : 2.4; for (let k = -2; k <= 2; k++) if (Math.abs(k) <= r) g.put(tx + k, ty, stripe(Math.round(tx), Math.round(ty * 1.4)) ? R.sh : k < 0 ? R.li : k > 0 ? R.sh : R.base); }
+    g.blob(cx, cy, q(20), q(15), (t, u, v, x, y) => stripe(x, y) ? R.sh : g.tone(R, Math.min(1, t + (K > .8 ? 0 : .12)), x, y));
+    if (lk.pattern === 'patches') g.blob(cx + q(6), cy + q(5), q(10), q(8), (t, u, v, x, y) => g.tone(Wt, t + .2, x, y));
     // лапки (передняя машет / мешает)
     const wave = st.pose === 'flap', stir = st.pose === 'stir';
-    for (const [px, k] of [[cx - 12, 0], [cx - 4, 0], [cx + 8, 1], [cx + 15, 1]]) {
-      const lift = (wave && k && px > cx + 10) ? -14 + (st.f % 2) * 3 : 0;
-      g.blob(px, FOOT - 3 + jump + lift, 3.6, 3.4, (t, u, v, x, y) => g.tone(R, t + .1, x, y));
+    for (const [dx, k] of [[-12, 0], [-4, 0], [8, 1], [15, 1]]) {
+      const lift = (wave && k && dx > 10) ? (-14 + (st.f % 2) * 3) * K : 0;
+      g.blob(cx + q(dx), FOOT - q(3) + jump + lift, Math.max(2.4, q(3.6)), Math.max(2.2, q(3.4)), (t, u, v, x, y) => g.tone(R, t + .1, x, y));
     }
-    if (stir && !st.noSpoon) spoon(g, cx + 18, cy - 4, .9 + Math.sin(st.f / 6 * Math.PI * 2) * .25, 24);
-    const hx = cx + 12, hy = cy - 22 + (st.pose === 'sad' ? 2 : 0);
+    if (stir && !st.noSpoon) spoon(g, cx + q(18), cy - q(4), .9 + Math.sin(st.f / 6 * Math.PI * 2) * .25, Math.round(24 * K));
+    const hx = cx + q(12), hy = cy - q(22) + (st.pose === 'sad' ? 2 : 0), eh = Math.round(9 * K);
     for (const s of [-1, 1]) { // уши
-      for (let j = 0; j < 9; j++) for (let i = -4 + Math.ceil(j / 2); i <= 4 - Math.ceil(j / 2); i++) g.put(hx + s * 9 + i, hy - 9 - j, Math.abs(i) < 2 && j < 6 ? '#F4A6C6' : R.base);
+      for (let j = 0; j < eh; j++) { const w = Math.round(4 * K) - Math.ceil(j / 2); for (let i = -w; i <= w; i++) g.put(hx + s * q(9) + i, hy - q(9) - j, Math.abs(i) < 2 && j < eh * .66 && w > 1 ? '#F4A6C6' : R.base); }
     }
-    g.blob(hx, hy, 15, 13, (t, u, v, x, y) => stripe(x, y) && v < -.3 ? R.sh : g.tone(R, t, x, y));
-    if (lk.pattern !== 'solid') g.blob(hx + 1, hy + 6, 8, 5, (t, u, v, x, y) => g.tone(lk.pattern === 'patches' ? Wt : X.ramp(X.mix(lk.fur, '#FFF4E4', .45)), t + .2, x, y));
-    const eyes = st.eyes || 'open', ey = hy - 1;
-    for (const [ex, k] of [[hx - 6, 0], [hx + 6, 1]]) {
+    g.blob(hx, hy, q(15), q(13), (t, u, v, x, y) => K > .8 && stripe(x, y) && v < -.3 ? R.sh : g.tone(R, Math.min(1, t + (K > .8 ? 0 : .18)), x, y));
+    if (lk.pattern !== 'solid') g.blob(hx + 1, hy + q(6), q(8), q(5), (t, u, v, x, y) => g.tone(lk.pattern === 'patches' ? Wt : X.ramp(X.mix(lk.fur, '#FFF4E4', .45)), t + .2, x, y));
+    const eyes = st.eyes || 'open', ey = Math.round(hy - 1), big = K > .8, ed = Math.round(6 * K) + (big ? 0 : 1);
+    for (const [ex, k] of [[Math.round(hx - ed), 0], [Math.round(hx + ed), 1]]) {
       const kind = eyes === 'wink' ? (k ? 'happy' : 'open') : eyes;
-      if (kind === 'open' || kind === 'sad') { eye(g, ex, ey, kind, true); g.put(ex, ey + 2, '#5BA84E', 'face'); g.put(ex - 1, ey + 2, '#5BA84E', 'face'); }
+      if (kind === 'open' || kind === 'sad') { eye(g, ex, ey, kind, big); g.put(ex, ey + 2, '#5BA84E', 'face'); g.put(ex - 1, ey + 2, '#5BA84E', 'face'); }
       else eye(g, ex, ey, kind);
     }
-    blush(g, hx - 10, ey + 6, .5); blush(g, hx + 10, ey + 6, .5);
-    g.put(hx, ey + 4, '#F08BC0', 'face'); g.put(hx + 1, ey + 4, '#F08BC0', 'face');
-    for (const [i, j] of [[-1, 6], [0, 7], [1, 7], [2, 6]]) g.put(hx + i, ey + j, PUPIL, 'face');
-    for (const s of [-1, 1]) for (let i = 0; i < 6; i++) { g.put(hx + s * (12 + i), ey + 4 + (i >> 1) - 1, '#FFFFFF', 'nol'); g.put(hx + s * (12 + i), ey + 7 + (i >> 2), '#FFFFFF', 'nol'); }
-    if (lk.scarf) { const c = X.ramp(lk.scarf); for (let x = hx - 11; x <= hx + 9; x++) for (let k = 0; k < 4; k++) g.put(x, hy + 11 + k, k === 0 ? c.li : Math.floor(x / 3) % 2 ? c.base : c.sh, 'acc'); }
-    if (lk.hat) paste(g, put => B().HDX.hat(put, lk.hat, 0, 0), hx, hy - 10);
+    const nx = Math.round(hx), ny = ey + Math.round(4 * K);
+    blush(g, nx - Math.round(10 * K), ny + 2, .5); blush(g, nx + Math.round(10 * K), ny + 2, .5);
+    g.put(nx, ny, '#F08BC0', 'face'); g.put(nx + 1, ny, '#F08BC0', 'face');
+    for (const [i, j] of [[-1, 2], [0, 3], [1, 3], [2, 2]]) g.put(nx + i, ny + j, PUPIL, 'face');
+    const wl = Math.round(6 * K);
+    for (const s of [-1, 1]) for (let i = 0; i < wl; i++) { g.put(nx + s * (Math.round(12 * K) + i), ny + (i >> 1) - 1, '#FFFFFF', 'nol'); g.put(nx + s * (Math.round(12 * K) + i), ny + 3 + (i >> 2), '#FFFFFF', 'nol'); }
+    if (lk.scarf) { const c = X.ramp(lk.scarf); for (let x = Math.round(hx - q(11)); x <= hx + q(9); x++) for (let k = 0; k < Math.max(3, Math.round(4 * K)); k++) g.put(x, hy + q(11) + k, k === 0 ? c.li : Math.floor(x / 3) % 2 ? c.base : c.sh, 'acc'); }
+    if (lk.hat && K > .8) paste(g, put => B().HDX.hat(put, lk.hat, 0, 0), hx, hy - 10);
     const it = lk.item && B().HDX.items[lk.item];
     if (it) paste(g, put => B().HDX.stamp(put, it.r, 0, it.dy, it.p), hx + 10, ey + 4);
     g.outline(X.INK, X.mix(X.INK, lk.fur, .45));
     return g.canvas();
   }
 
-  function create(id, avatar) {
+  function create(id, avatar, opt = {}) {
     const lk = B().dress(B().looks(id || 1), avatar || null), cache = new Map();
     const frame = st => {
       const key = [st.pose, st.f, st.eyes, st.beak, st.noSpoon ? 1 : 0].join('|');
-      if (!cache.has(key)) { if (cache.size > 160) cache.clear(); cache.set(key, (lk.kind === 'cat' ? catFrame : birdFrame)(lk, st)); }
+      if (!cache.has(key)) { if (cache.size > 160) cache.clear(); cache.set(key, (lk.kind === 'cat' ? catFrame(lk, st, opt.small ? .66 : 1) : birdFrame(lk, st))); }
       return cache.get(key);
     };
     return { lk, frame, W, H, FOOT };
@@ -166,7 +168,7 @@
 
   // живая птичка на сцене: x, y — точка между лапками в пикселях сцены; dir 1 — вправо, −1 — влево
   function actor(id, avatar, o = {}) {
-    const b = create(id, avatar);
+    const b = create(id, avatar, { small: o.small });
     const a = { x: o.x || 0, y: o.y || 0, dir: o.dir || 1, pose: 'idle', eyes: 'open', until: 0, eyesUntil: 0, nextBlink: 0, target: null, onArrive: null, speed: o.speed || 38, last: 0, bird: b };
     a.act = (pose, ms, eyes) => { a.pose = pose; a.until = performance.now() + (ms || 1500); if (eyes) a.mood(eyes, ms); };
     a.mood = (eyes, ms) => { a.eyes = eyes; a.eyesUntil = performance.now() + (ms || 1200); };
@@ -185,15 +187,6 @@
       if (eyes === 'open' && now > a.nextBlink) { eyes = 'blink'; if (now > a.nextBlink + 140) a.nextBlink = now + 2200 + Math.random() * 3800; }
       const speed = { walk: 130, flap: 110, stir: 110, happy: 120, idle: 700, sad: 260, think: 700 }[a.pose] || 400;
       const f = Math.floor(now / speed) % (a.pose === 'stir' ? 6 : 4);
-      if (o.hd) { // мелкий рисунок (котик в комнате): кадры HD-спрайта — 0/1 шаг, 2 сидит
-        const k = a.pose === 'walk' ? f % 2 : a.pose === 'idle' && a.eyes === 'closed' ? 2 : 0;
-        a.hdc = a.hdc || []; if (!a.hdc[k]) a.hdc[k] = B().crop(B().spriteHD(b.lk, k));
-        const im = a.hdc[k], jump = a.pose === 'happy' ? -3 : 0;
-        ctx.save(); ctx.fillStyle = 'rgba(42,27,46,.25)'; ctx.fillRect(Math.round(a.x) - 12, Math.round(a.y) - 1, 24, 2);
-        if (a.dir < 0) { ctx.translate(Math.round(a.x) + im.width / 2, Math.round(a.y) - im.height + jump); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); }
-        else ctx.drawImage(im, Math.round(a.x - im.width / 2), Math.round(a.y) - im.height + jump);
-        ctx.restore(); return;
-      }
       const c = b.frame({ noSpoon: !!o.noSpoon, pose: a.pose, f, eyes: a.pose === 'sad' && eyes === 'open' ? 'sad' : eyes, beak: a.pose === 'happy' ? 'open' : 'shut' });
       const ox = 46; // x точки между лапками в кадре
       ctx.save();
@@ -205,7 +198,7 @@
       ctx.restore();
     };
     // попадание по птичке (пиксели сцены)
-    a.hit = (x, y) => Math.abs(x - a.x) < (o.hd ? 18 : 26) && y < a.y + 4 && y > a.y - (o.hd ? 40 : 70);
+    a.hit = (x, y) => Math.abs(x - a.x) < (o.small ? 18 : 26) && y < a.y + 4 && y > a.y - (o.small ? 44 : 70);
     return a;
   }
 

@@ -255,7 +255,7 @@
     ctx.imageSmoothingEnabled = false;
     let st = o.state || {}, env = X.riga(), bgAt = 0, potCv = null, bagCv = bag(), stirUntil = 0, sayT = 0;
     const bird = window.PPBrewBird.actor(o.id, o.avatar, { x: 200, y: 190, dir: -1, noSpoon: true });
-    let cat = o.cat ? window.PPBrewBird.actor(o.cat.id || 10, null, { x: 300, y: 206, dir: -1, speed: 24, hd: true }) : null; // котик меньше птички: рисунок HD-спрайта
+    let cat = o.cat ? window.PPBrewBird.actor(o.cat.id || 10, null, { x: 300, y: 206, dir: -1, speed: 24, small: true }) : null; // котик-питомец: новый рисунок, мельче птички
     if (cat && o.cat.look) cat.bird.lk && Object.assign(cat.bird.lk, o.cat.look);
     const redraw = () => { env = X.riga(); background(bctx, st, env); cabinet(bctx, st); potCv = cauldron((st.cauldron && st.cauldron.dirt) || 0); bgAt = performance.now(); };
     const api = {
