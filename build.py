@@ -161,6 +161,7 @@ SOCIAL = [
     ("https://www.tiktok.com/@pigeonpolly", "TikTok"),
     ("https://www.patreon.com/cw/pigeon_polly", "Patreon"),
     ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
+    ("https://www.facebook.com/profile.php?id=61596806348947", "Facebook"),
 ]
 # Меню (этап 14 Б): 5 пунктов — Стая · Играть · Рисовать · Блог · Обо мне. Пункт ведёт на хаб раздела,
 # подпункт — (путь, название, значок, описание); путь с «#» — якорь на странице. Переводы — content/i18n (ключи с классами ns-t / ns-d / nm-t).
