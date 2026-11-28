@@ -25,5 +25,5 @@ description: Большой набор пинов Pinterest по заходящ�
 3. Заготовки: `SET=<SET> python3 tools/pins/pins16_prep.py diff` (tools/pins/p16/), адвент — `node tools/pins/pins17_shots.js` при `python3 -m http.server 8799 --directory site`.
 4. `node tools/pins/pins17.js [номер…]` → site/images/pins/pin-NNN.jpg + tools/pins/pins17.json (движок пишет ⚠, если текст наезжает на подвал).
 5. Лист 10 в ряд по 200 px — посмотреть всё; `python3 build.py`, /palettes/#новый-ключ на 390 и 1440 (3 языка).
-6. Notion «Pinterest pins 3.0» (`collection://5d16a77b-7199-4a1c-a3b2-07d17f217de3`): №, Заголовок, Ссылка, Шаблон (Темы/Палитра/Процесс/Арт/Адвент), Язык EN, Актуальность; внутри — картинка, Description, Alt, Topics. Пачками по 32.
+6. Notion — **только** «🐸 ENG Media Contet for Social Media» (`collection://69634395-245b-8362-aa6e-07febe1124f0`), по правилам скилла social-content-factory §5–6 (свои номера с 1, № на картинке, Pin-поля, Facebook Post Text). «Pinterest pins 3.0» Алина удалила (лежит в корзине) — туда ничего не писать (28.11 я загрузила туда 77 пинов по ошибке). Перед загрузкой — `notion-fetch` базы: нет пометки `deleted`.
 7. Строка в docs/palettes.md и plan-status, коммит, пуш.
