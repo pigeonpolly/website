@@ -1,6 +1,6 @@
 // Пины №1773–1810 (Алина 28.11.2026, по трендам Pinterest): каждая группа — своё оформление, арт целиком.
 // 1773–1782 земляные цвета 2026 («пробники краски»), 1783–1792 новогодний ар-деко (Neo Deco), 1793–1797 цирк (списки тем),
-// 1798–1807 строчка и арт («poet aesthetic», свои строчки Pigeon Polly), 1808–1810 эксперимент: новогодний образ из цветов арта.
+// 1798–1807 строчка и арт («poet aesthetic», свои строчки Pigeon Polly).
 // Палитры — те же, что на /palettes/ (content/palettes.json), ссылка на свою палитру. Движок — tools/pins/pins18b.js.
 const SITE = 'https://www.pigeonpolly.com';
 const U = (p, n, c = 'top28') => { const [a, h] = p.split('#'); return `${SITE}${a}?utm_source=pinterest&utm_campaign=${c}&utm_content=pin-${n}${h ? '#' + h : ''}`; };
@@ -80,18 +80,4 @@ PO.forEach(([art, line, season], i) => {
     link: U(i % 2 ? '/learn/' : '/prompts/', n), topics: 'Art quotes, Cozy aesthetic, Poetry aesthetic, Artist quotes, Sketchbook inspiration' });
 });
 
-// ——— 5) эксперимент: новогодний образ из цветов арта (вещи — простые плоские силуэты, раскрашенные цветами палитры) ———
-const LK = [
-  ['2023-pigeon-polly-celebrates-new-year', { dress: 4, coat: 3, shoes: 0, bag: 1, earr: 0, scarf: 2 }, 'slip dress, velvet coat, gold heels'],
-  ['2022-pigeon-polly-celebrates-new-year-first-time-in-the-bed', { dress: 1, coat: 3, shoes: 0, bag: 2, earr: 0, scarf: 5 }, 'plum dress, cocoa coat, copper heels'],
-  ['2026-pigeon-polly-sam-milka-cat-and-horse-of-the-year-celebrates-new-year', { dress: 2, coat: 5, shoes: 1, bag: 0, earr: 1, scarf: 3 }, 'fir-green dress, midnight coat, champagne bag'],
-];
-for (const [k, map, what] of LK) {
-  const p = PALS[k], t = p.title.en;
-  push({ tpl: 'look', img: p.img, cols: p.colors, map, t, season: 'Зима',
-    title: `New Year’s Eve Outfit from a Painting: “${t}” Color Palette`,
-    desc: `What if your New Year’s Eve outfit wore the colors of a painting? ${what} — all from my illustration “${t}”: ${p.colors.map(c => `${c.en} ${c.hex}`).join(', ')}. The palette with HEX codes is on pigeonpolly.com.`,
-    alt: `A flat-lay of a New Year’s Eve outfit — dress, coat, shoes, bag, earrings and scarf — colored with the palette of the painting “${t}” by Pigeon Polly.`,
-    link: U(`/palettes/#${k}`, n), topics: 'New Years Eve outfit, Outfit color palette, Color inspiration, Party outfit ideas, Art inspired fashion' });
-}
 module.exports = out;
