@@ -46,7 +46,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **sessions** (worker/index.js): `token` text PK, `user_id` int nn, `expires` int nn; + `pin_ok` int =0
 - **posts** (worker/index.js): `id` text PK, `user_id` int nn, `day` text nn, `theme` text, `bw` int =0, `created_at` int, `hidden` int =0; + `tod` int, `picked` int =0, `bytes` int, `store` text, `ai` int =0, `kv` int =1; UNIQUE(user_id, day)
 - **meta** (worker/index.js): `key` text PK, `value` text
-- **subscribers** (worker/index.js): `id` int PK auto, `email` text nn, `topic` text nn ='books', `lang` text, `consent` text, `created_at` int; UNIQUE(email, topic)
+- **subscribers** (worker/index.js): `id` int PK auto, `email` text nn, `topic` text nn ='books', `lang` text, `consent` text, `created_at` int; UNIQUE(email, topic); `kit_at` int =0 (когда ушёл в Kit), `kit_err` text (почему не ушёл; topic 'news' — «Приятная почта от Полли», worker/kit.js)
 - **gifts** (worker/index.js): `id` int PK auto, `user_id` int nn, `kind` text nn, `item` text nn, `note` text, `status` text ='new', `created_at` int, `opened_at` int
 - **site_blocks** (worker/index.js): `id` text nn, `lang` text nn, `html` text, `hidden` int =0, `page` text, `updated_at` int; PRIMARY KEY (id, lang)
 - **button_log** (worker/index.js): `id` int PK auto, `user_id` int nn, `kind` text nn, `ref` text nn, `amount` int nn, `day` text, `created_at` int; + `seen` int =1; UNIQUE (user_id, kind, ref)

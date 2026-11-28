@@ -47,7 +47,7 @@
     { id: 'strict', hide: 1, ic: '🛡', name: 'Строгий режим', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'broadcast', ic: '📢', name: 'Рассылка', group: 'birds', about: 'Одной кнопкой: сообщение с файлом, подарок или пуговки — всем, новым или старым птичкам. На почту — только тем, кто согласился.' },
     { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
-    { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
+    { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: '«Приятная почта от Полли» (почтовый ящик в шапке → Kit) и адреса тех, кто ждёт новость о книге.', count: 'subs' },
     { id: 'shop', ic: '🛍', name: 'Птичий рынок', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря. В окно можно положить вещи из магазина или загрузить свой файл — с компьютера, без ссылок.', count: 'advent' },
@@ -849,10 +849,6 @@
       ${box('🥚 Уровни (рекордная серия) — пуговки один раз за уровень', lvRows)}
       ${box('🏅 Бейджи — награда и условия', bRows, 'Числа в условиях можно менять прямо в тексте. Описание «как получить» у птичек подстраивается само.')}
       ${box('🛍 Птичий рынок', shopRows)}
-      ${box('🔮 Птичье таро в шапке', [
-        row('Новая карта — раз в … часов', num('tarotHour', R.tarotHour, D.tarotHour) + ' ч', D.tarotHour + ' ч', 'колода в шапке; счёт по браузеру'),
-        row('Сбросить лимит (открыть ещё одну карту сейчас)', num('tarotReset', R.tarotReset, D.tarotReset) + ' 🔘', D.tarotReset + ' 🔘', '0 — сброс бесплатный; платят только вошедшие птички'),
-      ], '10 нажатий «Открыть карту», пока лимит идёт, — карточка-шутка «дырка».')}
       <section class="adm-box adm-rules adm-unit"><h3>💡 Как устроена экономика</h3><p>Пуговки за действия и игры — <b>постоянные</b> (награды игр — в % от опорной цены ${G.avg} 🔘, она не меняется). А <b>цены на рынке подстраиваются сами</b>: раз в сутки сайт смотрит, сколько зарабатывает обычная активная птичка, и ставит уровень цен так, чтобы средняя вещь стоила примерно столько, сколько она зарабатывает за ${R.priceDays} дн. Если птички много накопили — чуть дороже. За день цены меняются не больше чем на 10 %. Вы меняете только % категорий и цены легендарных (раздел «🛍 Птичий рынок»).</p></section>
       ${box('🔘 Игра «Пуговичный дождь»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="gameOn"${R.gameOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за уровень ' + pct('gameLevelPct') + ` → сейчас ${G.level} 🔘`, D.gameLevelPct + ' %', `уровни 1–10 — столько, 11–20 — вдвое (${G.level * 2}), 21–30 — втрое (${G.level * 3}) и т. д.; каждый номер уровня платит раз в сутки`),
@@ -1018,8 +1014,6 @@
         <li>Любую вещь из сумки, кроме легендарных, можно подарить другой птичке (если у неё ещё нет максимума). Админ может дарить что угодно.</li>
         <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение рынка выключено.'}</li>
         <li>${R.sellOn ? `Любую вещь можно продать обратно на рынок за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно на рынок выключена.'}</li></ul>
-      <h4>Птичье таро в шапке</h4><ul>
-        <li>Новая карта — раз в ${R.tarotHour} ч; 10 нажатий «Открыть карту», пока лимит идёт, — карточка-шутка «дырка». Сброс лимита — ${R.tarotReset > 0 ? pc(R.tarotReset) : 'бесплатно'}.</li></ul>
       <h4>Игра «Пуговичный дождь»</h4><ul>
         <li>Птичка ловит пуговки и уворачивается от клякс; 3 сердечка, клякса или 5 упущенных пуговок — минус сердечко; каждые 5 уровней — +1 сердечко. Уровни бесконечные, каждый быстрее.</li>
         <li>Сложность растёт ступенями: каждые 10 уровней заметно быстрее и больше клякс (с 11-го — ветер, с 21-го — зигзаг).</li>
@@ -1519,8 +1513,16 @@
   async function subscribers() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/subscribers'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const list = d.subscribers, LN = { en: 'EN', ru: 'RU', lv: 'LV' };
-    main.innerHTML = `<section class="adm-box"><h2>📬 Ждут новость о книге: ${list.length}</h2>
+    const LN = { en: 'EN', ru: 'RU', lv: 'LV' }, news = d.subscribers.filter(s => s.topic === 'news'), list = d.subscribers.filter(s => s.topic !== 'news');
+    const bad = news.filter(s => !s.kit_at).length;
+    const kitBox = `<section class="adm-box"><h2>📮 Приятная почта от Полли: ${news.length}</h2>
+      <p class="be-note">Адреса из почтового ящика в шапке сайта. Каждый сохраняется здесь и сразу уходит в <b>Kit</b> — письма раз в неделю пишете там (kit.com → Broadcasts). Отписка — тоже в Kit.</p>
+      <p><label>Форма Kit: <input class="sub-kit" size="28" placeholder="вставьте код встраивания формы или её номер" value="${esc(d.kitForm)}"></label> <button type="button" class="pill-btn pill-fill" data-kitsave>Сохранить</button>
+      ${d.kitKey ? ' · <span class="be-note">ключ KIT_KEY есть — работает через API</span>' : ''}</p>
+      <p class="be-note">${d.kitForm ? `Номер формы: <b>${esc(d.kitForm)}</b>.` : '⚠️ Форма Kit не указана — адреса пока копятся только здесь.'} ${bad ? `Не дошли до Kit: <b>${bad}</b> <button type="button" class="pill-btn" data-kitretry>Отправить в Kit ещё раз</button>` : (news.length ? 'Все адреса в Kit ✓' : '')}</p>
+      ${news.length ? `<table class="be-table adm-table"><thead><tr><th>Email</th><th>Язык</th><th>Когда</th><th>Kit</th><th></th></tr></thead><tbody>
+      ${news.map(s => `<tr data-id="${s.id}"><td>${esc(s.email)}</td><td>${LN[s.lang] || ''}</td><td>${fmt(s.created_at)}</td><td>${s.kit_at ? '✓' : `<span title="${esc(s.kit_err)}">✕ ${esc(s.kit_err === 'no_form' ? 'нет формы' : s.kit_err)}</span>`}</td><td><button type="button" class="bc-link be-danger" data-delsub title="Удалить адрес здесь (в Kit удалите отдельно)">Удалить</button></td></tr>`).join('')}</tbody></table>` : ''}</section>`;
+    main.innerHTML = kitBox + `<section class="adm-box"><h2>📬 Ждут новость о книге: ${list.length}</h2>
       <p class="be-note">Люди оставили адрес под книгой и согласились получить письмо, когда она выйдет. Когда будете рассылать — вставляйте адреса в поле <b>«Скрытая копия» (BCC)</b>, чтобы получатели не видели адреса друг друга, и допишите в конце: «Если больше не хотите писем — ответьте на это письмо, и я удалю ваш адрес» (или дайте ссылку на сайт: под книгой есть «Отписаться»).</p>
       ${list.length ? `<div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-copyall>📋 Скопировать все адреса</button><button type="button" class="pill-btn" data-csv>⬇ Скачать таблицу (CSV)</button></div>
       <table class="be-table adm-table"><thead><tr><th>Email</th><th>Язык</th><th>Когда</th><th></th></tr></thead><tbody>
@@ -1534,6 +1536,10 @@
       const text = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv' })); a.download = 'pigeonpolly-podpischiki.csv'; a.click();
     });
+    const ks = main.querySelector('[data-kitsave]');
+    ks.onclick = async () => { try { await api('admin/subscribers', { kitForm: main.querySelector('.sub-kit').value }); subscribers(); } catch (e) { alert(err(e)); } };
+    const kr = main.querySelector('[data-kitretry]');
+    kr && (kr.onclick = async () => { kr.disabled = true; try { const r = await api('admin/subscribers', { retry: 1 }); alert('Дошло до Kit: ' + r.retried); subscribers(); } catch (e) { alert(err(e)); kr.disabled = false; } });
     main.querySelectorAll('[data-delsub]').forEach(b => b.onclick = async () => {
       if (!confirm('Удалить этот адрес из списка?')) return;
       try { await api('admin/subscribers', { id: Number(b.closest('tr').dataset.id) }); subscribers(); } catch (e) { alert(err(e)); }

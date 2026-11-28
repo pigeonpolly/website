@@ -88,21 +88,6 @@ export async function cardsApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   const body = () => req.json().catch(() => ({}));
 
-  // ---------- Птичье таро в шапке (site/assets/tarot.js) ----------
-  // сброс часового лимита за пуговки: RULES.tarotReset (0 — бесплатно). Саму карту выдаёт браузер, здесь только платёж.
-  if (m === 'POST' && p === '/api/tarot/reset') {
-    const u = await h.needUser(req, env);
-    if (!u.nick) fail(400, 'nick');
-    const price = Math.max(0, Math.round(h.rules().tarotReset || 0)), t = now();
-    if (price > 0) {
-      const paid = await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) - ? WHERE id = ? AND COALESCE(buttons, 0) >= ?').bind(price, u.id, price).run();
-      if (!paid.meta.changes) return json({ error: 'poor' }, 402);
-      await env.DB.prepare("INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, 'tarot', ?, ?, ?, ?)").bind(u.id, 'tarot:' + randomHex(8), -price, h.rigaDay(), t).run();
-    }
-    const bal = await env.DB.prepare('SELECT COALESCE(buttons, 0) AS b FROM users WHERE id = ?').bind(u.id).first();
-    return json({ ok: true, buttons: bal ? bal.b : 0, price });
-  }
-
   // ---------- магазин и альбом ----------
   if (m === 'GET' && p === '/api/cards') {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
