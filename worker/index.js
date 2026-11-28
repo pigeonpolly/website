@@ -42,6 +42,7 @@ import { pollsApi, pollPage, POLL_TABLES, POLL_ALTER } from './polls.js'; // �
 import { weekApi, outClick, WEEK_TABLES } from './week.js';
 import { tableApi, readHit, ANALYTICS_TABLES, ANALYTICS_ALTER } from './analytics.js'; // кабинет → «📊 Аналитика» одной таблицей + чтение статей (docs/admin.md) // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
+import { KIT_ALTER, kitFormOf, kitSync } from './kit.js'; // «Новости от Полли» → Kit (почтовый ящик на главной, docs/growth.md «Письма»)
 import { guidesApi, guidesList, guideOut, GUIDES_ALTER } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
@@ -730,7 +731,7 @@ async function ensureSchemaRun(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...ANALYTICS_ALTER, ...TITOS_ALTER, ...NOTE_ALTER, ...POLL_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...TRAIN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER, ...GUIDES_ALTER];
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...TRAIN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER, ...GUIDES_ALTER, ...KIT_ALTER];
   const ver = strHash(ensureSchemaRun.toString() + '\n' + sig.join('\n') + '\n' + alters.join('\n'));
   try { if (((await env.DB.prepare("SELECT value FROM meta WHERE key = 'schema_ver'").first()) || {}).value === ver) { schemaReady = true; return; } } catch (e) { /* новой базы ещё нет — создать */ }
   await env.DB.batch(stmts);
@@ -1919,8 +1920,13 @@ async function route(req, env, url) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) fail(400, 'email');
     if (!b.consent) fail(400, 'consent');
     const topic = ['books', 'news'].includes(b.topic) ? b.topic : 'books';
-    await env.DB.prepare('INSERT OR IGNORE INTO subscribers (email, topic, lang, consent, created_at) VALUES (?, ?, ?, ?, ?)')
+    if (topic === 'news' && (Number(await getMeta(env, 'sub_n:' + rigaDay())) || 0) >= 300) fail(429, 'busy'); // защита от ботов: не больше 300 новых в сутки
+    const ins = await env.DB.prepare('INSERT OR IGNORE INTO subscribers (email, topic, lang, consent, created_at) VALUES (?, ?, ?, ?, ?)')
       .bind(email, topic, ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', String(b.consentText || '').slice(0, 500), now()).run();
+    if (topic === 'news' && ins.meta.changes) { // новый адрес «Новостей от Полли» → Kit
+      await setMeta(env, 'sub_n:' + rigaDay(), String((Number(await getMeta(env, 'sub_n:' + rigaDay())) || 0) + 1));
+      await kitSync(env, { id: ins.meta.last_row_id, email }, await getMeta(env, 'kit_form'), (w, e) => healthErr(env, w, e)).catch(e => healthErr(env, 'kit', e));
+    }
     return json({ ok: true });
   }
   if (m === 'POST' && p === '/api/unsubscribe') {
@@ -2579,8 +2585,14 @@ async function route(req, env, url) {
   if (p === '/api/admin/subscribers') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
-    if (m === 'POST') { const b = await req.json().catch(() => ({})); await env.DB.prepare('DELETE FROM subscribers WHERE id = ?').bind(Number(b.id)).run(); }
-    return json({ subscribers: (await env.DB.prepare('SELECT id, email, topic, lang, consent, created_at FROM subscribers ORDER BY created_at DESC').all()).results });
+    let retried = 0;
+    if (m === 'POST') { const b = await req.json().catch(() => ({}));
+      if ('kitForm' in b) await setMeta(env, 'kit_form', kitFormOf(b.kitForm)); // номер формы Kit (из кода встраивания или ссылки)
+      else if (b.retry) { const form = await getMeta(env, 'kit_form'); // «Отправить в Kit ещё раз» — кто не дошёл
+        for (const r of (await env.DB.prepare("SELECT id, email FROM subscribers WHERE topic = 'news' AND kit_at = 0 LIMIT 40").all()).results) if (!(await kitSync(env, r, form, null))) retried++; }
+      else await env.DB.prepare('DELETE FROM subscribers WHERE id = ?').bind(Number(b.id)).run(); }
+    return json({ kitForm: (await getMeta(env, 'kit_form')) || '', kitKey: !!env.KIT_KEY, retried,
+      subscribers: (await env.DB.prepare('SELECT id, email, topic, lang, consent, created_at, kit_at, kit_err FROM subscribers ORDER BY created_at DESC').all()).results });
   }
   if (m === 'GET' && p === '/api/flock/find') {
     const q = String(url.searchParams.get('nick') || '').trim().replace(/^@/, '').slice(0, 40);
