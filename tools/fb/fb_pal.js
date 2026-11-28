@@ -5,6 +5,8 @@ const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
 const PAL = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/palettes.json'), 'utf8'));
+// PAL_EXTRA=файл.json — палитры с новых фото, которых нет в palettes.json: [{key, img: 'images/…', title: {en}, colors: [{hex, en}]}]
+if (process.env.PAL_EXTRA) PAL.push(...JSON.parse(fs.readFileSync(process.env.PAL_EXTRA, 'utf8')));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 // ключ палитры → позиция арта
