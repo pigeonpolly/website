@@ -50,6 +50,8 @@ const list = days.length ? days : DATA.map((_, i) => i + 1);
 .fbx-hb{position:absolute;left:${(1080 - HW) / 2}px;top:${372 + (640 - HH)}px;width:${HW}px;height:${HH}px}
 .fbx-hb img{width:100%;height:100%;display:block}
 .fbx-rg{position:absolute;border:${wide ? 3 : 5}px solid #FFD77A;border-radius:18px;box-shadow:0 0 0 6px rgba(255,215,122,.25),0 0 40px 10px rgba(255,215,122,.45)}
+.fbx-ch{position:absolute;top:395px;left:90px;right:90px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.fbx-ch span{padding:10px 22px;border:2px solid rgba(233,196,106,.55);border-radius:40px;font-size:25px;font-weight:700;color:#FFE9B0;background:rgba(233,196,106,.08)}
 .fbx-snow{position:absolute;left:0;right:0;top:1008px;height:340px;background:#EEF2F7}
 .fbx-f{position:absolute;left:0;right:0;top:1060px;text-align:center;color:#24324F}
 .fbx-f .fbx-a{font-family:Fraunces,Georgia,serif;font-size:46px;font-weight:700}
@@ -61,10 +63,11 @@ const list = days.length ? days : DATA.map((_, i) => i + 1);
   <div class="fbx-st">${Array.from({ length: 60 }, (_, i) => `<i style="left:${(i * 137.5) % 100}%;top:${(i * 61.8) % 30}%"></i>`).join('')}</div>
   <div class="fbx-k">${sp ? '★ ' : ''}${d.s.toUpperCase()}${sp ? ' ★' : ''}</div>
   <div class="fbx-h">${d.h.replace(/(\d+)/, '<em>$1</em>')}</div>
+  ${d.chips ? `<div class="fbx-ch">${d.chips.map(c => `<span>${c}</span>`).join('')}</div>` : ''}
   <div class="fbx-gar">${garland}</div>
   <div class="fbx-hb"><img src="data:image/png;base64,${img}"><div class="fbx-rg" style="${ring(geo.win, box, hs, wide ? 5 : 10)}"></div></div>
   <div class="fbx-snow"></div>
-  <div class="fbx-f"><div class="fbx-a">Window <em>${N}</em> is waiting for you</div><div class="fbx-b">A free advent for grown-ups · a file to keep + a gift for your bird</div><div class="fbx-u">pigeonpolly.com/advent</div></div>
+  <div class="fbx-f"><div class="fbx-a">${d.foot || `Window <em>${N}</em> is waiting for you`}</div><div class="fbx-b">A free advent for grown-ups · a file to keep + a gift for your bird</div><div class="fbx-u">pigeonpolly.com/advent</div></div>
 </div>` });
     await p.waitForTimeout(150);
     const file = path.join(OUT, `advent-d${String(N).padStart(2, '0')}.jpg`);

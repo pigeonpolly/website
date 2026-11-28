@@ -1,15 +1,21 @@
 // FB EN: 31 posts, one per advent day (1–31 Dec 2026) → Notion «ENG Facebook Posts», Дата = день.
 // h — headline on the picture, s — small line under it, t — post text (link is added by fb_advent.js).
 module.exports = [
-  { h: 'The first window is lit', s: 'Day 1 of 31', t: `It's the 1st of December, and the first window on my little advent street is glowing.
+  { h: 'The advent is open!', s: 'Grand opening · 1 December', chips: ['31 windows', 'a file to keep every day', '62 winter things for your bird', '5 golden windows', 'free'], foot: 'Come and open window <em>1</em> with me', t: `The advent is open! Today, on the 1st of December, my little winter street lights up for the first time.
 
-On my website there is a winter street of 31 windows: red, green, yellow and blue houses, a church with a golden bird on the roof, snow on every windowsill. Every day one window lights up. Inside there is a file to keep (a wallpaper, a calendar, a palette and more) and a small thing for your bird's room.
+I've been building it for weeks, and I'm so excited to finally show it to you. It's a whole street of 31 windows: a red house with a stepped roof, a cream one, a tall green one, a yellow one, a blue one, and a church in the middle with a golden bird on top. Snow on the sills, smoke from the chimneys, a garland of lights above the roofs.
 
-It's free. You just pick a nickname, and your pigeon gets a room to decorate all month.
+Here's how it works. Every day one window lights up. You tap it, the shutters swing open, and a little pigeon flies out with what was inside:
+🎁 a file to keep: wallpapers, calendars, palettes, pages to print
+🪑 a thing for your bird's room: 62 winter things that exist only in this advent, not in the shop
+⭐ five golden windows: the 6th, 12th, 19th, the big red door on the 24th, and the legendary one on New Year's Eve
+🏅 open all 31, and your bird gets the Collector badge and 50 buttons
 
-Window 1 has a red ribbon on it today. Tap it, and the shutters open.
+It's free. Pick a nickname, and your bird gets a room to fill all December. Missed a day? Missed windows wait for you until the 23rd of January.
 
-Are you an "open it at midnight" person or a "save it for the morning coffee" person?` },
+Window 1 has a red ribbon on it right now. Come and open it with me.
+
+Tell me in the comments: what do you hope to find behind the first window?` },
   { h: 'Two windows, one cup of tea', s: 'Day 2 of 31', t: `Day 2. The garland above my advent street now has two lights on.
 
 I love this little detail: every window you open lights one bulb on the string of lights above the houses. By Christmas it's almost full, and by the 31st every bulb is glowing. It's a small thing, but it feels like a real advent calendar on the kitchen wall, where you can see how far you've come.
