@@ -1,6 +1,7 @@
 // 📮 Почтовый ящик Полли в шапке (вместо Птичьего таро, Алина 28.11.2026). Клик — окно «Приятная почта от Полли»:
 // адрес → POST /api/subscribe {topic: 'news'} → таблица subscribers у нас и сразу в Kit (worker/kit.js), оттуда Алина пишет раз в неделю.
-// Красная точка — пока ни разу не открывали (localStorage pp_mb). Ссылка с #polly-post (например, из пина) открывает окно сразу.
+// Рядом с ящиком — полоска для почты (Алина 28.11), если в шапке хватает места до меню (fit); нет места — только ящик и окно.
+// Ссылка с #polly-post (например, из пина) открывает окно сразу. Подписались — localStorage pp_mb = 'sub', полоска не показывается.
 (function () {
   const box = document.getElementById('pmb'); if (!box) return;
   const L = ({ ru: 1, lv: 2 })[document.documentElement.lang] || 0;
@@ -12,6 +13,9 @@
       'Reizi nedēļā — neliela vēstule: zīmēšanas padoms, jauns zīmējums, kaut kas bez maksas izdrukāšanai. Mājīgi, īsi, bez surogātpasta.'],
     ph: ['your@email.com', 'твоя@почта.com', 'tavs@epasts.lv'],
     go: ['Send me letters 💌', 'Хочу письма 💌', 'Gribu vēstules 💌'],
+    strip: ['E-mail for Polly’s letters', 'Почта для писем Полли', 'E-pasts Pollija vēstulēm'],
+    thanks: ['✓ Thank you! Polly’s letters are on the way', '✓ Спасибо! Письма Полли уже в пути', '✓ Paldies! Pollija vēstules jau ceļā'],
+    sub: ['Subscribe', 'Подписаться', 'Pierakstīties'],
     small: ['Alina will send you a letter about once a week. Your address is not shared with anyone, and every letter has an “Unsubscribe” link.',
       'Алина будет присылать письмо примерно раз в неделю. Адрес никому не передаётся, в каждом письме есть ссылка «Отписаться».',
       'Alīna sūtīs vēstuli apmēram reizi nedēļā. Tava adrese netiek nodota citiem, un katrā vēstulē ir saite «Atrakstīties».'],
@@ -36,10 +40,38 @@
     <g class="pmb-flag"><rect x="49" y="15" width="2.6" height="22" rx="1" fill="#8B2A1E"/><path d="M51 15h9l-2.5 3.5L60 22h-9z" fill="#D85A30"/></g>
   </svg>`;
   box.hidden = false;
-  box.innerHTML = `<button type="button" class="pmb-b" aria-haspopup="dialog" aria-label="${t('aria')}" title="${t('aria')}">${SVG}<span class="pmb-dot" hidden></span></button>`;
-  const btn = box.firstElementChild, dot = btn.querySelector('.pmb-dot');
-  let seen = false; try { seen = !!localStorage.getItem('pp_mb'); } catch (e) {}
-  dot.hidden = seen;
+  box.innerHTML = `<button type="button" class="pmb-b" aria-haspopup="dialog" aria-label="${t('aria')}" title="${t('aria')}">${SVG}</button>`
+    + `<form class="pmb-f" hidden novalidate><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="${t('strip')}" aria-label="${t('strip')}">`
+    + `<input class="pmm-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="submit" aria-label="${t('sub')}" title="${t('sub')}">→</button></form>`;
+  const btn = box.firstElementChild, strip = box.querySelector('.pmb-f');
+  let subbed = false; try { subbed = localStorage.getItem('pp_mb') === 'sub'; } catch (e) {}
+  const valid = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+  const send = (email, website) => fetch('/api/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email, topic: 'news', consent: true, consentText: T.small[0], lang: ['en', 'ru', 'lv'][L], website }) })
+    .then(r => r.json().catch(() => ({})).then(d => { if (!r.ok) throw d; try { localStorage.setItem('pp_mb', 'sub'); } catch (x) {} return d; }));
+  // полоска: показываем, только если до меню справа хватает места (иначе меню бы съехало)
+  let done = false;
+  function fit() {
+    if (subbed && !done) { strip.hidden = true; return; }
+    strip.hidden = true; strip.style.width = '';
+    const hd = box.closest('header'); if (hd) hd.classList.remove('pmb-roomy');
+    const next = box.nextElementSibling; if (!next || getComputedStyle(box).position === 'fixed') return;
+    const gap = () => next.getBoundingClientRect().left - box.getBoundingClientRect().right - 24;
+    let free = gap();
+    // мало места (английская шапка) — прячем надпись «Pigeon Polly Art Lab» у логотипа: имя и так на значке (Алина 28.11: «в англ обязательно»)
+    if (free < 210 && hd) { hd.classList.add('pmb-roomy'); free = gap(); }
+    if (free >= 180) { strip.style.width = Math.min(300, free) + 'px'; strip.hidden = false; }
+    else if (hd) hd.classList.remove('pmb-roomy');
+  }
+  strip.onsubmit = async e => {
+    e.preventDefault();
+    const inp = strip.email, email = inp.value.trim();
+    if (!valid(email)) { strip.classList.add('bad'); inp.focus(); return; }
+    strip.classList.remove('bad'); strip.classList.add('busy');
+    try { await send(email, strip.website.value); done = true; strip.innerHTML = `<span class="pmb-ok">${t('thanks')}</span>`; }
+    catch (d) { strip.classList.remove('busy'); strip.classList.add('bad'); open(); }
+  };
+  addEventListener('resize', fit); addEventListener('load', fit); fit();
 
   let modal = null;
   function build() {
@@ -63,15 +95,12 @@
     f.onsubmit = async e => {
       e.preventDefault(); msg.textContent = '';
       const email = f.email.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = t('email'); f.email.focus(); return; }
+      if (!valid(email)) { msg.textContent = t('email'); f.email.focus(); return; }
       go.disabled = true;
       try {
-        const r = await fetch('/api/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ email, topic: 'news', consent: true, consentText: T.small[0], lang: ['en', 'ru', 'lv'][L], website: f.website.value }) });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw d;
+        await send(email, f.website.value);
         modal.querySelector('.pmm-in').innerHTML = `<span class="pmm-pic">${SVG}</span><div class="pmm-ok"><b>${t('okH')}</b><p>${t('ok')}</p></div>`;
-        try { localStorage.setItem('pp_mb', 'sub'); } catch (x) {}
+        done = true; strip.innerHTML = `<span class="pmb-ok">${t('thanks')}</span>`;
       } catch (d) { msg.textContent = d && d.error === 'email' ? t('email') : t('err'); go.disabled = false; }
     };
   }
@@ -79,7 +108,6 @@
     if (!modal) build();
     modal.hidden = false; document.addEventListener('keydown', modal._esc);
     const inp = modal.querySelector('input[type=email]'); if (inp) setTimeout(() => inp.focus(), 50);
-    dot.hidden = true; try { if (!localStorage.getItem('pp_mb')) localStorage.setItem('pp_mb', 'seen'); } catch (e) {}
   }
   btn.addEventListener('click', open);
   window.PPMailbox = { open };

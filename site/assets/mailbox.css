@@ -6,19 +6,30 @@
 .pmb-flag{transform-box:fill-box;transform-origin:0 100%;animation:pmb-flag 3.2s ease-in-out infinite}
 .pmb-let{animation:pmb-let 2.6s ease-in-out infinite}
 .pmb-b:hover .pmb-let,.pmb-b:focus-visible .pmb-let{animation-duration:1s}
-.pmb-dot{position:absolute;right:8px;top:6px;width:14px;height:14px;border-radius:50%;background:#c8335f;box-shadow:0 0 0 2px #fff;animation:pmb-dot 1.8s ease-in-out infinite}
-.pmb-dot[hidden]{display:none}
 @keyframes pmb-flag{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-10deg)}86%{transform:rotate(6deg)}}
 @keyframes pmb-let{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-@keyframes pmb-dot{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
-@media (prefers-reduced-motion:reduce){.pmb-flag,.pmb-let,.pmb-dot{animation:none}}
-@media (max-width:1100px){.pmb-b{width:64px;height:70px}.pmb-b svg{width:52px;height:52px}.pmb-dot{right:4px;top:4px;width:12px;height:12px}}
+@media (prefers-reduced-motion:reduce){.pmb-flag,.pmb-let{animation:none}}
+@media (max-width:1100px){.pmb-b{width:64px;height:70px}.pmb-b svg{width:52px;height:52px}}
 @media (max-width:560px){
   /* на телефоне ящик не в потоке шапки, а маленькой кнопкой под ней — как раньше колода таро */
   .pmb{position:fixed;top:76px;right:10px;z-index:30;background:rgba(246,236,217,.94);border-radius:16px;padding:2px 4px;box-shadow:0 6px 16px rgba(26,21,40,.18)}
   .pmb-b{width:50px;height:54px}.pmb-b svg{width:42px;height:42px}
-  .pmb-dot{right:2px;top:2px;width:11px;height:11px}
 }
+
+/* полоска для почты рядом с ящиком (видна, только если в шапке хватает места — mailbox.js fit) */
+.pmb-f{display:flex;align-items:center;margin-left:2px;height:40px;border:1.5px solid color-mix(in srgb,#2E5A8C 35%,transparent);border-radius:999px;background:#fff;overflow:hidden;transition:border-color .2s}
+.pmb-f[hidden]{display:none}
+.pmb-f:focus-within{border-color:#D85A30;box-shadow:0 0 0 3px rgba(216,90,48,.15)}
+.pmb-f.bad{border-color:#c8335f}
+.pmb-f.busy{opacity:.6}
+.pmb-f input[type=email]{flex:1;min-width:0;height:100%;border:0;background:none;padding:0 6px 0 16px;font:400 14px Karla,'Nunito Sans',sans-serif;color:#2A1D40;outline:none}
+.pmb-f input[type=email]::placeholder{color:#7A6E8A}
+.pmb-f button{flex:0 0 auto;width:34px;height:34px;margin-right:3px;border:0;border-radius:50%;background:#D85A30;color:#fff;font:700 17px/1 Karla,sans-serif;cursor:pointer}
+.pmb-f button:hover{filter:brightness(1.08)}
+.pmb-ok{padding:0 16px;font:700 13px Karla,sans-serif;color:#2E5A8C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* полоске не хватает места — без надписи у логотипа (имя есть на значке) */
+.pmb-roomy .lg>span:not(.lg-m){display:none}
 
 /* окно подписки */
 .pmm{position:fixed;inset:0;z-index:120;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:18px}
