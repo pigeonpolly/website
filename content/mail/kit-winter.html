@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- Шаблон письма Kit «Приятная почта от Полли», зимняя тема сайта (Алина 28.11.2026; цвета — v2.css html[data-season=winter], как worker/mail-html.js).
+     Вставить: Kit → Settings → Email templates → New template → HTML (Custom HTML) → весь этот файл.
+     {{ message_content }} — сюда Kit ставит текст письма; {{ unsubscribe_url }} и {{ address }} — обязательные для Kit (отписка и адрес отправителя). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Pleasant post from Polly</title>
+<link rel="stylesheet" href="https://www.pigeonpolly.com/assets/fraunces.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=Caveat:wght@700&display=swap">
+<style>
+  body { margin:0; padding:0; background:#EEF1F3; -webkit-text-size-adjust:100%; }
+  .pp-msg { font:400 17px/1.65 Karla,'Nunito Sans','Helvetica Neue',Arial,sans-serif; color:#1C2430; }
+  .pp-msg p { margin:0 0 18px; }
+  .pp-msg h1 { margin:0 0 20px; font:400 30px/1.15 Fraunces,Lora,Georgia,serif; letter-spacing:-.01em; color:#1C2430; }
+  .pp-msg h2 { margin:26px 0 12px; font:400 23px/1.2 Fraunces,Lora,Georgia,serif; color:#1C2430; }
+  .pp-msg h3 { margin:22px 0 10px; font:700 24px/1.2 Caveat,'Segoe Print','Bradley Hand',cursive; color:#9E1B22; }
+  .pp-msg a { color:#9E1B22; text-decoration:underline; }
+  .pp-msg img { max-width:100%; height:auto; border-radius:12px; }
+  .pp-msg blockquote { margin:0 0 18px; padding:14px 18px; background:#EEF1F3; border-left:3px solid #9E1B22; border-radius:0 12px 12px 0; font-style:italic; }
+  .pp-msg ul, .pp-msg ol { margin:0 0 18px; padding-left:22px; }
+  .pp-msg li { margin:0 0 6px; }
+  .pp-msg hr { border:0; border-top:1px dashed #D3DAE0; margin:24px 0; }
+  .pp-msg .email-button, .pp-msg a.button { display:inline-block; padding:14px 26px; background:#9E1B22; color:#FFFFFF !important; text-decoration:none; border-radius:999px; font-weight:700; }
+  @media (max-width:520px) { .pp-pad { padding:24px 20px 6px !important; } .pp-msg h1 { font-size:26px !important; } }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#EEF1F3;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EEF1F3;"><tr><td align="center" style="padding:28px 14px 36px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+
+  <!-- шапка: зимний значок + Pigeon Polly Art Lab + «winter edition» -->
+  <tr><td style="padding:0 4px 18px;border-bottom:1px solid #D3DAE0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="vertical-align:middle;width:66px;"><a href="https://www.pigeonpolly.com/?utm_source=kit&amp;utm_medium=email&amp;utm_campaign=polly_post"><img src="https://www.pigeonpolly.com/assets/logo-badge-winter.png" width="56" height="56" alt="Pigeon Polly" style="display:block;border:0;"></a></td>
+      <td style="vertical-align:middle;"><a href="https://www.pigeonpolly.com/?utm_source=kit&amp;utm_medium=email&amp;utm_campaign=polly_post" style="text-decoration:none;font:400 22px/1.1 Fraunces,Lora,Georgia,serif;color:#1C2430;white-space:nowrap;">Pigeon Polly <i style="font-weight:300;color:#9E1B22;">Art Lab</i></a>
+        <div style="font:700 18px/1.1 Caveat,'Segoe Print','Bradley Hand',cursive;color:#9E1B22;padding-top:4px;">winter edition</div></td>
+      <td style="vertical-align:middle;text-align:right;font:400 20px/1 Arial,sans-serif;color:#9FB3C4;letter-spacing:6px;">&#10052;&#10059;&#10052;</td>
+    </tr></table>
+  </td></tr>
+
+  <!-- лист письма -->
+  <tr><td style="padding:22px 0 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F8FAFB;border:1px solid #D3DAE0;border-radius:20px;">
+      <tr><td class="pp-pad" style="padding:30px 30px 10px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;"><tr><td style="border:1px solid #D3DAE0;border-radius:999px;padding:8px 16px;background:#EEF1F3;font:700 11px/1 Karla,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#1C2430;">
+          <span style="color:#9E1B22;">&#9679;</span>&nbsp; Pleasant post from Polly</td></tr></table>
+        <div class="pp-msg" style="font:400 17px/1.65 Karla,'Nunito Sans','Helvetica Neue',Arial,sans-serif;color:#1C2430;">
+          {{ message_content }}
+        </div>
+        <p style="margin:8px 0 22px;padding-top:16px;border-top:1px solid #D3DAE0;font:700 26px/1.2 Caveat,'Segoe Print','Bradley Hand',cursive;color:#9E1B22;">Alina &amp; Polly &#128038;</p>
+      </td></tr>
+      <!-- зимняя акварель с главной -->
+      <tr><td style="padding:0;"><a href="https://www.pigeonpolly.com/?utm_source=kit&amp;utm_medium=email&amp;utm_campaign=polly_post"><img src="https://www.pigeonpolly.com/images/mail/winter.jpg" width="600" alt="" style="display:block;width:100%;height:auto;border:0;border-radius:0 0 19px 19px;"></a></td></tr>
+    </table>
+  </td></tr>
+
+  <!-- ссылки -->
+  <tr><td align="center" style="padding:22px 10px 0;">
+    <p style="margin:0;line-height:2.6;"><a href="https://www.pigeonpolly.com/?utm_source=kit&amp;utm_medium=email&amp;utm_campaign=polly_post" style="display:inline-block;border:1px solid #D3DAE0;border-radius:999px;padding:7px 14px;font:700 13px/1 Karla,Arial,sans-serif;color:#1C2430;text-decoration:none;background:#F8FAFB;;margin:0 3px;">Site</a><a href="https://www.pigeonpolly.com/freebies/?utm_source=kit&amp;utm_medium=email&amp;utm_campaign=polly_post" style="display:inline-block;border:1px solid #D3DAE0;border-radius:999px;padding:7px 14px;font:700 13px/1 Karla,Arial,sans-serif;color:#1C2430;text-decoration:none;background:#F8FAFB;;margin:0 3px;">Freebies</a><a href="https://www.pinterest.com/pigeonpollyart/" style="display:inline-block;border:1px solid #D3DAE0;border-radius:999px;padding:7px 14px;font:700 13px/1 Karla,Arial,sans-serif;color:#1C2430;text-decoration:none;background:#F8FAFB;;margin:0 3px;">Pinterest</a><a href="https://www.instagram.com/pigeonpolly" style="display:inline-block;border:1px solid #D3DAE0;border-radius:999px;padding:7px 14px;font:700 13px/1 Karla,Arial,sans-serif;color:#1C2430;text-decoration:none;background:#F8FAFB;;margin:0 3px;">Instagram</a></p>
+  </td></tr>
+
+  <!-- подвал: обязательное для Kit -->
+  <tr><td style="padding:18px 20px 0;font:400 12.5px/1.6 Karla,Arial,sans-serif;color:#5D6670;text-align:center;">
+    <p style="margin:0 0 8px;">You get this letter because you dropped your e-mail into Polly’s mailbox on pigeonpolly.com.<br>
+      <a href="{{ unsubscribe_url }}" style="color:#5D6670;text-decoration:underline;">Unsubscribe</a></p>
+    <p style="margin:0 0 10px;color:#8A939C;">{{ address }}</p>
+    <p style="margin:0;font:700 11px/1.6 Karla,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;"><a href="https://www.pigeonpolly.com/" style="color:#1C2430;text-decoration:none;">pigeonpolly.com</a> <span style="color:#9E1B22;">&middot;</span> Riga</p>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body>
+</html>
