@@ -109,7 +109,7 @@ PK.forEach(([key, k0], i) => {
   const k = k0 === 8 && P8[key] && P8[key].length === 8 ? 8 : 6, cols = k === 8 ? P8[key] : p.colors, word = k === 8 ? 'eight' : 'six';
   push({ tpl: k === 8 ? 'pal8' : 'pal6', th: k === 8 ? 'cream' : ['dark', 'night'][i % 2], t: t.replace(/(\S+)$/, '<em>$1</em>'), img: p.img, key, cols, k, season: d.s,
     title: `${t} — ${k}-Color Palette with HEX Codes | Pigeon Polly`,
-    desc: `A ${word}-color palette from a detail of my painting: ${cols.map(c => `${c.en} ${c.hex}`).join(', ')}. ${MOOD[d.s].replace(/^./, c => c.toUpperCase())} mood. More palettes from my paintings — one click copies the HEX — on pigeonpolly.com.`,
+    desc: `${k === 8 ? "An" : "A"} ${word}-color palette from a detail of my painting: ${cols.map(c => `${c.en} ${c.hex}`).join(', ')}. ${MOOD[d.s].replace(/^./, c => c.toUpperCase())} mood. More palettes from my paintings — one click copies the HEX — on pigeonpolly.com.`,
     alt: `${word.replace(/^./, c => c.toUpperCase())}-color palette “${t}” with names and HEX codes next to a detail of a painting by Pigeon Polly.`,
     link: U(`/palettes/#${key}`, n), topics: `${t} color palette, ${k} color palette, Color palette from painting, HEX codes, ${SEAS[d.s] || 'Aesthetic'} color palette` });
 });
