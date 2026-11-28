@@ -42,7 +42,7 @@ import { pollsApi, pollPage, POLL_TABLES, POLL_ALTER } from './polls.js'; // �
 import { weekApi, outClick, WEEK_TABLES } from './week.js';
 import { tableApi, readHit, ANALYTICS_TABLES, ANALYTICS_ALTER } from './analytics.js'; // кабинет → «📊 Аналитика» одной таблицей + чтение статей (docs/admin.md) // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
-import { KIT_ALTER, kitFormOf, kitSync } from './kit.js'; // «Новости от Полли» → Kit (почтовый ящик на главной, docs/growth.md «Письма»)
+import { KIT_ALTER, KIT_FORM, kitFormOf, kitSync } from './kit.js'; // «Новости от Полли» → Kit (почтовый ящик на главной, docs/growth.md «Письма»)
 import { guidesApi, guidesList, guideOut, GUIDES_ALTER } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
@@ -1923,7 +1923,7 @@ async function route(req, env, url) {
       .bind(email, topic, ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', String(b.consentText || '').slice(0, 500), now()).run();
     if (topic === 'news' && ins.meta.changes) { // новый адрес «Новостей от Полли» → Kit
       await setMeta(env, 'sub_n:' + rigaDay(), String((Number(await getMeta(env, 'sub_n:' + rigaDay())) || 0) + 1));
-      await kitSync(env, { id: ins.meta.last_row_id, email }, await getMeta(env, 'kit_form'), (w, e) => healthErr(env, w, e)).catch(e => healthErr(env, 'kit', e));
+      await kitSync(env, { id: ins.meta.last_row_id, email }, ((await getMeta(env, 'kit_form')) || KIT_FORM), (w, e) => healthErr(env, w, e)).catch(e => healthErr(env, 'kit', e));
     }
     return json({ ok: true });
   }
@@ -2586,10 +2586,10 @@ async function route(req, env, url) {
     let retried = 0;
     if (m === 'POST') { const b = await req.json().catch(() => ({}));
       if ('kitForm' in b) await setMeta(env, 'kit_form', kitFormOf(b.kitForm)); // номер формы Kit (из кода встраивания или ссылки)
-      else if (b.retry) { const form = await getMeta(env, 'kit_form'); // «Отправить в Kit ещё раз» — кто не дошёл
+      else if (b.retry) { const form = ((await getMeta(env, 'kit_form')) || KIT_FORM); // «Отправить в Kit ещё раз» — кто не дошёл
         for (const r of (await env.DB.prepare("SELECT id, email FROM subscribers WHERE topic = 'news' AND kit_at = 0 LIMIT 40").all()).results) if (!(await kitSync(env, r, form, null))) retried++; }
       else await env.DB.prepare('DELETE FROM subscribers WHERE id = ?').bind(Number(b.id)).run(); }
-    return json({ kitForm: (await getMeta(env, 'kit_form')) || '', kitKey: !!env.KIT_KEY, retried,
+    return json({ kitForm: ((await getMeta(env, 'kit_form')) || KIT_FORM), kitKey: !!env.KIT_KEY, retried,
       subscribers: (await env.DB.prepare('SELECT id, email, topic, lang, consent, created_at, kit_at, kit_err FROM subscribers ORDER BY created_at DESC').all()).results });
   }
   if (m === 'GET' && p === '/api/flock/find') {

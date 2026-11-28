@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 471, страниц 58, маршрутов 222, таблиц 84, ключей meta 74, имён 6325, разделов доков 267
+# файлов 471, страниц 58, маршрутов 222, таблиц 84, ключей meta 74, имён 6326, разделов доков 267
 file	build.py	build.py	0	897 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -443,7 +443,7 @@ file	worker/garden.js	worker/garden.js	0	489 строк, 42 КБ
 file	worker/guides.js	worker/guides.js	0	199 строк, 15 КБ
 file	worker/ideas.js	worker/ideas.js	0	197 строк, 17 КБ
 file	worker/index.js	worker/index.js	0	3296 строк, 322 КБ
-file	worker/kit.js	worker/kit.js	0	32 строк, 3 КБ
+file	worker/kit.js	worker/kit.js	0	34 строк, 3 КБ
 file	worker/kitchen.js	worker/kitchen.js	0	135 строк, 10 КБ
 file	worker/mail-html.js	worker/mail-html.js	0	90 строк, 10 КБ
 file	worker/mail.js	worker/mail.js	0	280 строк, 25 КБ
@@ -6909,10 +6909,11 @@ sym	invOf	worker/index.js	1783	const
 sym	mazeItems	worker/index.js	1785	fn
 sym	addBadge	worker/index.js	1793	fn
 sym	route	worker/index.js	1801	fn
-sym	KIT_ALTER	worker/kit.js	5	const
-sym	kitFormOf	worker/kit.js	8	const
-sym	kitAdd	worker/kit.js	11	fn
-sym	kitSync	worker/kit.js	27	fn
+sym	KIT_FORM	worker/kit.js	6	const
+sym	KIT_ALTER	worker/kit.js	7	const
+sym	kitFormOf	worker/kit.js	10	const
+sym	kitAdd	worker/kit.js	13	fn
+sym	kitSync	worker/kit.js	29	fn
 sym	KITCHEN_TABLES	worker/kitchen.js	7	const
 sym	KITCHEN_RULES	worker/kitchen.js	11	const
 sym	KITCHEN_RANGE	worker/kitchen.js	17	const

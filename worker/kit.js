@@ -2,6 +2,8 @@
 // сначала сохраняется у нас (таблица subscribers, topic = 'news'), потом уходит в Kit — оттуда Алина пишет письма раз в неделю.
 // Два пути: есть секрет KIT_KEY (Cloudflare → Settings → Variables) — API v4; нет — открытая форма Kit по её номеру
 // (meta kit_form, кабинет → 📬 Подписчики). Ошибка — пишем в subscribers.kit_err, «Отправить ещё раз» в кабинете.
+// форма Алины «Charlotte form» (28.11.2026) — по умолчанию, пока в кабинете не вставлена другая
+export const KIT_FORM = '10254877';
 export const KIT_ALTER = ['ALTER TABLE subscribers ADD COLUMN kit_at INTEGER DEFAULT 0', "ALTER TABLE subscribers ADD COLUMN kit_err TEXT DEFAULT ''"];
 
 // номер формы из чего угодно: «1234567», ссылка …/forms/1234567/subscriptions, код встраивания
